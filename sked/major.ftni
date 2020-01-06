@@ -1,0 +1,39 @@
+! contains info about the major modes\
+! History
+! 2011Apr25  Added MaxAngle
+! 2013Sep13  Made rMinAngle, rMaxAngle and rMinSunAngle real and changed their names.
+      real    rcovar_win        !covariance window
+      real    radd_noise        !additive noise
+      real    rBestPercent      !number of obs to return as best
+      real    rMinAngle         !Minimum angle (degrees)
+      real    rMaxAngle         !Maximum angle
+      real    rSunMinAngle      !minium sun distance
+
+      common /major_modes_real/rcovar_win,radd_noise,rBestPerCent,
+     >   rMinAngle,rMaxAngle,rSunMinAngle
+
+      integer iMinBetween       !minimum time in seconds between observing a source   
+      integer iMaxSlewTime
+      integer iFillBest         !Best% to return
+      integer iFillMin          !minimum subnet.
+      integer iFillTime         !minimum fillin time
+      integer MinSubNetSize     !minimum subnet
+      integer NumSubNet         !maxium number of subnets
+      integer isubst(max_stn)   !Subnet
+      integer nsubst            !number of stations in subnet.
+
+      common /major_modes_int/
+     >  iMinBetween,iMaxSlewTime,
+     >  iFillBest,iFillMin,iFillTime,
+     >  MinSubnetSize,NumSubNet,nsubst,isubst
+
+
+      logical kallBlGood        !All Baselines in a scan good.
+      logical kfillin           !Fill in mode on or off.
+      logical koptbySky         !if true, use sky coverage to optimize. Else covar
+      logical ksnrWts           !how to weight the observations
+      logical kSplitTwins        !split twin telescopes or not
+!      logical kallowSubnet
+
+      common /major_modes_log/
+     >  kallBlGood,kfillin,koptbysky,ksnrwts,ksplittwins

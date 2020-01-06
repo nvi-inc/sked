@@ -1,0 +1,15 @@
+!   Flux information common block
+!  2007Jul02  JMG  Moved out of sourc.ftni
+!
+      integer nflux(max_band,max_sor)        !number of fluxes
+      character*1 cfltype(max_band,max_sor)  !kind of flux: (B)aseline, (M)odel, (C)lean
+
+      real  flux(max_flux,max_band,max_sor)  !fluxes
+
+      common /flux_cmn/nflux, flux
+      common /flux_ch/cfltype
+
+
+
+
+

@@ -1,0 +1,4 @@
+! StatWt Common block 
+! 2010Apr12 JMGipson
+      real statwt(max_stn)
+      common/statwt_cmn/statwt

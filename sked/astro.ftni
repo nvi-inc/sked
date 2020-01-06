@@ -1,0 +1,8 @@
+!       Astro information commmon block
+! 2007Jul02  JMGipson.  Removed from sourc.ftni
+! 2019Mar16  JMGipson.  Added kastro_src
+      real rmin_astro(Max_sor)  !minimum target (as % of obs) for source.
+      real rmax_astro(max_sor)  !maximum target (as % of obs) for source.
+      logical kastro_src(max_sor)
+
+      common/astro_cmn/rmin_astro,rmax_astro,kastro_src 

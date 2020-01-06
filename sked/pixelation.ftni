@@ -1,0 +1,22 @@
+! common block used in sky-coverage.
+! this is used for triangulating the sphere.
+      logical kinit_pixel                        !Have initial calculations been done?
+      common /pixelation_Int/kinit_pixel
+      real R(0:19,3,3), v(0:11,3)     !used for all pixelations
+      integer ires
+      integer max_pixel
+      parameter (ires=7, max_pixel= 40*ires*(ires-1)+12)
+
+      real*4 pix_vec4(3)                         !vector that points at a pixel (NOTE: real*4)
+      real*8 pix_vec8(3,max_pixel)               !set of all vectors
+      common /pixelation_Real/pix_vec8,R,V
+ 
+
+
+
+      
+
+
+
+
+

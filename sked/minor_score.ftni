@@ -1,0 +1,28 @@
+! These hold the test scores.
+      Double Precision TstAstro(Max_Trial)      !Astrometry mode
+      double precision TstBegScan(Max_Trial)    !Beginning time of scan
+      double precision TstCovar(Max_Trial)      !Beginning time of scan
+
+      double precision TstDurScan(Max_Trial)    !Total duration of scan
+      double precision TstEndScan(Max_Trial)    !End
+      double precision TstLowDec(Max_Trial)     !emphasize lo-dec sources.
+
+      double precision TstNumLoel(Max_Trial)    !Num LoEl
+      double precision TstNumObs(Max_Trial)     !Number of OBs
+      double precision TstNumRiseSet(Max_Trial) !Num Rise&Set
+
+      Double Precision TstSkyCov(Max_Trial)     !sky coverage.
+      double precision TstSrcEvn(Max_Trial)     !Even source distribtuoin
+      double precision TstStatEvn(Max_Trial)    !Even station distrbution
+      double precision TstStatIdle(Max_Trial)   !idle times for stations.
+      double precision TstStatWt(Max_Trial)     !Station weighting
+      double precision TstSrcWt(Max_Trial)      !Src weighting
+
+      double precision TstTimeVar(Max_Trial)    !Scatter in ending times.
+
+      common /minor_score/
+     >   TstAstro,  TstBegScan,  TstDurScan,   TstEndScan, TstLowDec,
+     >   TstNumLoel,TstNumObs,   TstNumRiseSet,TstSkyCov,  TstSrcEvn,
+     >   TstStatEvn, TstStatIdle,TstStatWt,    TstSrcWt,TstTimeVar
+
+

@@ -1,0 +1,57 @@
+! 7. tracks.cat
+! This has lines like this.
+* 8 USB channels, fanout 1:4, 1-bit
+! 8U-4-1   4  1
+! -    1 1(-1)
+! -    2 1(7)
+! -    3 1(15)
+! The continuation lines can also look like:
+! -    1 1(-1,3,7,11)
+! -    8 101(-1,3,7,11)
+!
+      logical kcat_track                  !Catalog read in?
+      common /cat_track/kcat_track
+
+      integer max_cat_trk,num_cat_trk                  !This is where the first line info is stored
+      parameter(max_cat_trk=30)                        !e.g.:  8U-4-1   4  1
+      character*12 cat_trk(max_cat_trk)
+      integer icat_trk_fan(max_cat_trk)
+      integer icat_trk_bit(max_cat_trk)
+      common /cat_trk_ch/cat_trk
+      common /cat_trk/num_cat_trk,icat_trk_fan,icat_trk_bit
+
+      integer icat_trk_map(max_cat_trk,max_headstack,max_trk)  !This is where the rest of the info is stored.
+      common /cat_trk/icat_trk_map
+
+      character*40 cat_trk_map(max_cat_trk,max_chan)   !This stores the info in ascii form
+      common /cat_trk_ch/cat_trk_map
+
+
+
+!------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

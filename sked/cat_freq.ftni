@@ -1,0 +1,50 @@
+!-----------------------------------------------------------------------
+! Freq.Cat info.  This catalog has lines that look like:
+!
+********************************************************
+* Name   Code Sub-group RXname
+! CDP-SX SX    STD      SX_STD
+* band pol sky_freq SB  ChanID  BBC#  PCfreq
+!- X    R   8210.99  U   CH1     1    10000.0
+!- X    R   8220.99  U   CH2     2    10000.0     1,2
+! Different names may have some or all common codes, sub_group and rx_name.
+! Note:  The same name can appear in several places, with different sub_groups.
+!        These correspond to different stations.
+
+! Code is only 2 chars--can't save much in indexing.
+! Others are longer. Makes sense to keep separate list and index into it.
+
+! First define structure for the NAME line.
+      logical kcat_freq                  !Catalog read in?
+      common /cat_freq/kcat_freq
+
+      integer max_cat_freq,num_cat_freq
+      parameter (max_cat_Freq=max_cat_mode)
+! Common for all channels in a sequence.
+      character*8 cat_seq_name(max_cat_freq)
+      character*2 cat_freq_code(max_cat_freq)
+      character*8 cat_sg_name(max_cat_freq)
+      character*8 cat_rx_name(max_cat_freq)
+      common /cat_freq_ch/cat_seq_name,cat_freq_code,cat_sg_name,
+     >  cat_rx_name
+      common /cat_freq/num_cat_freq
+
+      integer nchan_cat_freq(max_cat_freq)       !Number of channels/subgroup.
+      common /cat_freq/nchan_cat_freq
+
+! vary by channel #.
+      character*2 cat_freq_band(max_cat_freq,max_chan)
+      character*2 cat_freq_pol(max_cat_freq,max_chan)
+      real*8      rcat_freq_sky(max_cat_freq,max_chan)
+      character*2 cat_freq_sb(max_cat_freq,max_chan)
+      integer     icat_freq_chan(max_cat_freq,max_chan)
+      integer     icat_freq_bbc(max_cat_freq,max_chan)
+      real*8      rcat_freq_pcal(max_cat_freq,max_chan)
+      character*4 cat_freq_sw(max_cat_freq,max_chan)
+
+! Common statements
+      common /cat_freq_ch/cat_freq_band,cat_freq_pol,cat_freq_sb,
+     >    cat_freq_sw
+      common /cat_freq/icat_freq_chan,icat_freq_bbc,
+     >    rcat_freq_sky,rcat_freq_pcal
+

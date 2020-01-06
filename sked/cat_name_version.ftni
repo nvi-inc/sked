@@ -1,0 +1,68 @@
+
+! This file contains the name_uses and version info of the catalogs actually used.
+! This info is taken from the schedule file if present.
+! It is updated if the schedule is updated.
+! 
+       character*20 lmodes_cat_version  
+       character*20 lfreq_cat_version
+       character*20 lrx_cat_version
+       character*20 lrec_cat_version
+       character*20 lhdpos_cat_version
+       character*20 lloif_cat_version
+       character*20 ltracks_cat_version
+
+       character*20 lsource_cat_version
+       character*20 lflux_cat_version
+
+       character*20 lstation_cat_version
+       character*20 lantenna_cat_version
+       character*20 lequip_cat_version       
+       character*20 lposition_cat_version
+       character*20 lmask_cat_version
+
+       character*128 lmodes_cat_use  
+       character*128 lfreq_cat_use 
+       character*128 lrx_cat_use
+       character*128 lrec_cat_use
+       character*128 lhdpos_cat_use
+       character*128 lloif_cat_use
+       character*128 ltracks_cat_use
+       character*128 lsource_cat_use
+       character*128 lflux_cat_use
+
+       character*128 lstation_cat_use
+       character*128 lantenna_cat_use 
+       character*128 lequip_cat_use     
+       character*128 lposition_cat_use
+       character*128 lmask_cat_use
+
+       common /cat_cat_use_cat_version/
+     > lmodes_cat_version,  
+     > lfreq_cat_version,
+     > lrx_cat_version,
+     > lrec_cat_version,
+     > lhdpos_cat_version,
+     > lloif_cat_version,
+     > ltracks_cat_version,
+     > lsource_cat_version,
+     > lflux_cat_version,
+     > lstation_cat_version,
+     > lantenna_cat_version,
+     > lequip_cat_version,   
+     > lposition_cat_version,
+     > lmask_cat_version,
+     > lmodes_cat_use,   
+     > lfreq_cat_use, 
+     > lrx_cat_use, 
+     > lrec_cat_use, 
+     > lhdpos_cat_use, 
+     > lloif_cat_use, 
+     > ltracks_cat_use, 
+     > lsource_cat_use, 
+     > lflux_cat_use, 
+     > lstation_cat_use, 
+     > lantenna_cat_use, 
+     > lequip_cat_use,   
+     > lposition_cat_use, 
+     > lmask_cat_use 
+

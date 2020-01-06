@@ -1,0 +1,4 @@
+! StatWt Common block 
+! 2010Apr12 JMGipson
+      real srcwt(max_sor)
+      common/srcwt_cmn/srcwt

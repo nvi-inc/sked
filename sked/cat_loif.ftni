@@ -1,0 +1,38 @@
+!------------------------------------------------------------------------------------
+! 4. LIOF catalog.
+! This catalog has lines that look like this.
+* LOIFname = referenced from the rx.cat file
+* VC/BBC = physical VC or BBC connected to this LO freq
+* IF = the physical Mark III IF (N=normal, A=alternate)
+*      or VLBA IF channel A, B, C, or D
+* Band = 1-letter band designator for this LO
+* Freq = total LO frequency (MHz)
+* SB = sideband of the LO conversion
+*
+*LOIF_name
+*  BBC/VC IF Band Freq  SB
+! CDP_STDN
+! -   1  1N    X   8080  U
+! -   2  1N    X   8080  U
+!--------------------------------------------------------------------------
+      logical kcat_loif                  !Catalog read in?
+      common /cat_loif/kcat_loif
+
+
+      integer max_cat_loif,num_cat_loif      !LOIF list structure.
+      parameter (max_cat_loif=60)
+      character*10 cat_loif_name(max_cat_loif)
+      common /cat_loif/num_cat_loif
+      common /cat_loif_ch/cat_loif_name
+
+      integer    num_chan_cat_loif(max_cat_loif)   !number of channels defined.
+      common /cat_loif/num_chan_cat_loif
+
+      integer     ibbc_cat_loif(max_cat_loif,max_chan)      !Channel line
+      character*2 cat_loif_if(max_cat_loif,max_chan)
+      character*2 cat_loif_band(max_cat_loif,max_chan)
+      real*8      freq_cat_loif(max_cat_loif,max_chan)
+      character*2 cat_loif_sb(max_cat_loif,max_chan)
+      common /cat_loif/ibbc_cat_loif,freq_cat_loif
+      common /cat_loif_ch/cat_loif_if,cat_loif_band,cat_loif_sb
+

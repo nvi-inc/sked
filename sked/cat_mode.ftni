@@ -1,0 +1,66 @@
+!
+! 2005Nov15  JMG      First version
+! 2009Apr02 JMGipson. Changed name: icat_mode_freq-->icat_mode_freq_ptr
+!                                   icat_mode_rec -->icat_mode_rec_ptr 
+! 2009Apr02  JMG.     Also store trak-chan-fan-bit information. 
+! 
+! *****************************************************************************************
+! Info dealing with the observing mode.  This is VERY complicated, and involves 7 catalogs.
+!  We break it up into different sections for each catalog.
+!  Overall hierarchy is:
+!            --------- modes.cat --------------------
+!            |                                      |
+!          freq.cat                               rec.cat
+!            |                                  |             |
+!           rx.cat                             hdpos.cat     tracks.cat
+!            |
+!           loif.cat
+!
+!
+! In the NEW format, this catalog consists of lines that look like:
+***********************************************************************
+*Mode name       freq.cat    chan  samp    rec.cat
+*Max 16 char    Max 8 char    bw   rate    Max 16 char
+*rate-chan(sess)                          trk-chan-fan-bit
+***********************************************************************
+* 56-14(R4)        GEOSX        2.0   4.0    28-14-1-1
+! In the OLD format, this catalog consists of lines that look like:
+*              Max 8 char                     Max 8 char       Max 10 char
+*Mode name     freq.cat chan  bw   samp  bits mode/fan  barrel rec.cat
+*CDPSX-C-2      CDP-SX    14   2.0   4.0   1     C       none     C
+!
+! There is a lot of duplication in the freq.cat & rec.cat entries.
+! Therefore we will build a list and store the info as pointers into the list.
+!
+! 
+!
+
+      logical kcat_mode                       !Catalog read in?
+      common /cat_mode/kcat_mode
+
+      integer max_cat_mode                    !maximum number of different modes
+      integer max_cat_mode_freq
+      integer max_cat_mode_rec
+      parameter (max_cat_mode=50)
+      parameter (max_cat_mode_freq=max_cat_mode)
+      parameter (max_cat_mode_rec=max_cat_mode)
+      logical kcat_mode_sel(max_cat_mode)             !mode selected
+      integer icat_mode_freq_ptr(max_cat_mode_freq)   !pointer to appropriate freq-key
+      integer icat_mode_rec_ptr(max_cat_mode_rec)     !pointer to appropriate rec-key
+      integer icat_mode_tcfb(4,max_cat_mode_rec)      !This stores trk,chan,fan,bit
+      integer num_cat_mode                            !number of different modes
+      integer num_cat_mode_freq                       !number of different freq-keys
+      integer num_cat_mode_rec                        !number of different rec-keys
+
+      real*8 rcat_mode_bw(max_cat_mode)       	      !bandwidth
+      real*8 rcat_mode_samp(max_cat_mode)             !sample rate
+
+      common /cat_mode/num_cat_mode,num_cat_mode_freq,num_cat_mode_rec,
+     >  kcat_mode_sel, icat_mode_freq_ptr,icat_mode_rec_ptr,
+     >  icat_mode_tcfb,rcat_mode_bw,rcat_mode_samp
+
+      character*16 cat_mode(max_cat_mode)     !Character lists.
+      character*8  cat_mode_freq(max_cat_mode)
+      character*16 cat_mode_rec(max_cat_mode)
+
+      common /cat_mode_ch/cat_mode,cat_mode_freq,cat_mode_rec

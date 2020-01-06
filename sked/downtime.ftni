@@ -1,0 +1,10 @@
+      integer Max_down,num_down
+      parameter (max_down=2000)
+      integer mjd_down_beg(max_down),mjd_down_end(max_down)
+      double precision ut_down_beg(max_down),ut_down_end(max_down)
+      integer idown_stat(max_down)
+
+      Common/down_time_cmn/num_down,idown_Stat,
+     > mjd_down_beg,mjd_down_end
+      Common/down_time_dbl/ ut_down_beg,ut_down_end
+

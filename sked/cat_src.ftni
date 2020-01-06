@@ -1,0 +1,16 @@
+
+      logical kcat_src                          !Catalog read in?
+      common /cat_src/kcat_src
+
+      integer max_cat_src,num_cat_src
+      parameter(max_cat_src=1000)
+      logical kcat_src_sel(max_cat_src)          !Selected?
+
+      common /src_cat/num_cat_src,kcat_src_sel
+
+      character*8 cat_src_name(max_cat_src)      !Common name
+      character*8 cat_src_iau(max_cat_src)
+      character*2 cat_src_grade(max_cat_src)     !Grade
+
+      common /src_cat_chr/cat_src_name,cat_src_iau,cat_src_grade
+

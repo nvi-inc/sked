@@ -1,0 +1,50 @@
+! 7. hdpos.cat
+! This has lines like this.
+*Name    Pass/direction(offset)
+*
+! S2-1
+!-   11(0)
+! K4-1
+! -   11(0)
+! MK3A-A
+! -   11(-350) 21(0)    31(-295) 41(55)   51(-240) 61(110)
+! -   71(-185) 81(165)  91(-130) A1(220)  B1(-75)  C1(275)
+      logical kcat_hdpos                  !Catalog read in?
+      common /cat_hdpos/kcat_hdpos
+
+
+      integer max_cat_hdpos,num_cat_hdpos
+      parameter(max_cat_hdpos=30)
+      character*8 cat_hdpos_name(max_cat_hdpos)
+      common /cat_hdpos_ch/cat_hdpos_name
+      common /cat_hdpos/num_cat_hdpos
+
+
+
+!------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

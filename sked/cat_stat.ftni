@@ -1,0 +1,25 @@
+! Hold info about station catalogs.
+      logical kcat_stat                  !Catalog read in?
+      common /cat_stat/kcat_stat
+
+      integer max_cat_ant,num_cat_ant
+      integer max_cat_stat,num_cat_stat
+      parameter(max_cat_ant=200,max_cat_stat=300)
+
+      character*8 cat_ant_name(max_cat_ant)       !Antenna name
+      character*1 cat_ant_id1(max_cat_ant)        !One character ID
+      character*2 cat_ant_id2(max_cat_ant)        !Two character ID
+      character*4 cat_term(max_cat_stat)           !Terminal ID
+      logical kcat_stat_sel(max_cat_stat)         !Selected?
+
+      integer max_equip_band,num_equip_band
+      parameter (max_equip_band=20)
+      character*2 cat_equip_band(max_equip_band)   !SX,KQ, etc
+
+      integer icat_stat_vec(4,max_cat_stat)   !indices: Antenna, Rack, Recorder, Band
+      common /stat_cat_cmn/num_equip_band,num_cat_ant,
+     > num_cat_stat,icat_stat_vec, kcat_stat_sel
+! store in decreasing order of size.
+      common /stat_cat_chr/cat_ant_name,cat_term,cat_equip_band,
+     >  cat_ant_id2,cat_ant_id1
+

@@ -1,0 +1,69 @@
+!
+!  rec.cat info.
+! This catalog has info that looks like:
+*Group name is MAX 8 characters!
+*Group   Station    head pos     track assg  rec.    barrel  max bw
+*name    name       hdpos.cat    tracks.cat format   roll 
+*        max 8 char max 8 char  max 4 char  default  default  default in
+*                                            Mk34     none  modes.cat
+*******************************************************************
+*
+* 32 tracks, 8 USB channels fanned out 1:4, 1-bit sampling. 
+* Used for RDV sessions. 
+! 32-8-4-1
+! -       ALGOPARK   MK3V-A       8U-4-1   Mk34  16
+! -       GILCREEK   MK3A-A       8U-4-1   VLBA  8:1   4
+!
+      logical kcat_rec                  !Catalog read in?
+      common /cat_rec/kcat_rec
+
+      integer max_cat_rec,num_cat_rec                     !cat_rec list structure.
+      parameter (max_cat_rec=max_cat_mode)                ! eg:  32-8-4-1
+      character*8 cat_rec(max_cat_rec)
+      common /cat_rec/num_cat_rec
+      common /cat_rec_ch/cat_rec
+
+! In principle, can have any station in the catalog use any combination.
+! max_cat_stat*max_cat_rec=50*400=20,000
+! Actually, much smaller.  Total number lines in catalog is currently 1100.
+! To save space, keep track of rec starting point, and number of stations.
+      integer irec_cat_off(max_cat_rec),irec_cat_num(max_cat_rec)
+      common /cat_rec/irec_cat_off,irec_cat_num
+
+      integer max_rec_lines
+      parameter (max_rec_lines=2000)
+! Station, HDPOS,Tracks and Format is stored as integer pointers into character list.
+! Barrel roll is stored as character*4 list.
+! Bandwidht is store as real.
+
+      integer irec_stat(max_rec_lines)                  !station.
+      integer irec_hdpos(max_rec_lines)                 !headpos
+      integer irec_trk(max_rec_lines)                   !Track assignments
+      integer irec_fmt(max_rec_lines)                   !format.
+      real*8  rcat_rec_bw(max_rec_lines)                !Bandwidth
+      character*4 cat_rec_brl(max_rec_lines)            !Barrel roll.
+      common /cat_rec/irec_stat,irec_hdpos,irec_trk,irec_fmt,rcat_rec_bw
+      common /cat_rec_ch/cat_rec_brl
+
+
+      integer max_cat_rec_hdpos,num_cat_rec_hdpos       !hdpos list structure
+      parameter (max_cat_rec_hdpos=20)                  !eg: MK3V-A
+      character*8 cat_rec_hdpos(max_cat_rec_hdpos)
+      common /cat_rec_hdpos/num_cat_rec_hdpos
+      common /cat_rec_hdpos_ch/cat_rec_hdpos
+
+      integer max_cat_rec_trk,num_cat_rec_trk           !trk list structure
+      parameter (max_cat_rec_trk=20)                    !eg: 8U-4-1
+      character*12 cat_rec_trk(max_cat_rec_trk)
+      common /cat_rec_trk/num_cat_rec_trk
+      common /cat_rec_trk_ch/cat_rec_trk
+
+      integer max_cat_rec_fmt,num_cat_rec_fmt           !fmt list structure
+      parameter (max_cat_rec_fmt=20)                    !eg: MK34
+      character*8 cat_rec_fmt(max_cat_rec_fmt)
+      common /cat_rec_fmt/num_cat_rec_fmt
+      common /cat_rec_fmt_ch/cat_rec_fmt
+
+
+
+

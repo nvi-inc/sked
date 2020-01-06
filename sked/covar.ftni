@@ -1,0 +1,45 @@
+! This file holds all of the information needed for optimization by covariance.
+
+! max_par_esti, max_par_opti set in skparm.ftni
+
+      integer max_tri
+      parameter (max_tri=max_par_esti*(max_par_esti+1)/2)
+      integer MaxSubNet
+      parameter (MaxSubNet=10)
+
+      integer*2 num_est,num_opt,num_tri_est,num_src_est
+      logical kcar                                 !optimize XYZ coords (true) or LAT-Lon-Ht
+      logical lpara(max_dim_esti,2)
+      double precision dnorm_tri(max_tri,0:MaxSubNet)   !holds normal matrix
+      double precision dnorm_tmp(max_tri)          !holds temporary copy
+      double precision dnorm_inv(max_tri)          !holds inverse of dnorm_tri(*,0)
+
+      common /sk_covar/num_est,num_opt,num_tri_est,num_src_est,
+     >   kcar,lpara
+      common /sk_covar_dbl/dnorm_tmp,dnorm_inv,dnorm_tri
+
+      integer*2 ixref_est2all(max_par_esti)         !cross reference into all parameters
+      integer*2 ixref_opt2est(max_par_opti)         !cross reference into estimated.
+      common /sk_covar/ixref_est2all,ixref_opt2est
+
+      character*14 cparname(max_dim_esti)            !Parameter name
+      character*6  cpardim(max_dim_esti)             !and dimension
+      common /sk_covar_string/cparname,cpardim
+
+! info for trial scans.
+      integer NumTrial                               !number of trial scans
+!      integer*2 ltrial_scan(ibuf_len,MaxSubNet)              !trail scan
+      character*(ibuf_len*2) ctrial_scan(MaxSubNet)
+!      equivalence (ctrial_scan,ltrial_scan)                   !ASCII version of same.
+      character*(ibuf_len*2) ctrial_vec(MaxSubNet,max_trial)   !array holding saved trial scans
+      integer*2 nsub_trial_vec(max_trial)                      !subnets per scan
+
+      double precision sky_trial_vec(max_trial)                !coverage score
+      double precision covar_trial_vec(max_trial)              !rank score
+      integer itrial_key(max_trial)                            !used to sort trials by rank.
+
+      common /sk_trial/NumTrial, ctrial_scan,ctrial_vec,
+     >     nsub_trial_vec,itrial_key
+      common /sk_trial_dbl/ sky_trial_vec,covar_trial_vec
+
+

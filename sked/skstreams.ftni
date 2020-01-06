@@ -1,0 +1,27 @@
+C     SKED STREAMS COMMON BLOCK
+C
+C 001003 nrv New.
+C
+C
+      integer max_stream
+      parameter ( MAX_STREAM = 5 )
+C DOUBLE PRECISION
+      double precision utstart_stream(max_stream,max_obs),
+     .utend_stream(max_stream,max_obs)
+C INTEGER
+      integer nobs_stream(MAX_STREAM),
+     .mjdstart_stream(max_stream,max_obs),
+     .mjdend_stream(max_stream,max_obs),idur_stream(max_stream)
+C INTEGER*2
+      integer*2 scanname_stream(5,max_stream,max_obs)
+C LOGICAL
+      LOGICAL kopen_stream(max_stream)
+
+      COMMON /SKSTREAMS/
+     .utstart_stream,utend_stream,
+     .
+     .nobs_stream,mjdstart_stream,mjdend_stream,idur_stream,
+     .
+     .scanname_stream,
+     .
+     .kopen_stream

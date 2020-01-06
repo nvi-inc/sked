@@ -1,0 +1,34 @@
+!------------------------------------------------------------------------------
+! Receiver station setup.
+! 3. rx.cat info.  This catalog has lines that look like:
+!
+*RXname  Stn.Name    LOIFname
+*
+! SX_DSN
+! -       DSS15       DSN_CRF
+! -       DSS45       DSN_CRF
+! -       TIDBIN64    DSN_CRF
+
+      logical kcat_rx                           !Catalog read in?
+      common /cat_rx/kcat_rx
+
+      integer max_cat_rx,num_cat_rx
+      parameter (max_cat_rx=30)
+      common /cat_rx/num_cat_rx
+
+! In principle, can have any station in the catalog use any combination.
+! max_cat_stat*max_cat_rx=50*400=20,000
+! Actually, much smaller.  Total number lines in catalog is currently 400.
+! To save space, keep track of irx starting point, and number of stations.
+
+      integer irx_cat_off(max_cat_rx)  		!offset into vector for particular RX.
+      integer irx_cat_num(max_cat_rx)           !number of entries
+      common /cat_rx/irx_cat_off,irx_cat_num
+
+      integer max_rx_lines
+      parameter (max_rx_lines=1000)
+
+      integer irx_stat_xref(max_rx_lines)       !index into station list.
+      integer irx_loif_xref(max_rx_lines)       !index into loif names.
+      common /cat_rx/irx_stat_xref,irx_loif_xref
+

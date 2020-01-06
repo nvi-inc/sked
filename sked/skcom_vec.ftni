@@ -1,0 +1,36 @@
+! This contains info about the observations.
+! variables having to do with an observation.  All of these for current observation.
+      integer nstn_vec(Max_obs)                  !number of stations
+      integer ist_vec(max_stn,max_obs)           !station indices
+      integer mjd_vec(max_stn,max_obs)           ! mjd
+      integer mjdr_vec(max_stn,max_obs)          !time we start recording
+      integer iyr_vec(max_stn,max_obs)           ! year
+      integer ida_vec(max_stn,max_obs)           ! day
+      integer nsor_vec(max_stn,max_obs)          !_vecent source
+      integer ical_vec(max_stn,max_obs)          ! calibration
+      integer idur_vec(max_stn,max_obs)          !duration
+      integer ipas_vec(max_stn,max_obs)          ! pass
+      integer icod_vec(max_stn,max_obs)          ! frequency code index
+      integer ift_vec(max_stn,max_obs)           ! feet
+      integer iftend_vec(max_stn,max_obs)        ! feet at end of obs
+      integer idir_vec(max_stn,max_obs)          ! tape direction
+      integer idl_vec(max_stn,max_obs)           !idle time
+      integer itu_vec(max_stn,max_obs)           !tape moving
+      integer*2 lcbl_vec(max_stn,max_obs)        !cable wrap indicator.
+      double precision ut_vec(max_stn,max_obs)   !ut
+      double precision utr_vec(max_stn,max_obs)  !start of recording time.
+      double precision gst_vec(max_stn,max_obs)  !GST
+      double precision st0_vec(max_stn,max_obs)
+
+      character*6 cmid_vec(max_stn,max_obs)
+      character*6 cpst_vec(max_stn,max_obs)
+      character*6 cpre_vec(max_stn,max_obs)
+
+      common /skcom_vec/
+     > nstn_vec,ist_vec,mjd_vec,mjdr_vec,iyr_vec,ida_vec,nsor_vec,
+     > ical_vec,
+     > idur_vec,ipas_vec,icod_vec,ift_vec,iftend_vec,
+     > idir_vec,idl_vec,lcbl_vec, itu_vec,
+     > ut_vec,utr_vec,gst_vec,st0_vec,
+     > cmid_vec,cpst_vec,cpre_vec
+

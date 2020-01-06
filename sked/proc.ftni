@@ -1,0 +1,7 @@
+! this contains buffer to save $PROCS section
+        
+        integer num_proc_lines,max_proc_lines
+        parameter (max_proc_lines=500)
+        character*120 cproc_lines(max_proc_lines)
+        
+        common /proc_cmn/num_proc_lines,cproc_lines

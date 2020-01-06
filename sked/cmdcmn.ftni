@@ -1,0 +1,17 @@
+!
+! if a change is made here, also update cmdblock.f
+! ********************************************************
+!***** Note: Max that can be in any set is 24 to bug in compiler!
+! 2017Feb14 JMG. Changed length of Cmdlist from char*14 to char*18
+! 2017Dec22 KOL. Changed length of MxCmd4 from 18 to 19
+      integer MaxCmd
+      integer MxCmd1,MxCmd2,MxCmd3,MxCmd4
+      parameter (MxCmd1=21,MxCmd2=22,MxCmd3=23,MxCmd4=19)
+      parameter (MaxCmd=MxCmd1+MxCmd2+MxCmd3+MxCmd4)
+
+      character*2 cmdshort(MaxCmd)
+      character*18 CmdList(MaxCmd)   !length is also max_nccmd
+      character*29 cmdbrief(MaxCmd)  !brief description of command.
+      character*120 cmdsyntax(MaxCmd) !more detailed syntax.
+      common /cmdlist/cmdshort,cmdlist,cmdbrief,cmdsyntax
+

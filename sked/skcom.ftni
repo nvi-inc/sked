@@ -1,0 +1,398 @@
+! Sked common block
+! Completely rearranged in more logical order.
+! 2007Oct2  John Gipson.
+! 2010.01.25 JMG.  Changed index order of azimu, eleva from (max_stn,max_obs) to (max_obs,max_stn)
+! 2010Mar26 JMG. Changed stutcm ->utstcm, enutcm->utencm for consistency with jdstcm and jdencm
+! 2010Apr15 JMG. Removed obsolete ktpo array. Made obsolete by statwt command. 
+!                Removed isweight array. Not used.  SrcWt does better replacement 
+! 2010.06.15     Added kvexin variable to keep track of whether input file was vex. 
+
+! 2010.09.16. Removed tape paremeters ksynch, knorewind, and kpostpass and various tape times. 
+! 2010.11.05  Added cline as temporary ASCII output.
+! 2013Sep17  JMGipson.  Moved some parameters from skdrincl/skparm.ftni to here. 
+! 2013Sep18  JMGipson. Added "ast_margin". Separate margin for astrometric sources.
+! 2016Apr18  KOLeBail. Added iprevscan to indicate in which scan stations previously were
+! 2017Oct06  KOLeBail. Added kconf_equip: if .true., the catalog equipment will be used automatically;
+!                      if .false., SKED will continue to ask: "Use catalog equipment?" when needed.
+!
+! Some parameter definitions.
+!     Maximum number of rise/set times in arrays.
+      integer max_nrs
+      parameter (max_nrs = 10)
+
+!  The main buffer used throughout the program.
+!  First word in IBUFQ holds the number of characters to follow in IBUF.
+!  Actual characters are put into IBUF(1)=IBUFQ(2).
+!  Separate character array used for convenience at times.
+      dimension IBUF(IBUF_LEN)
+      EQUIVALENCE (IBUF(1),IBUFQ(2))
+      CHARACTER*(IBUF_LEN*2) cbuf
+      equivalence (cbuf,ibuf)
+
+      integer*2 ibufq,ibuf
+      common /skcom/IBUFQ(IBUFQ_LEN)
+
+! variables having to do with an observation.  All of these for current observation.
+! Note: We define these twice.  First for actualy observation (e.g.: utcur)
+!                               Then  for test                (e.g.: uttst)
+      double precision utcur(max_stn)   !ut
+      double precision gstcur(max_stn)  !GST
+      double precision st0cur(max_stn)
+      integer nstncur	  		!number of stations
+      integer istcur(max_stn)           !station indices
+      integer mjdcur(max_stn)           !current mjd
+      integer iyrcur(max_stn)           !current year
+      integer idacur(max_stn)           !current day
+      integer nsorcur(max_stn)          !curent source
+      integer icalcur(max_stn)          !current calibration
+      integer idurcur(max_stn)          !duration
+      integer ipascur(max_Stn)          !current pass
+      integer icodcur(max_Stn)          !current frequency code index
+      integer iftcur(max_stn)           !current feet
+      integer iftend_cur(max_stn)
+      integer idircur(max_stn)          !current tape direction
+      integer idlcur(max_stn)           !idle time
+      integer itucur(max_stn)           !tape moving
+      integer ireccur(max_stn)
+      integer iprevscan(max_stn)        !previous scan in which the station was in
+      integer*2 lcblcur(max_stn)        !cable wrap indicator.
+      character*6 cmidcur(max_stn),cpstcur(max_stn),cprecur(max_stn)
+
+      character*2 cwrap_cur(max_stn)
+      equivalence (cwrap_cur,lcblcur)
+
+      common /skcom_obs_dbl/utcur,gstcur,st0cur
+      common /skcom_obs/
+     > nstncur,istcur,mjdcur,iyrcur,idacur,nsorcur,icalcur,
+     > idurcur,ipascur,icodcur,iftcur,iftend_cur,
+     > idircur,idlcur,lcblcur,itucur,ireccur,iprevscan
+
+      common /skcom_obs_ch/cmidcur,cpstcur,cprecur
+!
+! Repeat the definitions for the TEST 
+!
+      double precision uttst(max_stn)   !ut
+      double precision gsttst(max_stn)  !GST
+      double precision st0tst(max_stn)
+      integer nstntst		        !number of stations in current observation.
+      integer isttst(max_stn)           !station indices
+      integer mjdtst(max_stn)           !current mjd
+      integer iyrtst(max_stn)           !current year
+      integer idatst(max_stn)           !current day
+      integer nsortst(max_stn)          !curent source
+      integer icaltst(max_stn)          !current calibration
+      integer idurtst(max_stn)          !duration
+      integer ipastst(max_Stn)          !current pass
+      integer icodtst(max_Stn)          !current frequency code index
+      integer ifttst(max_stn)           !current feet
+      integer iftend_tst(max_stn)
+      integer idirtst(max_stn)          !current tape direction
+      integer idltst(max_stn)           !idle time
+      integer itutst(max_stn)    	!tape moving
+      integer irectst(max_stn)          ! for symmetry with ireccur
+      integer*2 lcbltst(max_stn)        !cable wrap indicator.
+      character*6 cmidtst(max_stn),cpsttst(max_stn),cpretst(max_stn)
+
+      character*2 cwrap_tst(max_stn)
+      equivalence (cwrap_tst,lcbltst)
+
+      common /skcom_obs_dbl/ uttst,gsttst,st0tst
+      common /skcom_obs/
+     >   nstntst,isttst,mjdtst,iyrtst,idatst,nsortst,icaltst,
+     >   idurtst,ipastst,icodtst,ifttst,iftend_tst,
+     >   idirtst,idltst,lcbltst,itutst, irectst
+
+      common /skcom_obs_ch/cmidtst,cpsttst,cpretst
+
+! other things?
+      integer ituse(max_stn)
+      integer itrun(max_stn)
+      integer idurxt(max_stn)  !Used in adaptive mode only! Time a station arrives on source and can start taking data.             
+      common /skcom_obs/ituse,itrun,idurxt
+
+! Logical stuff
+      logical kvexin            !input file was vex
+      logical kvlba_corr        !correlating at VLBA  Same as CCORNAME='VLBA' but this common block is more widely used. 
+      logical kbonn_corr        !Bonn. Put in because DIFX does not like some stuff
+      common  /skcom_log/kvexin,kvlba_corr,kbonn_corr 
+! Extended listing stuff.
+      logical kxlist            !Extended listing on
+      logical KxAZEL            ! AZ el
+      logical kxLong            ! Long format (more precision)
+      logical kxazel2           ! Az El HA
+      logical KxDUR             ! Duration
+      logical kxfeet            ! Feet
+      logical kxfreq            ! Freq
+      logical kxmaxl            ! Maximum listing
+      logical kxobsf            ! Flux
+      logical KxSNR             ! SNR
+      logical kxwrap            ! Include cable wrap in AZEL
+      logical kxSky             ! Display sky coverage
+      common /skcom_log/kxlist,KxAZEL,KxLong,kxazel2,KxDUR,kxfeet,
+     > kxfreq, kxmaxl,kxobsf,KxSNR,kxwrap,kxsky
+
+! Display extended information when scheduling observations.
+      logical kxnewbase         !baselines
+      logical kxnewflux         !Flux info
+      logical kxnewsnr          !SNR
+      logical kxnewsefd         !SEFDS
+      common /skcom_log/kxnewbase,kxnewflux,kxnewsnr,kxnewsefd
+
+! Flags dealing with writing out the file.
+      logical kflux             ! Is there a flux section?  (don't need if all scans are the same length)
+      logical knewfi            !have we written out the results  to a new file?
+! Flags that indicate that part of the sked file has changed
+      logical knewfl            !flux
+      logical KNEWFR            !frequency
+      logical knewop            !ops
+      logical knewpa            !parameter part.
+      logical KNEWSO            !sources
+      logical knewst            !stations
+      logical knewsk            !schedule
+      common /skcom_log/kflux,knewfi,knewfl,knewfr,knewop,knewpa,
+     >      knewso,knewst,knewsk
+
+! Variables dealing with what info is displayed or not.
+      logical kask             !Ask before scheduling an observation.
+      logical kdebug           !Display debugging info.
+      logical kkeep_log
+      logical kdissub          !dispaly subnet info in scheduling.
+      logical kdiswh           !Display info in "Whatsup"
+      logical KTMLIN           !display a timeline for the scans.
+      logical kverbose         !display lots of information when writing out stuff.
+      logical kconf_equip    !Confirm the automatic use of the catalog equipment.  
+      common /skcom_log/kask,kdebug,kkeep_log,kdissub,kdiswh,ktmlin,
+     >   kverbose,kconf_equip
+
+! Variables used in scheduling observations.
+      logical kasnr            !Auto SNR: Automatically schedule obs that meet SNR targets
+      logical kauto            !automatic mode is on.
+      logical knov             !special VLBA mode.
+      logical kvisde           !Mutual visibility of ALL stations required.
+      logical kvscan           !Use variable scan length in scheduling.
+      common /skcom_log/kasnr,kauto,knov,
+     >         kvisde,kvscan
+
+
+! Miscellaneous other flags.
+      logical kexpand          ! ????
+      logical kflg(4)
+      logical kopgo            !Have we inserted obs into covariance matrix yet?
+      logical krsini           !have we computed rise and set yet?
+      logical kparam           !Flag to indicate Java "Param program" is running
+      common /skcom_log/kflg,kexpand,kopgo,krsini,kparam
+
+! Logical arrays dealing with observations
+      logical  KOBC(MAX_OBS)            !Observation within time window
+      logical  KVS(MAX_SOR,MAX_STN)     !is a source visible at this staiton.
+      common /skcom_log/KOBC,kVS
+
+
+! ***** OTHER STUFF ****************************************************
+
+! Logical Units
+      integer lucat                     !catalog file
+      integer ludsp                     !dispaly
+      integer lufil     		!output file
+      integer lulog                     !log file
+      integer luscn                     !Screen (output)
+      integer luskd                     !sked file
+      integer lusel                     !selection files
+      integer luusr                     !input
+      integer lutmp,lutm2              !temporary Lus
+      common /skcom_int/lucat,ludsp,lufil,lulog,luscn,luskd,lusel,
+     >    luusr, lutmp,lutm2
+
+
+! Arrays dealing with sources
+      integer ISSCAN(MAX_SOR)           !Default scan length (currently all the same)
+      integer NOBSSO(MAX_SOR)           !# of obs on this source
+      integer NSUPN(MAX_SOR)            !# of stations up at current time.
+
+      integer MJPRSO(MAX_SOR)           !Source last observed: Day part
+      double precision UTPRSO(MAX_SOR)   !Source last observed: Seconds part.
+      common /skcom_int/isscan,nobsso,nsupn,mjprso
+      common /skcom_dbl/utprso
+
+! Scan stuff.
+      integer idurst(max_stn)           !duration required to reach target SNR.
+      integer numbadsnr(max_stn)        !number of obs to a station with low SNRs. (for a scan)
+      integer numgoodsnr(max_stn)       !number of obs to a station with good SNRs.
+       common /skcom_int/idurst,numbadsnr,numgoodsnr
+
+! source stuff 
+      integer mjdstart(max_stn)         !starting time of observations (MJD)
+      integer irs(max_sor,max_stn)      !Is source rising or setting near current obs.
+      integer ntsrisset(max_sor,max_stn) !Number of times source rises & Sets at a station
+      common /skcom_int/mjdstart,irs,ntsrisset
+
+      double precision utstart(max_stn) !starting time (seconds part)
+      double precision azim(max_stn)    !azimuth of a station
+      double precision elev(max_stn)    !elevation
+      double precision tsris(max_sor,max_stn,max_nrs)   !Times when a source rises
+      double precision tsset(max_sor,max_stn,max_nrs)   !And times when it sets.
+      common /skcom_dbl/utstart,azim,elev,tsris,tsset
+
+! Observation dependent stuff
+      double precision AZIMU(MAX_OBS,MAX_STN)   !azimuth of station at given obs
+      double precision ELEVA(MAX_OBS,MAX_STN)   !elevation of staiton at given obs.
+      double precision TIM(MAX_OBS)             !time of obs (in days)
+      integer isrc_obs(max_obs)                 !Source used in this obs
+      integer inum_pix_obs(max_obs,max_stn)
+      double precision avg_pix_obs(max_obs)
+      common /skcom_dbl/azimu,eleva,tim,avg_pix_obs
+      common /skcom_int/isrc_obs,inum_pix_obs
+
+!stuff having to do with sky_coverage
+      integer num_pix_bands,max_pix_band
+      parameter (max_pix_band=12)
+      integer max_pix
+      parameter (max_pix=300)
+      integer ipix_bands(12)
+      double precision dang_pix_band(max_pix_band)
+      common /skcom_int/num_pix_bands,ipix_bands
+      common /skcom_dbl/dang_pix_band
+
+! Miscellaneous common Double precisions
+      double precision frac             !fractional part of a day.
+      double precision cov              !used in cover
+      double precision covs             !used in coverage
+      double precision utstcm           !ut start stored in common
+      double precision utencm           !UT end stored in common
+      double precision RASUN, DECSUN            !RA and Dec of sun at start of sesions
+      double precision factbl(max_band,max_baseline)    !actual baseline flux
+      double precision projbase(max_baseline)           !projected baseline
+
+      common /skcom_dbl/frac,cov,covs,utstcm,utencm,rasun,decsun,
+     >  factbl,projbase
+
+! Miscellaneous integer stored in common
+      integer jdstcm            !Julian day in common
+      integer jdencm            !last day we have data for
+      integer isorcm            !source number in common
+      common /skcom_int/jdstcm,jdencm,isorcm
+      integer icode_set_last    !last code we set.
+      integer itskip            !tape parameter. (number of feet to skip?)
+      integer norig             !# of original sources or stations.
+      integer iblen             !buffer length (same as ibuflen)
+      common /skcom_int/icode_set_last,itskip,norig,iblen
+
+! From Unpak.
+      integer lobs              !number of observations in a scan.
+      double precision utobs    !begining of observation in seconds
+      double precision utobss   !end of obsevation in seconds (includes JUlday)
+      common /skcom_int/lobs
+      common /skcom_dbl/utobs,utobss
+
+! Variables dealing with spacing to some record.
+      integer ircnt            !# of records found in range
+      integer ircur            ! Current record #
+      integer irecgo           ! Record to go to
+      integer nobscm           ! Number of records to advance (used in list command)
+      integer nxtrec           ! next record #
+      common /skcom_int/ircnt,ircur,irecgo,nobscm,nxtrec
+
+! Used in printing errors.
+      integer inumcm            !# of message to write out.
+      integer ierrcm            !Error #. Used in printing out messages.
+      common /skcom_int/inumcm,ierrcm
+
+! Following are read by system calls.
+      integer ihscn             !height of screen
+      integer iwscn             !width of screen
+      integer pid               !process ID
+      common /skcom_int/ihscn,iwscn,pid
+
+! following are set by the $PARAM section
+      integer icalde            !default calibration time
+      integer idurde            !default duration
+      integer idldef            !default delay
+      integer imintm            !minimum time between scans.
+      integer imodtm            !modular time unit (e.g., if 5, obs scheduled only at 5,10,etc.
+     
+      integer itsync            !synch time
+      integer iwdef             !width of screen. IF 0, then use actual screen width.
+      integer lookah            !lookahead time (secondS)
+      integer maxscn            !maximum scan    (seconds)
+      integer minscn            !minimum of scan (seconds)
+      integer modscn            !make all scans a multiple of this.
+      integer imark6_off        !offset in seconds for Mark6
+      common /skcom_int/icalde,idurde,idldef,imintm,imodtm,itsync,
+     >    iwdef,lookah,maxscn,minscn,modscn,imark6_off
+
+! FILL command - offset ifill_off
+      integer ifill_off
+      common /skcom_int/ifill_off
+
+! SNR stuff
+      integer iactbl(max_band,max_baseline)     !actual SNRs on some observation.
+      integer imarg(max_band)                   !allowable margin
+      integer imarg_1(max_band)
+      integer imarg_ast(max_band)
+      integer ISNRBL(MAX_BAND,MAX_BASELINE)     !SNR targets
+      integer isnrbl_1(max_band,max_baseline)   ! "  " " "
+      common /skcom_int/iactbl,imarg,imarg_1,imarg_ast, isnrbl,isnrbl_1
+
+! Source-baseline stuff
+      integer itimeup(max_sor,max_baseline)             !Time (in minutes)that source is up on this baseline
+      integer itsincer(max_sor,max_baseline)            !Time since rising.
+      integer nsorobs(max_sor,max_baseline)             !# of obs of this source on this  baseline
+      integer ntrisset(max_sor,max_baseline)            !# of times source rises and sets.
+      integer itset(max_sor,max_baseline,max_nrs)       !Times it sets
+      integer itris(max_sor,max_baseline,max_nrs)       !Times it rises
+      common /skcom_int/itimeup,itsincer,nsorobs,ntrisset,itset,itris
+
+! ****START of character arrays **************
+! Define various character arrays.
+      integer nlpass
+      parameter (nlpass=62)
+      character*1   cdir(2)             !Direction: "R", "F"
+      character*(nlpass) cpass               !Pass numbers
+      CHARACTER*6   CPID                !process ID
+      character*10  skversion           !Sked Version
+      character*6   cprede,cmidde,cpstde  !PREOB, MIDOB, POSTOB  procedures.
+
+      CHARACTER*(IBUF_LEN*2) cbuftmp    !temporary character array
+      character*24 refdef_name(9,max_stn,max_frq)
+!  File names for SKED's scratch files
+      CHARACTER*128 CSKFIL,CTMFIL,CTMFI2,CLGFIL,COPFIL,
+     >   CFRFIL,CSTFIL,CSOFIL,CPRFIL,CFLFIL,CHDFIL,
+!  File names for the catalog files
+     >   antenna_cat,equip_cat,flux_cat,flux_comments,freq_cat,
+     >   hdpos_cat,  loif_cat, mask_cat,modes_cat,modes_description_cat,
+     >   position_cat,   rec_cat,   rx_cat,  source_cat,station_cat,
+     >   tracks_cat,
+!  File names for the catalog interface files and program
+     >  cskselect_file,cskcontrol_file,cskcat_file,
+     >  cat_program_path,ccat_pid_file,
+!  File names for the parameter interface files and program
+     >  cparam_file,par_program_path,cpar_pid_file,
+!  Script names for printing
+     >  CPLFIL,cprtpor,cprtlan,cprtlab, ctpfil,
+     >  csktmp,csked,ctmpnam,  cprttyp,cprport,
+! location of master_file
+     >  cmaster_dir
+
+      character*256 cline         !output buffer
+
+      common /skcom_ch/
+     >   cline,
+     >   cdir,cpass,cpid,skversion, cprede,cmidde,cpstde,cbuftmp,
+     >   refdef_name,
+!  File names for SKED's scratch files
+     >   CSKFIL,CTMFIL,CTMFI2,CLGFIL,COPFIL,
+     >   CFRFIL,CSTFIL,CSOFIL,CPRFIL,CFLFIL,CHDFIL,
+!  File names for the catalog files
+     >   antenna_cat,equip_cat,flux_cat,flux_comments,freq_cat,
+     >   hdpos_cat,  loif_cat, mask_cat,modes_cat,modes_description_cat,
+     >   position_cat,   rec_cat,   rx_cat,  source_cat,station_cat,
+     >   tracks_cat,
+!  File names for the catalog interface files and program
+     >  cskselect_file,cskcontrol_file,cskcat_file,
+     >  cat_program_path,ccat_pid_file,
+!  File names for the parameter interface files and program
+     >  cparam_file,par_program_path,cpar_pid_file,
+!  Script names for printing
+     >  CPLFIL,cprtpor,cprtlan,cprtlab, ctpfil,
+     >  csktmp,csked,ctmpnam,  cprttyp,cprport,
+     >  cmaster_dir

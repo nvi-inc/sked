@@ -1,0 +1,3 @@
+void flush(int i)
+{
+}

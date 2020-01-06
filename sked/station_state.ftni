@@ -1,0 +1,58 @@
+!------INFORMATION TO SAVE/RESTORE -------------------------------------------------
+! This block appears in both:
+!  save_station_state
+!  restore_station_state
+
+! General station information. 
+      real          bb_bw_save(max_stn)
+      real          stnelv_save(MAX_STN)                 !elevation limit
+      common /station_save_real/stnelv_save,bb_bw_save
+
+      integer       nstatn_save 
+      integer       itearl_save(max_stn)                 ! save early start  
+      common /station_save_integer/nstatn_save,itearl_save
+  
+      character*128 tape_motion_type_save(max_stn)       ! save tape motion
+      character*128 tape_allocation_save(max_stn)        
+      character*8   cstnna_save(max_stn)                 !name
+      character*1 cstcod_save(max_stn)                   !1 letter code
+     
+      common /station_save_char/tape_motion_type_save,
+     >  tape_allocation_save,cstnna_save, 
+     >  cstcod_save
+
+! SNR information.     
+      integer       isnrbl_save(max_band,max_baseline)
+      integer       isnrbl_1_save(max_band,max_baseline)
+      common /station_save_integer/isnrbl_save,isnrbl_1_save
+
+     
+! Subnet information
+      integer       nsubst_save                          !number in the current subnet.
+      character*2 cposub_save(max_stn)                   !Current subnet
+      common /station_save_integer/nsubst_save
+      common /station_save_char/cposub_save
+
+! Downtime information.
+      integer num_down_save
+      integer mjd_down_beg_save(max_down)
+      integer mjd_down_end_save(max_down)
+      double precision ut_down_beg_save(max_down)
+      double precision ut_down_end_save(max_down)
+      character*2 cpo_down_save(max_down)
+      common /station_save_integer/num_down_save,
+     >  mjd_down_Beg_save, mjd_down_end_save         
+      common /station_save_dbl/ut_down_beg_save,ut_down_end_save
+      common /station_save_char/cpo_down_save      
+     
+      integer idata_mbps_save(max_stn)
+      integer isink_mbps_save(max_stn)
+      common /station_save_integer/idata_mbps_save,isink_mbps_save
+
+      
+      
+! Optimization information
+      logical        lpara_save(max_dim_esti,2)           !used if optimizing for covarinace
+      common /station_save_logical/lpara_save  
+!-------END OF SAVE/RESTORE INFO ----------------------------
+

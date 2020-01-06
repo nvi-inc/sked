@@ -1,0 +1,70 @@
+!  2015Nov13  JMGipson. Added kCovar for covariance optimization. 
+! This holds the things that control the various minor modes.
+! Each line contains a minor mode item.
+! If true, the item is on.
+! the "NORM" flag indicates whether we should normalize
+! by the peers:   (Value-ValueMin)/(ValueMax-ValueMin)
+! the Wt number is how much to weight each option.
+! Following this is any special info.
+      logical
+     >  kAstro,      kAstroNorm,
+     >  kBegScan,    kBegScanNorm,
+     >  kCovar,      kCovarNorm,          !use covariance optimization 
+     >  kDurScan,    kDurScanNorm,
+     >  kEndScan,    kEndScanNorm,
+     >  kLowDec,     kLowDecNorm,
+     >  kNumLoEl,    kNumLoElNorm,
+     >  kNumRiseSet, kNumRiseSetNorm,
+     >  KNumObs,     kNumObsNorm,
+     >  kSkyCov,     kSkyCovNorm,
+     >  kSrcEvn,     kSrcEvnNorm,
+     >  kSrcWt,      kSrcWtNorm,
+     >  kStatEvn,    kStatEvnNorm,
+     >  kStatIdle,   kStatIdleNorm,
+     >  kStatWt,     kStatWtNorm,     
+     >  kTimeVar,    kTimeVarNorm,
+     >  kTapeWaste,  kTapeWasteNorm
+
+      real
+     >    rAstroWt,
+     >    rBegScanWt,
+     >    rCovarWt,
+     >    rDurScanWt,
+     >    rEndScanWt,
+     >    rNumLoElWt,rLoEl,             !rLoEl--elevation cutoff.
+     >    rLowDecWt,
+     >    rNumRiseSetWt,
+     >    rNumObsWt,
+     >    rSkyCovWt,
+     >    rSrcEvnWt,
+     >    rSrcWtWt, 
+     >    rStatEvnWt,
+     >    rStatIdleWt,
+     >    rStatWtWt,
+     >    rTimeVarWt,
+     >    rTapeWasteWt
+
+      integer iSrcEvnMode
+      integer iStatEvnMode
+
+      common /minor_modes/
+     >  kAstro,      kAstroNorm,      rAstroWt,
+     >  kBegScan,    kBegScanNorm,    rBegScanWt,
+     >  kCovar,      kCovarNorm,      rCovarWt,
+     >  kDurScan,    kDurScanNorm,    rDurScanWt,
+     >  kEndScan,    kEndScanNorm,    rEndScanWt,
+     >  kLowDec,     kLowDecNorm,     rLowDecWt,
+     >  kNumLoEl,    kNumLoElNorm,    rNumLoElWt,rLoel,
+     >  KNumObs,     kNumObsNorm,     rNumObsWt,
+     >  kNumRiseSet, kNumRiseSetNorm, rNumRiseSetWt,
+     >  kSkyCov,     kSkyCovNorm,     rSkyCovWt,
+     >  kSrcEvn,     kSrcEvnNorm,     rSrcEvnWt, iSrcEvnMode,
+     >  kSrcWt ,     kSrcWtNorm,      rSrcWtWt, 
+     >  kStatEvn,    kStatEvnNorm,    rStatEvnWt,iStatEvnMode,
+     >  kStatIdle,   kStatIdleNorm,   rStatIdleWt,
+     >  kStatWt,     kStatWtNorm,     rStatWtWt,
+     >  kTimeVar,    kTimeVarNorm,    rTimeVarWt,
+     >  kTapeWaste,  kTapeWasteNorm,  rTapeWasteWt
+
+
+

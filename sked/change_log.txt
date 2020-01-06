@@ -1,0 +1,471 @@
+ This file contains a brief description of the changes made to sked
+2019Aug14 ../skdrut/vread.f, vglinp.f, errormsg.f:  Made better error messages. 
+2019Jun24 read_mode_cat: Was always printing errror message even when there wasn't. (Wrote to screen instead of lerr_msg') 
+2019Jun13 read_mode_cat:  Better error messages on parsing errros. 
+2019Jun13 NR stuff: Got rid of caldat.  Added iday_of_year. 
+2019May23 sumcm.f.  Was not printing our SNR historgram. NBA=numbands was being set to 0. 
+2019May23 nextpr.f.  If AUTO mode is on, make sure we are returning only stations in SUBNET list. 
+2019May15 auchk.f.  Don't return from errors if command is 'ch'. Mush on. 
+2019Apr24 select_from_list.f:  Initialized various variables to zero to prevent problems interfacing to curses
+2019Apr24 sked_rdctl.f:      Use /etc/skedf.ctl for global config.
+2019Mar16 find_best_scan.f:  was reversing args in dsecdif. Was UT,MJD, should be MJD, UT
+2019Mar16 snr_fidn_numgood_numbad.f, astro_cull.f, source_cull.f, readsourcecatalog.f,nexct.f, bestsources.f,
+          skopn.f, astro_obs.f, fillcmd.f, astro_cmd.f, astro_out.f
+          Introduced using kastro_src instead of checking rmin_astro, rmax_astro 
+2019Feb05 param_read.f: Ignore comment lines in reading $PARAM
+2019Jan31 
+2018Dec26 make_defnames.f: Fixed bug in $IF section if staions have VDIF, or share setup with VDIF. 
+2018Dec22. stcmd.f.  Changed name of logical variable del_stat-->kdel_stat. Added implicit none.
+          ../skdrut/frinp.f, ../skdrut/vglinp.f.  Added 'implicit none'. Replaced undefined variables with correct ones. 
+!       
+!2018Oct10 vtrout.f, make_defnames.f, vfrout.f:  Better handling of VDIF stations.
+!            getist.f: Slight change in printing out stations. First station did not have " " after it. 
+!            vglinp.f: Set the flag indicating VLBA correlator on reading in VEX file.
+!            skcls.f:  Don't write out some VEX sections dealing with tape
+!2018Oct09 ../skdrut/vmoinp.f.  If vex file is made from sked file, now preserve naming of modes and submode. 
+           Also better handling of BBCs. Assume same 'freq-channel' if everything is the same except for sidebands. 
+           vstout.f:  Don't need to write out tape type or density.  
+           vdaout.f:  Don't need to output bit-density or tape length. 
+!2018Oct08 KLB: Work from Dec 2017 to April 2018 on: the "station command", CONF_EQUIP parameter,
+!          managing twin telescopes (TWIN_TELESCOPES section in sked file, SplitTwins in major option),
+!          problems when calling the "fill" command (management of downtime and end of session).
+!           1) Modified the station command to give the user the ability of manually adding and deleting
+!              stations in the station list. For example, "stati add Mc" will add the station Mc to the
+!              station list. Call "? stati" in sked for more details. Affected routines are stcmd.f,
+!              cmdblock.f, cmdblock2.f, and fsked.f.
+!           2) Added CONF_EQUIP in the parameters section. If the variable is set to false, sked will
+!              asks "use catalog equipment?" when necessary. If the variable is set to true, this
+!              update is done automatically without asking the user. Affected routines are prout.f, skini.f,
+!              prlis.f, prset.f, and skcom.ftni.
+!           3) Added a section TWIN_TELESCOPES in the sked file which is used to list the sets of
+!              twin telescopes in the schedule and define if the user wants to schedule them together,
+!              split them or whatever sked optimizes them for. Affected routines are twin_mod.f, cmdblock2.f,
+!              unout.f, skcls.f, skopn.f, cmdblock.f, cmdcmn.ftni, whatsup.f and fsked.f. The Makefile in the
+!              sked directory was modified to add the module twin_mod.
+!           4) Added SplitTwins in major option. Affected routines: major_init.f, major_cmd.f, major_out.f,
+!              prset.f, and major.ftni.
+!           5) Fixed a problem with the fill command managing downtime and end of session. Affected routines:
+!              fillcmd.f, and ydhms.f.
+!2018Oct05 prset.f. Added UTAS to list of OK correlators.
+!2018Oct03 ../skdrut/frinit.f.  Removed initialization of frequency codes (=lcodes)
+           vmoout.f: No longer output HEAD_POS or PASS_ORDER. Obsolete with disks. 
+           vscout.f: Hardcoded pass number and order to be "1" 
+           skcls.f:  Don't need to write out HEAD_POSS or PASS_ORDER.  Also ran through dos2unix command
+!2018Oct01 vex_comment.f: Modified vex_trailing_comment to be consistent with vex_comment.
+           vifout.f:  Modified so if VLBA correlator AND VLBA IF, puts trailing comments at the end of the line
+           ../skdrut/frinp.f Modifed so samprate applies only to stations specified in latest "F" line. 
+           Previosly applied to all stations in schedule.
+!2018Aug06 ../skdrut/vunpfrq.f: Modified so that it tries to infer band info ("X", "S") if it is missing in the vex file. 
+!2018Jul30 snr_per_sec.f: Modified so that BW can vary from station to station. 
+!2018Jul10 read_rec_cat.f: Put out error if did not read expected key.  
+!          frec.f: put out error if did not find expected token. 
+!          frcmd.f: got rid of message about obsolete catalog version
+!          read_track_cat.f: Better errror messages if cannot parse a line 
+!2018Jul05 ../skdrut/frinp.f Modifed to fix erorr message. Message code was printing as '***'
+!2018Jul05 printfr.f  Was not accounting for # of headstacks in computing number of bits
+!2018May15 frec.f. If it encounters duplicate track assignments in reading catalog, types warning message.
+!2018Mar30 Fixed bug in sscan.f. Was not copying over all of the characters into temporary buffer. 
+!2018Mar30 Also fixed bug in sked_rdctl.f where reading in mysql parameters  DATABASE)---> DATABASE
+!2018Mar29 Modified sked_rdctl to read in mysql parameters from skedf.ctl. Removed init_mysql from fsked.f 
+!2018Mar17 Fixed skdrut/Makefile. Turning on some options made sked crash. 
+!2018Jan23 Some changes so that sked does not choke on comment lines.  
+!          Affected routines: param_read.f, skopn.f, op_read.f
+!2018Jan18 sscan.f: Modified to get rid of hollerith and have better error messages. 
+!2017Dec19 sumcm.f:  Do test on writing precision based on MAXimum amount per station rather than average. 
+!2017Dec08 sumcm.f: If >10TB, only 1 decimal. 
+!2017Dec05 sumcm.f:  When priting out storage in TB, give 2 decimals. 
+!2017Dec04 make_stat_list.f.  Changed bug if mismatch between sked& catalogs, and catalogs have more than one equip for station
+!           
+!2017Nov15 ../skdrincl/skparm.ftni. MAX_OBS---30000
+!2017Nov14 auchk.f Fixed problem in writing out cable-wrap problems. Indicated wrong station. 
+!2017Aug01 sumcm.f In writing out the summary did not work correctly when writing histogram of durations to file.
+!2017Aug01 chcmd.f Commented out debugging statement.
+!2017Jul06 chmd.f  Error in tagalong. Was not checking SNRs! (Misunderstood ierr_snr in return call from snrsk.f)
+!
+!2017Jun23 make_defnames.f  Modified to include VDIF if MARK5C or FLEXBUFF
+!
+!2017Apr18 skini.f: Changed icalde from 5 to 10. 
+!2017Mar22 Set 'knewsk=.true.' in fill
+!
+!2017Mar13 In the 'T' lines of the $STATION section, if the rack or the recorder is unknown, 
+!          trudg on. Previously would stop processing T-line.
+!          ../skdrut/unpvt.f, ../skdrut/stinp.f 
+!          stlis.f.  Changed header information so thhat it lines up. 
+!          (Previosly didn't after increasing Rack character length)
+!2017Mar02 Changes having to do with replacing 'DBBC' by DBBC_DDC' (but still keeping DBBC in catalogs)
+!          and also issues related to displaying longer (char*20) rack types.
+!    read_antenna_cat.f, twrst.f: If read in 'DBBC' in equip line, convert it to DBBC_DDC
+!    display_stat_item.f    Changed header to accomodate longer line. 
+!    stcat.f, master_cmd.f, column width increased to 50 to accomodate longer rack names.  
+! 
+!2017Feb27 Many minor changes uncovered while 
+!       1.) checking for compatibility with gfortran. 
+!       2.) merging sked and drudg code libraries. 
+!       3.) Adding implicit none 
+!   cablw.f       azwrap was not defined. Also had variable that went past line 72
+!   cmdblock.ftni changed length of cmdlist from char*14 to char*18
+!   cmdblock.f    Changed various data statements so that strings were not longer than targets. 
+!   display_list.f Changed "Cursor keys" to "Cursor" so that it could fit in string variable lcmd
+!   group_mod.f   logical found-->kfound.  Statements found.eq..false. -->.not.kfound 
+!   lshed.f       removed a few tabs that were in the code. 
+!   major_cmd.f   Changed length of lyt_list from char*4 to char*5 because it was truncating 'FALSE' to 'FALS'
+!   sked_lnx.f    Changed iarg to iargc. 
+!   vex_comment.f Changed call to 'fcreate_comment'. For unknown reason previous version does not work with gfortran.
+!   vscout.f      Initialized 'cso' and 'cstat' to " ".  
+!   vtrout.f      Added DBBC_PFB, DBBC_PFB/FILA10G, DBBC_DDC, DBBC_DDC/FILA10G as valid rack types.
+!  ../skdrut/vmoinp.f  Skiped some stuff dealing with tapes for disk based recording. 
+! 
+!2017Jan19 renam.f. Modified to handle strange filenames (e.g., with spaces or "(" in them). Done AEM.
+!
+!2016Dec12 prout.f: Don't write out 'TAPE_TYPE' parameter because everything is now disk.
+2016Dec12  stlis.f: Minor formatting change to make columns line up. 
+!2016Dec06-09. Introduction of FILL and GROUP commands. Many changes in files associated 
+!          with commands and reading and writing schedule files. Affected routines are: 
+!          1) cmdblock.f (=command help). 
+!          2) prlis.f, prout.f (=new ifill_off parameter)
+!          3) skini.f, skcls.f, unout.f (all with reading writing sked file). 
+!          4) group_mod.f and fillcmd.f and fsked.f (=execution of the command.) 
+!2016Dec09 proc_out.f. Fixed bug where it was writing "$PROCS" to un-opened file.
+!2016Dec06 ydhms.f.  Modifed so that "^,FIRST,BEGIN,START" all reference first epoch. 
+!          Previously "^" and "FIRST" referenced a long time ago (Jan01 1900)
+!2016Dec06 astro_cmd.f, simul.f.  Minor typograpic changes in comments and output statements
+!2016Nov10 broadband_cmd.f, cmdcmn.ftni, cmdblock.f: Better description of broadband syntax.
+!2016Oct31 simul.f  Corrected calculation of nutation partial by deleting multiplication by se=sin(eps) 
+!2016sep26 slewt.f, slewt2.f changed calculation of rise time to be consistent with looka.f 
+!2016Sep26 allday.f  Use finer grid to do search for rise/set times.
+!2016Sep26 looka.f   Changed logic in calculating when source will rise set because of bug at GST day boundaries
+!2016Sep25 whatsup.f  Output rising,setting time in seconds
+!2016Aug17 cablw.f  Fixed a bug if starting scan is near border of "W" and neutral. 
+!2016Aug16 chcmd.f  TAGALONG mode. Previous version did not handle cable wrap correctly.
+!2016Jul14 chcmd.f  TAGALONG mode. Takes into account time to write buffer for Mark6. 
+!2016Jul14 ../skdrut/ttape.f  Previously set tape type. Now do nothing since we no longer have tapes!
+!2016Jul07 prout.f.   If recorder is Mark6, then write out TAPE_TYPE as "THIN HIGH"
+!2016Feb01 save_station_state.f: Now preserves $BROADBAND data after station selection. 
+!2016Feb01 ../skdrut/stinp.f: Was setting isink_mbs=0 on reading in. This screwed things up if you added stations. 
+!2016Feb01 skcl.s: God rid of writting out correlator name on exit.
+!2015Dec21  Fixed bug in ../skdrut/cablw.f that was introduced on 2015Nov13.  
+!2015Dec01  prset.f.  Added SHAO to list of OK correlators. 
+!2015Nov13 ../skdrut/cablw.f  Rewritten and simplfied. 
+!2015Oct23 ../skdrut/frinp.f  Fixed bug in initializing samprate. Previously loop upper bound was unitialized variable
+!2015Oct23 return_master_line.f  Print out Update date for master file. 
+!2015Oct22 ../skdrut/kcont.f  Simplified code and fixed a bug.  Code was erroneously saying scan not continuous when it was. 
+!2015Oct21  extract_station_list.f. Fix problem where one station appears in the list twice,eg. KkWfWsGsYjWs  (Ws is in twice!)
+!2015Sep23  sumcm.f  For small sessions (intensives)  print out total media in GB, not TB. 
+!2015Sep22  printfr.f. Was not correctly calculating BW for two-bit sampling. 
+!2015Sep21  Prset.f was not reading in MARK6_OFF. 
+!2015Aug26  Modified op_read.f to be more forgiving when reading old (~2005) schedules) 
+!2015Aug14  Merged in many changes from 'broad-band' version of sked. These are the 2014.04.23 changes below
+!2015Jul09  Changed calculation of epoch in simul. Should have minor effects.
+!2015.06.30 Many changes to make compatible with drudg. Mostly addition of new rack type, but also changing length of strings holding racks, recorders.
+!2015.04.23 autot.f For Mark6 systems (which use buffers):  buf_time is now added to setup time.  Previously was concurrent with slew. )
+!2015.04.23 master_cmd.f     Set up correlator as well. 
+!2015.04.23 broadband_out.f   Output:  idata_mbps and isink_mbps. 
+!2015.02.12 hwrst.f. Fixed bug that would inifinite loop if two lines in the mask file were the same and corresponded to a station in schedule file.
+!           twrst.f  Removed writing out some information.  wrsts.f. Write out more information about which stage in the processing. 
+!2014.12.08 snrac.  This was incorectly flagging obs as bad. Also fixed warning messages in newob.f and nexct.f
+!2014.11.25 chcmd.f, auchk.f, gtobs.f, autot.f:  Fixed bug with tagalong mode thinking there was enough time. 
+!2014.09.30 make_defnames.f.  Modified to make K5 use Mark5A if correlated at VLBA. 
+!2014.09.23 ckiau.f. If the last character of the IAU source name is a character, only check first 7 chars. 
+!2014.09.23 chksundist. Previously always wrote out FIRST source if an error instead of correct source.
+!2014.09.22 vsiout.f: only write out occupation code if we have one.
+!2014.09.22 vsoout.f: only write out source name if we have one.
+!2014.09.22 vtrout.f: "NONE" is now valid Rack tape. 
+!2014.09.22 vppout.f: Only write out pass order if we have passes. 
+!2014.08.22 vdaout.f, vstout.f. Changed determining if VLBA station to function call. Define new function kvlba_station.f
+!2014.08.08 vtrout.f Modified so that if K5 recorder, converted to Mark4 for RDVs, Mark5B for others
+!2014.06.03 Added 'kbonn_corr' to see if Bonn correaltor. This controls how some stuff is writtn in VEX. 
+!2014.06.02 Changed prlis.f. Previously was not printing out GST seconds correctly.
+!2014.05.28 Minor change to vstout--Sc made a VLBA station. (Omitted on 5/22/ change)
+!2014.05.27 Better handling when tagging along new stations. This can result in collision of 1-letter codes when new stations read in. 
+!2014.05.22 Many minor modifications to write out modified VEX file for VLBA. vstout.f, vdaout.f,skcls.f, vmoout.f,vpcout.f,solis.f,source_cmd.f
+!2014.05.06 Modified output information when writing VEX files to make it clearer what is happening. 
+!           vmout.f, getist.f, make_defnames.f, vbbout.f,vifout.f,vroout.f,vtrout.f,vfrout.f, vppout.f, vhdout.f
+!2014.05.02 Removed bug that was setting pass to "F" instead of "1". 
+!2014.05.02 Got rid of references to ipas,idir,ift:  set_scan_param.f,newob.f,display_scan_info.f,unpak.f
+!2014.04.24 More consistent error messages. Fixed some more cablewrap issues. 
+!2014.04.24 Fixed continuity at start of tagalong. 
+!2014.04.23 Replaced integer*2 cablewrap parameters by character*2 versions: icpblpre-->cwrap_pre
+!2014.04.22 lscur.f.  Fixed case when would occaisonally add 4pi. 
+!2014.04.21 ../skdrut/cablw.f.  More modifications to handle cases near the wrap. 
+!2014.04.18 skopn.f Changed size of ctemp from 80 to 256. ctemp holds lines read in from sked file. 
+!2014.04.18 downtime.f Increased size of string variable to hold more stations in parsing downtime command.
+!2014.04.18 ../skdrut/cablw.f. MAde more robust for obs near C/N boundary. 
+!2014.04.11 ../skparm.ftni  max_obs 20,000-->30,000
+!2014.04.09 ../skdrut/stinp.f. Fixed bug where station was not getting initialized. 
+!2014.04.08 ../skdrut/kcont.f.  Removed changing cable wrap!
+!2014.04.07 Removed some printout about tape footage in display_scan_info.f
+!2014.04.04 Fixed problems with tagalong introduced at 2014.03.27. snrsk.f, chmcd.f, snrac.f
+!2014.04.04 next.c. Changed handling of warning message if schedule>24 hours. 
+!2014.04.03 readcmdline_new.f. Modified to replace "char(0)" with spaces
+!2014.03.31 skdrut/stnip.f removed extra arg in call to unpvt.f; 
+!           skdrut/unpvt.f removed extra arg. Removed special handling of terminals that start "K4"
+!2014.03.28 snrsk.f  Modified to 'round-up' the duration. This ensures we meet SNR targets. 
+!2014.03.27 snrok modified to calculate both NumSNRbad AND NumSNRGood. Don't do the sum of SNR_target=0
+!2014.03.27 snrac,snrsk. Modified to use compatible routines for computing SNR and duration. 
+!2014.03.27 snrac.f --> snrac.f + snr_find_numGood_numbad.f 
+!2014.02.18 sumcm.f Modified to output histogram of scan lengths.
+!2014.01.22 major_cmd.f. Was not correcting setting MinAngle.
+!2014.01.16 In cat_out, fixed problem with using wrong LU for some lines. 
+!2013.10.31 Fixed error in printing freq mode. Got Rate and BW reversed. Also changed #chan to #BBC
+!2013.10.11 Fixed make_defnames.f because was only checking first character of IF and BBC.
+!           Hence A1 and A3 were considered the same.
+!2013.10.10 Changed warning message in stsel if it could not determine frequency. 
+!2013.10.08 Changed default value for rMinSunAngle to 4.deg from 8.deg
+!2013.09.24 Modified because 'cat' command did not work with POSITION catalog
+!2013.09.18 Fixed bug in get_cat_version if the version info was missing. 
+!2013.09.18 Fixed bug in master_get that caused crash if encounter EOL w/o getting all info.
+!             return_master_line.f       
+!2013.09.18 Added "snr ast_margin" command. This works the same as SNR MARGIN but applies only to 
+!           astrometric sources. prout.f, cmdblock.f, snrac.f,skini.f, snrcm.f
+!2013.09.13 Changed versioning information at top of sked file. Now ouput "SCHEDULING_SOFTWARE", 
+!           "SOFTWARE_VERSION", "SCHEDULE_CREATE_DATE".       
+!2013.09.13 Made rSunMinAngle, rMinAngle,rMaxAngle real*4 (previously integer*4) and renamed.
+!  Affects: auchk.f,chksundist.f, clear_close_sources.f, major_cmd.f, major_init.f,
+!           major_out.f, nextc.f, newob.f,prset.f, ranksources.f,skini.f, solis.f           
+!2013.08.21 On extended listing print out flux to 2 decimals for small fluxes. (lshed.f lscur.f) 
+!2013.08.07 soplt_gnu.f.  Modified so that outpts sun's position curve at daily rather than 2-week intervals
+!2013.07.24 Corrected bug with "Flux Fix" command. Affected routine=flcmd.f 
+!2013.07.20 Can set skedf.ctl by using environment variables.
+!2013.07.02 Better calculation of SNRs. Now incorporates: 1-bit or 2-bit sampling. Correlator efficency factor. 
+!2013.06.20 Calculate number of  TB for BB stations
+!2013.06.18 Made sumpl_gnu compatible with more recent version of gnuplot
+!2013.05.17 Better messages when writing to PS file
+!2013.05.09 Modified cablewrap. auchk.f slewt.f 
+!2013.05.08 Minor change to whatsup.  Doesn't display footage anyomore.
+!2013.05.07 Only write out one broadband section.
+!2013.05.06 Fixed bug introduce in 2013.04.11 below. 
+!2013.05.01 Modified sumpl_gnu so that it would work with more recent versions of gnuplot. 
+!2013.04.25 SNRs were calculated correctly--but not durations. Fixed this.
+!2013.04.23 Added broadband option for calculating SNRs.
+!2013.04.19 Fixed problem with writing out $CATALOGS_USED more than once
+!2013.04.12 Now calcualte average SNR by baseline and band.
+!2013.04.11 Fixed problem with adding a station to a schedule which already had observations.
+!2013.03.22 Fixed problem if first antenna limit is negative i.e: (-270, 270) instead of (90, 630) 
+!2013.02.11 Changed maximum number of times a source can rise to 10.
+!2013.01.23 Added "VCC" command. This will create a VEX file without $SCHEDULING_PARAMS
+!2012.11.19 Changed so that did not write out CATALOGS_USED more than once. 
+!2012.11.08 Wasn't printing out some info to file if used "unit file".  
+!           subroutines: wrt_param_line.f, major_out.f    
+!2012.10.26 Slightly better warning message in master_get if can't determine SNR. 
+!2012.10.11 Don't check slew time if previous source is the same as the current source.
+!2012.10.10 Will now update list of catalogs used every time something is updated and will write to schedule file. 
+!2012.10.04 Many changes to support VEX read/write. 
+!2012.09.24 Initialze cat_trk_map to " " in read_mode_cat.f.
+!           Better error message in wrfclines: Indicate which track map and/or is bad. 
+!2012.09.21 Split reading of skedf.ctl into 'sked_version' and 'drudg version'.
+!           When seeing if there is a match on frequency sequence, check track map as well. 
+!2012.09.19 Minor changes to support dbbc in catalog. Also fixed bug in writing out horizon lines (hwrst.f)
+!2012.09.18 Fixed bug in writing out $FREQ section of VEX files where it would duplicate FREQuency sequence's. 
+!2012.09.07 Changes to support Mark5B in vex. Files affected: make_defname.f, vtrout.f 
+!           twrst.f (which checks for equipment matches) ignores case.
+!           make_stat_list.f. Previously asked if wanted to replace if a mismatch between catalogs
+!           and schedule. Now can specify "All" to stop asking. 
+!2012.07.06 Was not writing out TAPETM parameter in $PARAM section. 
+!2012.06.21 Bug fix by AEM in 'addsec2ut.f'.  If the result was exactly 86400 produced error.            
+!2012.05.10 Better checking in newob for issues related to cablewrap.
+!2012.04.09 Replaced socmd.f by source_cmcd.f. Added "cull" option. 
+!2011.12.02 vifout.f. Fixed problem writing out lower sideband.
+!           vtrout.f. Made Mark5B a valid rack type
+!2011.08.12 Added "Now" cmd.  Syntax: Now [?|<sub><time>]
+!           sets the  time of the subnet to 'time'. 
+!2011.08.11 Increased number of downtimes from 20 to 2000. Cont11 requires ~450.
+!           Added "Now" command that sets current time.
+!2011.05.24 Fixed long standing bug dealing with TAPE_TYPE uncovered by Cynthia Thomas.  prout.f
+!2011.05.03 Changed subnet output for whatsup command.  Effects subcon.f 
+!2011.04.21 Added MaxAngle option.  Effects major_cmd, major_inti, major_out, clear_close_sources.
+
+!2011.03.21 wrfclines.f:  Previously wouldn't work correctly if fanout was different for some stations.          
+!2011.02.16 get_srcs_2_monitor.f: If NUM<0, then output list of monitored sources
+!2011.02.16 prset.f Made valid correlator list consistent with master_file list. 
+!           All correlators are now 4-letter codes
+!2011.02.08 chcmd.f: Fixed bug in tag-along mode. The slewing calculation starts at the
+!           last time a station was used. If this is a long time ago, then this can lead 
+!           to problems. In this case mark the antenna as if it hasn't been used. 
+!                            
+!2011.02.08 Modified so that ignores case when doing 'saveps' test that checks if plots.
+!           Fixed list of valid correlators in prset.f 
+!           should be sent to a file. 
+! ************************Below is 2010 **********************
+!2010.12.03 Fixed writing out VEX BBC info.
+!2010.11.29 Restored SUBCON option which had been turned off. 
+!2010.11.23 If a station is down, don't schedule in tag along mode.
+!2010.11.04 Fixed bug in writing out BBCs in VEX file.  vbbout.f
+!2010.10.11 Increased number of valid BWs could handle BWs upto 1024
+!2010.10.04 Fixed bug in format statement for SrcWt. minor_out.f
+!           srcwt_cmd.f had some incorrect references to STATIONS, not SOURCES. fixed. 
+!2010.09.20 Make it so that sumout's Arg is not captilalized.  gtcmd.f 
+!2010.09.16 Got rid of references to tape parameters kysync, knorewind, kpostpass.
+!           prlis.f, prout.f, skcom.ftni, prset.f
+!           Got rid of any references to rewinding: find_best_scan.f 
+!           
+!2010.09.02 Fixed bug in vtrout.f. When checking rack type, didn't work if specified lower case.
+!           Now capitalizes rack-type before checking.
+!2010.08.23 Cleaned up various refrences to tapes in autot.f, auchk.f, newob.f chcmd.f
+!           Removed subroutines mutap.f and tapef.f 
+!2010.06.16 JMG. When printing out vex info, leave name between procedures.
+!           vfrout.f, fppout.f, vtrout.f, fhdout.f, vifout.f, vbbout.f,vanout.f,vstout.f
+!2010.06.15 JMG. Many changes having to do with vex.  
+!           Added logical flag kVexIn stored in common skcom.ftni which is true if input is vex.
+!           kVex -->KvexIn in skopn.f 
+!           In prset.f, don't change frequency if kVexIn=.true.  
+!               (Probably should only apply on initial reading of $PARAM section.)         
+!           Added support for K5: ../skdrut/gnpas.f, ../skdrut/vmoinp.f
+!           Minor change in output ../skdrut/vread.f 
+!                     
+!2010May19 JMG. Major_cmd.f: FillMinTime wasn't being set correctly. Fixed and reorganized 
+!           parsing of commands.
+!2010Apr29 JMG. Fixed bug with header messages and ch command. 
+!2010Apr26 JMG. Better error messages in unpak. Now identifies offending data item. 
+!               Better error messages in ydhms.  Now identify offending part of time. 
+!
+!2010Apr23 JMG. Fixed problem in a) writing out statwt, srcwt multiple times.  unout.f
+!               Fixed problem with "Statwt Add", "Srcwt Add"  commands. 
+!2010Apr21 JMG. At K. Kingham's request, use 1-character codes from catalogs if possible.
+!               Will still try to preserve if tagging a station along. 
+!          Routines: wrsts.f, make_stat_list.f 
+
+!2010Apr15 JMG. Added statwt, srcwt commands. statwt works in conjunction with minor statwt option.
+!          New routines: srcwt_cmd.f, srcwt_out.f, statwt_cmd,f, statwt_out.f
+!          Modifed: fsked.f, opread.f, minor_cmd.f, minor_out.f, find_best_scan.f, write_minor_score_and_scan.f,
+!          skopn.f, skcls.f, sini.f, cmdblock.f              
+!
+!2010Apr07 JMG. snrok.f.  Modified to use "iwhere_in_int_list".  Also, if ends with only 1 station, mark as bad.
+!               vscan.f.  Fixed bad arg list to snrok.f.  Also changed formatting. 
+!2010Apr06 JMG. Changed help command for media, tape. 
+!2010Mar26 JMG. Changed stutcm ->utstcm, enutcm-utencm for consistency with jdstcm and jdencm
+!           skcomn.ftni, gtobs.f, gtdtr.f, nexct.f,skini.f
+!2010Mar24  major_cmd.f Fixed error in seting MAXSLEW.  (previously skipped setting this.!)
+!           prout.f.  Fixed bug introduced Jan27.
+!2010Mar23  Modified so that would preserve 1-character statin IDs if we added stations.
+!           Needed to do this because if added stations to a schedule, want to preserve so that
+!           scan (which use this info) don't need to be remade. 
+!           wrsts.f 
+!
+!2010Mar19  Moved calculation of number of obs & scans per source out of astro_obs.f astro_cull.f
+!           into new subroutine find_obs_per_src.f. Also modified format of astro_cmd.f 
+!           Also modified astro syntax in cmdblock.f 
+!           Removed dependence on KBSELN, KPART, obsolete options that didn't work correctly.
+!           bslen.f, fsked.f, lscur.f, sumcm.f,subdis.f, skini.f  
+!
+!2010Mar15  Fixed problem with removing station.  Previoulsy if there were 2 scans 
+!            involving same removed station, skipped 2nd.
+!2010Mar10  Removed obsolete minor options srcfloor and tapewaste.
+!            minormodes.ftni, minor_cmd.f, minor_init.f, minor_out.f 
+!2010.03.01 major_cmd.f.  Modified "Master sub" to accept "Master sub all" and "master sub _"
+!2010.02.27 master_cmd.f: Modified to display experiment code we are using.
+!2010Jan27  Wasn't outputting Mark5B correctly.
+!2010Jan04  Added "list" option to xl Command.  Added "media" as a synonym for tape command. 
+!           Affected xlcmd.f, cmdblock.f, cmdcmn.ftni, helpsk.f, fsked.f 
+!2010Jan06  Formatting changes in extended listings.  lscur.f, lshed.f
+!           Fixed bug in selecting fluxes. Only appeared if did the following: 1. BestSource; 2. FluxSel.
+!           changed keep_some_srcs.f, readsourcecatalog.f.
+!           Modified format of printing fluxes.   fllis1.f 
+!2010Jan21  Modified master command so that don't have to specify full name-only directory.
+!           Wrote a new routine "return_master_line" that returns line corresponding to a given experiment in masterfile.
+!           If you specify the master directory, sked will search all master files back to 2000 to see if it finds 
+!           the session. 
+!2010.01.25 Added significant new diagnostic: Sky coverage by site.
+!           New routines: computer_coverage.f, pixelation.f 
+!           Modified routines: skini.f, result.f, sky_cov_pix.f cover.f, coverage.f,sphere_pix.f fsked.f
+!             cmdblock.f, lscur.f
+!2010.01.26 Fixed bug in downtime command. Previously checked to see if a station was up at the 
+!           begining and end of the scan. If so, assumed that the station was up. This missed the case 
+!           (for long scans) where station is down in middle.
+!           Also changed things a bit so that scans will be picked up closer to the start and end of downtime. 
+!           Routines: kstatup.f, nextc.f, newob.f, find_best_scan.f
+!2010.01.27 Wasn't handling Mark5B as valid tape type on writing out.  Also updated so that valid tape types include Mar5C.
+!           Files: prout.f,  ../skdurt/valid_hardware_blk.f,  ../skdrincl/valid_hardware.ftni 
+!2010.01.27 master_cmd.f: Modified to check PIname and Correlator against master file.!
+!
+! ********Changes Made in 2009********************************************
+! Below are in chronological order.
+! 2009Jan09. Fixed bug in shift command. 
+! 2009Jan29. If kdebug=true, display why stations kicked out in autosked mode. 
+!             Fixed bug in writing out long TAPE_xxx lines.  Last line was not 
+!             getting written out.
+! 2009Feb09.  Write out setup time for Param list command.
+! 2009Mar03   Numerous fixes in making backward compatible with HPUX for Haystack.
+!   Following routines had unused variables removed:
+!     skdrut: addscan.f,  kget_response.f, m3mode.f,novas.f, readline_skdrut.f,
+!             soinp.f, stinp.f, ydjul.f, vobinp.f,vunpif.f
+!     sked:   autot.f, cover.f, coverage.f chske.f, downtime.f, display_scan_info.f,
+!       findallslewtimes.f,find_best_scan.f, gtsti.f,make_scans.f,makesubset.f, 
+!       newob.f,nextc.f, opfill.f, pakup.f,prlis.f, prout.f,pwrst.f, 
+!       read_rec_cat.f, read_rx_cat.f, skip_to_next_cat_group.f, skopn.f,
+!       snrac.f, snrsk.f, statjmg.f, stlis.f, unpak.f, vex_comment.f, vscan.f,
+!       whatsup.f,wrllines.f,xlcmd.f 
+!                  
+!  Bug fixes:  
+!     skdrut/stinp.f:  Fixed bug in Or statement.
+!     skdrut/delete_file.f: Unitialzed variable.
+!     sked/helpsk.f         Array overflow.
+!     sked/master_cmd.f     Unitialized variable (master_end_time).
+!     sked/newob.f          Removed function trim which HPUX doesn't know.
+!     sked/set_signal_ctrlc.f   Changed "==" to ".eq." in Logical statements
+!  Miscellaneous:
+!     sked:  Added alternate read_cmdline for cases where no read_line utility.
+!     obs_sort:  Stepped back to using hhmm in scan name (not hhmmss)
+!     ex_read:   Fixed spellling error in output
+!     major_cmd: Rearranged data statements, order of outputing stuff
+!2009Mar04  Modified xlcmd "help" listing to include new modes 
+!2009Apr02  read_mode_cat.f, wrfrs.f, make_mode_list.f, cat_mode.ftni,display_mode_item.f 
+!           Renamed two variables (icat_mode_rec, icat_mode_freq) by adding "_ptr" onto the end.
+!2009Apr02  make_mode_list.f.  
+!           Modified to make automatic matching of frequency modes more robust. 
+!           Now checks #tracks, #bits. 
+!2009Apr02  prout.f
+!           Fixed bug in writing out "Tape" type if we had K5 recorder. 
+!2000Apr09  Added "all" option to refer to ^-* range.
+!           delcm.f, helpsk.f, chpar.f 
+!2009Apr13  incorporated bug fixes A.Melnikov in slewt.f and igetsrc.f
+!2009Apr29  Fixed bug where sked wasn't outputing "?" prompt if read_line was off.
+!           Also fixed problem in sked_date.ftni 
+!2009May05  Fixed problem withs sumpl_gnu.f cutting off the righthand edge. 
+!2009May08  Modified mysql routines to use gemini mysql server
+!2009Jun20  Issue error message if station can't participate because of downtime.
+!           Newob.f 
+!2009Jun20  Fixed bug in makesubset which occured if we were sub-netting.
+!2009Jul08  Fixed bug in calculating Formal errors, covariance if we regenerated the schedule
+!           Modified so that don't have to explicitly turn on optimization ("op go")
+!           solve.f.  Fixed bug in deleting file if it existed. Now calls purge_file. 
+!2009Jul15  Bug in old schedules where minimum sub-net size=0. New sked doesn't work.
+!           Modified prset.f to only accept values larger than 2. 
+!           Modified newpr.f to print out better error messages. 
+!           master_cmd.f.  Will check to see that all stations have SNR>0.
+!2009Sep01  Changed getting ../skdrut/igetsrcnum.f to check both common names and IAU names.
+!2009Sep03  Changed master_cmd.f to read upto 64 stations from master file 
+!           Changed ../skdrut/extractnexttoken.f If not space for entire token, return as much as we can 
+!2009Sep09  master_cmd.f Modified so that returns to main if masterfile not found. 
+!2009Sep09  rdctl.f    Modified so that can specify default path for catalogs 
+!2009Sep15  vsiout.f  Removed debugging statements. 
+!2009Sep22  nexctc.f  Modified format statement which was overflowing if end date>1 century.
+!2009Sep29  fllis1.f  Modified printing of fluxes. Add "*****MISSING****" for missing. 
+!           sochr.f   Modified assignment of source characters so that wrapped after 90
+!           ../skdrut/ttape.f  Better checking for valid tape types for K4
+!           ../skdrut/frinp.f  Got rid of extraneous variable itype
+!2009Oct01  major_cmd.f.  Bug in setting subnet.  Previously limited subnet size to 10 stations.
+!           Now subnet can be any size.
+!           frlis.f    Modified formating
+!           ..skdrut/speed.f.  Made all disk-recording have the same speed.
+!2009Oct12  In scheduling IYA2009 ran out of good 1-character codes for stations.
+!          ../skdrut/idchk.f
+!2009Oct12  Ran out of space printing subnet if larger than 32. Enlarged to 80.
+!           major_out.f 
+!2009Oct13  flinp.f   Modified so that when it comes to a "!" assumes rest of line is a comment
+!2009Oct15  frlis.f   Pretty print.
+!2009Oct29  prset.f, prlis.f, prout.f  Got rid of unused variable lsrcdist.
+!           Better printing on minor_cmd.
+!2009Nov02  newpr.f  Previosly default was source had to be visible from ALL stations.
+!           Now only true if sub=  is set
+!2009Nov03  Better handling of #obs per source and baseline.
+!           delete_all_obs.f   Initialize this to 0.
+!           astro_obs.f        Wasn't initializing correctly.
+!2009Nov05  Several minor bugs (formatting, etc) found in making gfortran compatilble.
+!           Incorporated two bug fixes found by AEM.
+!           major_cmd.f, opread.f
+!2009Nov16  get_srcs_2_monitor.f Wasn't properly initializing default choice to 10 
+!2009Dec11  Changed default modular time unit from 10 to 1.  Only effects VEX files where this is not explicitly set.
+!2009Dec29  Minor format change in sumcm.f
+
+   
+
