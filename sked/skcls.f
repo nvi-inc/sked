@@ -87,6 +87,7 @@ C 000523 nrv Add separator lines between VEX sections.
 ! 2013Apr23  JMG. Write out Broadband sections
 ! 2014May22  JMG. Set kvlba flag which indicates will be correlated at Socorro. VEX file is slightly modified. 
 ! 2014Jun03 JMG. kvlba-->kvlba_corr. Added kbonn_corr,and placed $SCHEDULING PARAMs at end of VEX file
+! 2020Jun02 JMG. Don't write obsolete head stuff 
 C
        cs2fil=" "
        KERR = 1
@@ -288,10 +289,11 @@ C  4.6 $SKED. Write if changed or creating a new file.
           END IF
  
 C  4.7 $HEAD section.
- 
-          IF (NSTATN.GT.0.and.ncodes.gt.0.and.(knewfr.or.knewfi))THEN
-            call chout('HEAD    ',chdfil)
-          END IF
+!         if(.false.) then 
+!          IF (NSTATN.GT.0.and.ncodes.gt.0.and.(knewfr.or.knewfi))THEN
+!            call chout('HEAD    ',chdfil)
+!          END IF
+!         endif
 
 C  4.8 $FLUX.  Write if sources or codes changed.
  

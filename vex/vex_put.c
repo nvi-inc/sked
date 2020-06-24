@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <ctype.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 #include "vex.h"
 #include "y.tab.h"
@@ -34,8 +34,6 @@ char *err2 = "ERROR in";
 
 extern FILE * yyin;
 extern struct vex *vex_ptr;
-char *filename;
-FILE *fp;
 
 /*********************************************************************
  * functions:                                                         *

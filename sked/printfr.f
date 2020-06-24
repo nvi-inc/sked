@@ -18,8 +18,12 @@ C 010119 nrv Forgot to print Mk3 speed.
 !                     Now use ntrakn, but use trkn for calculating effective # of channels. 
 ! 2013Oct31 JMGipson. Had TotRate and BandWidth reversed. Also changed #chan to #BBC
 ! 2015Sep22 JMGipson. Corrected printing of Bandwidth. Now accounts for number of bits!
-! 2018Jul05 JMGipson. Previously did not accont for headstack in calculating number of bits. Now does
+! 2018Jul05 JMGipson. Previously did not accont for headstack in calculating number of bits.
+! 2020Jun6  JMGipson. Changed  to using ntrnk from ntrakfssince GNPAS modified.
+!                     Condensed write statements. Got rid of S2,K4 flags which were not used. 
 
+
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
@@ -37,10 +41,10 @@ C
 C  LOCAL VARIABLES
       integer isub,ivc,j,k,iv,ibit,i
       integer ittrack
-      logical ks2,kk4
       real*4 tot,speed
       real*8 fmax,fmin
       real*8 ChanBW
+      integer ntmp   !number of channels
       integer ntot   
       real*8 bit_eff_1bit
       real*8 bit_eff_2bit
@@ -52,8 +56,7 @@ C  LOCAL VARIABLES
 C
 C 1. Summary information
 
-      ks2=cterna(is)(1:2) .eq. "S2"
-      KK4=cterna(is)(1:2) .eq. "K4"
+
       ibit=1
       tot=0.
     
@@ -64,26 +67,25 @@ C 1. Summary information
       enddo
       call itras_params(is,ic,npass,ntrks,nhead,ibit)
 
-      ntot=ntrakf(is,ic)
       tot=trkn(1,is,ic)+trkn(2,is,ic)
+      ntot=ntrkn(1,is,ic)+ntrkn(2,is,ic) 
    
       if (ifan(is,ic).gt.0) then
-        ittrack=npassf(is,ic)*ntrakf(is,ic)*ifan(is,ic)
+        ittrack=ntot*ifan(is,ic)
       else
-        ittrack=npassf(is,ic)*ntrakf(is,ic)
+        ittrack=ntot
       endif
+      ntmp=ntot/ibit 
+
+      write(ludsp,'(a)')
+     > "  Mode      Tot.Rate  #Chan  Chan.BW  Tot.BW   #BBC  #bits "
+     > //"Tracks*(fan) Tot.tracks Barrel" 
       write(ludsp,
-     > "('  Mode      Tot.Rate    Tot.BandW   #BBC #bits  Barrel')")
-      write(ludsp,
-     > "(1x,a8,1x,i5,' Mbits  ',i5,' MHz     ',i2,5x,i1,5x,a4)")
-     >   cMODE(is,Ic), nint(samprate(is,ic)*ntot*nhstack(is,ic)),
-     >   nint(ChanBW*ntot)/ibit,
-     >   nchan(is,ic), ibit,cbarrel(is,ic)
-        write(ludsp,
-     > "('  Chan.BW  #Subpasses  Tracks(*fan)  Tot.tracks ')")
-      write(ludsp,
-     > "(1x,f5.2,' MHz',5x,i2,9x,i2,'(*',i1,')',7x,i3)") 
-     > ChanBW,NPASSF(is,Ic),ntrakf(is,ic),ifan(is,ic),ittrack     
+     > "(1x,a8,1x,i5, ' Mbps ', i5, i5, ' Mhz ', i5, ' Mhz '
+     >   i4, 2x,i4,4x,i4,'*(',i1,')',4x,i6,6x,a )") 
+     >  cmode(is,ic), nint(samprate(is,ic)*ntot), ntmp, nint(ChanBW), 
+     >  nint(ChanBw*ntmp), nchan(is,ic), ibit,
+     >  ntot,ifan(is,ic),ittrack,cbarrel(is,ic)
    
       do j=1,nband !# of bands
         fmax=0.0

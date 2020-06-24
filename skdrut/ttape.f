@@ -37,7 +37,7 @@ C  LOCAL
       save cstrec_old
 
       integer ilist_len
-      parameter (ilist_len=7)
+      parameter (ilist_len=6)
       character*12 list(ilist_len)
 
       integer ilist_hl
@@ -50,7 +50,7 @@ C  LOCAL
 
       integer ikey,ikeyhl,ikeys2
 
-      data list/"SHORT","THICK","THIN","MARK5A","MARK5B","MARK5C","K5"/
+      data list/"MARK5A","MARK5B","MARK5C","MARK6","FLEXBUFF","K5"/
       data list_hl/'HIGH','LOW','SUPER','DUPER'/
       data listS2/'LP','SLP'/
 
@@ -74,6 +74,7 @@ C 021003 nrv Adjust K4 output for speed being in dm internally.
 ! 2008Jun04 JMG fixed rounding problem with S2 tapes.  Would change the input footage
 ! 2009Sep22 JMG. Added Mark5B as a valid mode
 ! 2014Dec02 JMG. Mark5C support
+! 2020Jun09 JMG. Added MARK6, got rid of THICK,THIN,SHORT
 
       IF  (NSTATN.LE.0.or.ncodes.le.0) THEN  
         write(luscn,*)

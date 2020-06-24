@@ -10,6 +10,7 @@
       include 'skcom.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni'
       include '../skdrincl/freqs.ftni'
 
 ! Passed variables

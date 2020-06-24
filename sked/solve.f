@@ -1,9 +1,9 @@
-C@SOLVE
 C
-      SUBROUTINE SOLVE(linstq)
+      SUBROUTINE SOLVE(lfilnam)
 C
 C     SOLVE generates an output file for SOLVE
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
 C
 C  COMMON BLOCKS
@@ -16,20 +16,21 @@ C
 C     CALLING SUBROUTINES: SKED
 C
 C Input:
-      integer*2 linstq(*)
+      character*(*) lfilnam   !filename to use if specified. 
 
 C LOCAL VARIABLES
-      character*128 ctmp
+      character*128 lfilout   !output filename 
       integer ierr,i,j,ldum,irh1,irm1,l1,idd1,idm1
       integer idum
-      integer ich,iy1,im1,id1,ih1,mi1,is1,iy2,im2,id2,ih2,mi2,is2,
-     .ic1,ic2,ida
-      integer trimlen
+      integer ich
+      integer iy1,im1,id1,ih1,mi1,is1,iy2,im2,id2,ih2,mi2,is2
+      integer ic1,ic2,ida
       real*4 ds1,rs1,dum
       integer nch,nc
       logical*4 kex
       character cans
       integer itmp
+      integer ind 
 C
 C      WHO  WHEN    WHAT
 C      NRV  921005  First edition
@@ -37,6 +38,7 @@ C      nrv  930412  Add number of obs, start/end times
 C      nrv  930429  Add user-specified file name
 !   2008Mar22 JMGipson Changed iobswt->ksnrwts
 !   2009Jul08 JMGipson
+!   2020Jun10. JMG. Added implict none. Base filename on skedfile name, not cexper. 
 C
 
 C  1. Make sure there is enough information.
@@ -55,36 +57,37 @@ C  1. Make sure there is enough information.
         return
       endif
 
-C  1.5 Get file name or generate a default file name.
+! 1.5 Get file name or generate a default file name.
 
-      if (linstq(1).gt.0) then !file name specified
-        nch=linstq(1)
-        call hol2char(linstq(2),1,nch,ctmp)
-      else !default file name
-        if (cexper .eq. " ") then
-          ctmp = 'exper.solve'
-        else !use experiment name
-          ctmp=cexper
-          call c2lower(ctmp,ctmp)
-          nch = trimlen(ctmp)
-          ctmp = ctmp(1:nch)//'.solve'
+      if(lfilnam .ne. ' ') then
+        lfilout=lfilnam
+      else
+!  use name of schedule file, replacing '.skd' or '.vex' with '.solve'
+        lfilout=cskfil
+        ind=index(cskfil,".skd")
+        if(ind .eq. 0) then
+          ind=index(cskfil,".vex")
+          if(ind .eq. 0) then
+             if(ind .eq. 0) ind=len_trim(cskfil)+1
+          endif
         endif
-      endif
- 
+        lfilout(ind:)=".solve"  
+      endif 
+           
 C  2. Create the output file. 
 
-      call purge_file(ctmp,luscn,luusr,.false.,ierr)
+      call purge_file(lfilout,luscn,luusr,.false.,ierr)
     
-      open(lutmp,file=ctmp,status='unknown',iostat=ierr)
+      open(lutmp,file=lfilout,status='unknown',iostat=ierr)
       CLOSE(lutmp,status='delete')
-      OPEN (lutmp,file=ctmp,status='NEW',iostat=IERR)
+      OPEN (lutmp,file=lfilout,status='NEW',iostat=IERR)
       if (ierr.ne.0) then
-        write(luscn,9201) ierr,ctmp(1:nch)
+        write(luscn,9201) ierr,lfilout(1:nch)
 9201    format('SOLVE01: Error ',i5', trying to create SOLVE output',
      .  ' file ',a)
         goto 900
       else
-        write(luscn,9291) ctmp(1:nch)
+        write(luscn,9291) lfilout(1:nch)
 9291    format('SOLVE02: Opened output file ',a)
       endif
 

@@ -750,7 +750,7 @@ fget_station_scan__
 fget_station_scan
 #endif
 (n)
-int *n;
+integer *n;
 /*<      integer function fget_station_scan(n) >*/
 /*<      implicit none >*/
 /*<      integer n >*/
@@ -799,7 +799,7 @@ fget_data_transfer_scan__
 fget_data_transfer_scan
 #endif
 (n)
-int *n;
+integer *n;
 /*<      integer function fget_data_transfer_scan(n) >*/
 /*<      implicit none >*/
 /*<      integer n >*/
@@ -1221,7 +1221,7 @@ doublereal *double__;
     { "min" , 60.0 },
     { "hr"  , 60.0*60.0 },
     { "day" , 60.0*60.0*24.0 },
-    { "yr"  , 60.0*60.0*24.0*365.2425 },
+    { "yr"  , 60.0*60.0*24.0*365.25 },
     { NULL  , 0.0 }
   };
 
@@ -1326,6 +1326,7 @@ doublereal *double__;
   num_found=0;
   LOOKUP(num_found,num,angle,num_factor);
   LOOKUP(num_found,num,length,num_factor);
+  LOOKUP(num_found,num,time,num_factor);
 
   denom_found=0;
   LOOKUP(denom_found,denom,time,denom_factor);
@@ -1363,7 +1364,7 @@ integer *int__;
 /*   integer (return value)    - error code, zero indicates no error */
 /*                               -7 = field was not a valid int */
 {
-  if(1!=sscanf(*field,"%d",int__))
+  if(1!=sscanf(*field,"%ld",int__))
     return -7;
 
   return 0;
@@ -1405,7 +1406,7 @@ doublereal *seconds;
 {
   int count;
 
-  count=sscanf(*field,"%dy%dd%dh%dm%lfs",
+  count=sscanf(*field,"%ldy%ldd%ldh%ldm%lfs",
 	       iarray,iarray+1,iarray+2,iarray+3,seconds);
 
   if (count<2)

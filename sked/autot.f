@@ -7,6 +7,7 @@ C
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni'
       include '../skdrincl/skobs.ftni'
       include '../skdrincl/constants.ftni'
 

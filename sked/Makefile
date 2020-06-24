@@ -20,7 +20,7 @@ OBJ_MOD = \
 OBJ_FOR=  \
     $(SKED_HEAD) \
     $(READ_CMDLINE)  \
-       \
+    gnpas.o       \
     adjustendtime.o \
     add_file_to_vex.o \
     addsec2ut.o \
@@ -83,7 +83,6 @@ OBJ_FOR=  \
     exread.o \
     extract_station_list.o \
     ffreq.o \
-    fhdpos.o \
     fillcmd.o \
     find_best_scan.o  \
     findsegoverlap.o \
@@ -198,7 +197,6 @@ OBJ_FOR=  \
     readsourcecatalog.o \
     read_antenna_cat.o \
     read_freq_cat.o \
-    read_hdpos_cat.o \
     read_loif_cat.o \
     read_mode_cat.o \
     read_rec_cat.o \
@@ -270,7 +268,8 @@ OBJ_FOR=  \
     sumpl_gnu.o \
     sumpr.o \
     swapint.o \
-   testcon.o \
+    testcon.o \
+    thin_cmd.o \
     tmlin.o \
     tsincer.o \
     twrst.o \

@@ -11,6 +11,7 @@
       integer ierr      !0=no error.
 
 ! History
+!  2020Jun02  JMG. Removed debugging write. 
 !  2019Sep03  JMG. 1) Added implicit none. 2) Replaced unitialized variable with correct one.
 !  2008Jun11  JMGipson.  Only write to screen if verbose is on.
 !  2005Nov21  JMGipson  First version
@@ -33,7 +34,6 @@
       integer iwid
       integer icnt
 
-      write(*,*) "kcat_freq ", kcat_freq 
 !  1. Open the frequency catalog
       ierr=0
       if(kcat_freq) return   !skip re-reading the catalog

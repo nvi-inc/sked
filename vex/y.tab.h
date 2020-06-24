@@ -1,14 +1,13 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.0.4.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,164 +30,173 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     T_VEX_REV = 258,
-     T_REF = 259,
-     T_DEF = 260,
-     T_ENDDEF = 261,
-     T_SCAN = 262,
-     T_ENDSCAN = 263,
-     T_CHAN_DEF = 264,
-     T_SAMPLE_RATE = 265,
-     T_BITS_PER_SAMPLE = 266,
-     T_SWITCHING_CYCLE = 267,
-     T_START = 268,
-     T_SOURCE = 269,
-     T_MODE = 270,
-     T_STATION = 271,
-     T_DATA_TRANSFER = 272,
-     T_ANTENNA_DIAM = 273,
-     T_AXIS_OFFSET = 274,
-     T_ANTENNA_MOTION = 275,
-     T_POINTING_SECTOR = 276,
-     T_AXIS_TYPE = 277,
-     T_BBC_ASSIGN = 278,
-     T_CLOCK_EARLY = 279,
-     T_RECORD_TRANSPORT_TYPE = 280,
-     T_ELECTRONICS_RACK_TYPE = 281,
-     T_NUMBER_DRIVES = 282,
-     T_HEADSTACK = 283,
-     T_RECORD_DENSITY = 284,
-     T_TAPE_LENGTH = 285,
-     T_RECORDING_SYSTEM_ID = 286,
-     T_TAPE_MOTION = 287,
-     T_TAPE_CONTROL = 288,
-     T_TAI_UTC = 289,
-     T_A1_TAI = 290,
-     T_EOP_REF_EPOCH = 291,
-     T_NUM_EOP_POINTS = 292,
-     T_EOP_INTERVAL = 293,
-     T_UT1_UTC = 294,
-     T_X_WOBBLE = 295,
-     T_Y_WOBBLE = 296,
-     T_NUT_REF_EPOCH = 297,
-     T_NUM_NUT_POINTS = 298,
-     T_NUT_INTERVAL = 299,
-     T_DELTA_PSI = 300,
-     T_DELTA_EPS = 301,
-     T_NUT_MODEL = 302,
-     T_EXPER_NUM = 303,
-     T_EXPER_NAME = 304,
-     T_EXPER_NOMINAL_START = 305,
-     T_EXPER_NOMINAL_STOP = 306,
-     T_PI_NAME = 307,
-     T_PI_EMAIL = 308,
-     T_CONTACT_NAME = 309,
-     T_CONTACT_EMAIL = 310,
-     T_SCHEDULER_NAME = 311,
-     T_SCHEDULER_EMAIL = 312,
-     T_TARGET_CORRELATOR = 313,
-     T_EXPER_DESCRIPTION = 314,
-     T_HEADSTACK_POS = 315,
-     T_IF_DEF = 316,
-     T_PASS_ORDER = 317,
-     T_S2_GROUP_ORDER = 318,
-     T_PHASE_CAL_DETECT = 319,
-     T_TAPE_CHANGE = 320,
-     T_NEW_SOURCE_COMMAND = 321,
-     T_NEW_TAPE_SETUP = 322,
-     T_SETUP_ALWAYS = 323,
-     T_PARITY_CHECK = 324,
-     T_TAPE_PREPASS = 325,
-     T_PREOB_CAL = 326,
-     T_MIDOB_CAL = 327,
-     T_POSTOB_CAL = 328,
-     T_HEADSTACK_MOTION = 329,
-     T_PROCEDURE_NAME_PREFIX = 330,
-     T_ROLL_REINIT_PERIOD = 331,
-     T_ROLL_INC_PERIOD = 332,
-     T_ROLL = 333,
-     T_ROLL_DEF = 334,
-     T_SEFD_MODEL = 335,
-     T_SEFD = 336,
-     T_SITE_TYPE = 337,
-     T_SITE_NAME = 338,
-     T_SITE_ID = 339,
-     T_SITE_POSITION = 340,
-     T_SITE_POSITION_EPOCH = 341,
-     T_SITE_POSITION_REF = 342,
-     T_SITE_VELOCITY = 343,
-     T_HORIZON_MAP_AZ = 344,
-     T_HORIZON_MAP_EL = 345,
-     T_ZEN_ATMOS = 346,
-     T_OCEAN_LOAD_VERT = 347,
-     T_OCEAN_LOAD_HORIZ = 348,
-     T_OCCUPATION_CODE = 349,
-     T_INCLINATION = 350,
-     T_ECCENTRICITY = 351,
-     T_ARG_PERIGEE = 352,
-     T_ASCENDING_NODE = 353,
-     T_MEAN_ANOMALY = 354,
-     T_SEMI_MAJOR_AXIS = 355,
-     T_MEAN_MOTION = 356,
-     T_ORBIT_EPOCH = 357,
-     T_SOURCE_TYPE = 358,
-     T_SOURCE_NAME = 359,
-     T_IAU_NAME = 360,
-     T_RA = 361,
-     T_DEC = 362,
-     T_SOURCE_POSITION_REF = 363,
-     T_RA_RATE = 364,
-     T_DEC_RATE = 365,
-     T_SOURCE_POSITION_EPOCH = 366,
-     T_REF_COORD_FRAME = 367,
-     T_VELOCITY_WRT_LSR = 368,
-     T_SOURCE_MODEL = 369,
-     T_VSN = 370,
-     T_FANIN_DEF = 371,
-     T_FANOUT_DEF = 372,
-     T_TRACK_FRAME_FORMAT = 373,
-     T_DATA_MODULATION = 374,
-     T_VLBA_FRMTR_SYS_TRK = 375,
-     T_VLBA_TRNSPRT_SYS_TRK = 376,
-     T_S2_RECORDING_MODE = 377,
-     T_S2_DATA_SOURCE = 378,
-     B_GLOBAL = 379,
-     B_STATION = 380,
-     B_MODE = 381,
-     B_SCHED = 382,
-     B_EXPER = 383,
-     B_SCHEDULING_PARAMS = 384,
-     B_PROCEDURES = 385,
-     B_EOP = 386,
-     B_FREQ = 387,
-     B_CLOCK = 388,
-     B_ANTENNA = 389,
-     B_BBC = 390,
-     B_CORR = 391,
-     B_DAS = 392,
-     B_HEAD_POS = 393,
-     B_PASS_ORDER = 394,
-     B_PHASE_CAL_DETECT = 395,
-     B_ROLL = 396,
-     B_IF = 397,
-     B_SEFD = 398,
-     B_SITE = 399,
-     B_SOURCE = 400,
-     B_TRACKS = 401,
-     B_TAPELOG_OBS = 402,
-     T_LITERAL = 403,
-     T_NAME = 404,
-     T_LINK = 405,
-     T_ANGLE = 406,
-     T_COMMENT = 407,
-     T_COMMENT_TRAILING = 408
-   };
+  enum yytokentype
+  {
+    T_VEX_REV = 258,
+    T_REF = 259,
+    T_DEF = 260,
+    T_ENDDEF = 261,
+    T_SCAN = 262,
+    T_ENDSCAN = 263,
+    T_CHAN_DEF = 264,
+    T_SAMPLE_RATE = 265,
+    T_BITS_PER_SAMPLE = 266,
+    T_SWITCHING_CYCLE = 267,
+    T_START = 268,
+    T_SOURCE = 269,
+    T_MODE = 270,
+    T_STATION = 271,
+    T_DATA_TRANSFER = 272,
+    T_ANTENNA_DIAM = 273,
+    T_AXIS_OFFSET = 274,
+    T_ANTENNA_MOTION = 275,
+    T_POINTING_SECTOR = 276,
+    T_AXIS_TYPE = 277,
+    T_BBC_ASSIGN = 278,
+    T_CLOCK_EARLY = 279,
+    T_RECORD_TRANSPORT_TYPE = 280,
+    T_ELECTRONICS_RACK_TYPE = 281,
+    T_NUMBER_DRIVES = 282,
+    T_HEADSTACK = 283,
+    T_RECORD_DENSITY = 284,
+    T_TAPE_LENGTH = 285,
+    T_RECORDING_SYSTEM_ID = 286,
+    T_TAPE_MOTION = 287,
+    T_TAPE_CONTROL = 288,
+    T_TAI_UTC = 289,
+    T_A1_TAI = 290,
+    T_EOP_REF_EPOCH = 291,
+    T_NUM_EOP_POINTS = 292,
+    T_EOP_INTERVAL = 293,
+    T_UT1_UTC = 294,
+    T_X_WOBBLE = 295,
+    T_Y_WOBBLE = 296,
+    T_NUT_REF_EPOCH = 297,
+    T_NUM_NUT_POINTS = 298,
+    T_NUT_INTERVAL = 299,
+    T_DELTA_PSI = 300,
+    T_DELTA_EPS = 301,
+    T_NUT_MODEL = 302,
+    T_EXPER_NUM = 303,
+    T_EXPER_NAME = 304,
+    T_EXPER_NOMINAL_START = 305,
+    T_EXPER_NOMINAL_STOP = 306,
+    T_PI_NAME = 307,
+    T_PI_EMAIL = 308,
+    T_CONTACT_NAME = 309,
+    T_CONTACT_EMAIL = 310,
+    T_SCHEDULER_NAME = 311,
+    T_SCHEDULER_EMAIL = 312,
+    T_TARGET_CORRELATOR = 313,
+    T_EXPER_DESCRIPTION = 314,
+    T_HEADSTACK_POS = 315,
+    T_IF_DEF = 316,
+    T_PASS_ORDER = 317,
+    T_S2_GROUP_ORDER = 318,
+    T_PHASE_CAL_DETECT = 319,
+    T_TAPE_CHANGE = 320,
+    T_NEW_SOURCE_COMMAND = 321,
+    T_NEW_TAPE_SETUP = 322,
+    T_SETUP_ALWAYS = 323,
+    T_PARITY_CHECK = 324,
+    T_TAPE_PREPASS = 325,
+    T_PREOB_CAL = 326,
+    T_MIDOB_CAL = 327,
+    T_POSTOB_CAL = 328,
+    T_HEADSTACK_MOTION = 329,
+    T_PROCEDURE_NAME_PREFIX = 330,
+    T_ROLL_REINIT_PERIOD = 331,
+    T_ROLL_INC_PERIOD = 332,
+    T_ROLL = 333,
+    T_ROLL_DEF = 334,
+    T_SEFD_MODEL = 335,
+    T_SEFD = 336,
+    T_SITE_TYPE = 337,
+    T_SITE_NAME = 338,
+    T_SITE_ID = 339,
+    T_SITE_POSITION = 340,
+    T_SITE_POSITION_EPOCH = 341,
+    T_SITE_POSITION_REF = 342,
+    T_SITE_VELOCITY = 343,
+    T_HORIZON_MAP_AZ = 344,
+    T_HORIZON_MAP_EL = 345,
+    T_ZEN_ATMOS = 346,
+    T_OCEAN_LOAD_VERT = 347,
+    T_OCEAN_LOAD_HORIZ = 348,
+    T_OCCUPATION_CODE = 349,
+    T_INCLINATION = 350,
+    T_ECCENTRICITY = 351,
+    T_ARG_PERIGEE = 352,
+    T_ASCENDING_NODE = 353,
+    T_MEAN_ANOMALY = 354,
+    T_SEMI_MAJOR_AXIS = 355,
+    T_MEAN_MOTION = 356,
+    T_ORBIT_EPOCH = 357,
+    T_SOURCE_TYPE = 358,
+    T_SOURCE_NAME = 359,
+    T_IAU_NAME = 360,
+    T_RA = 361,
+    T_DEC = 362,
+    T_SOURCE_POSITION_REF = 363,
+    T_RA_RATE = 364,
+    T_DEC_RATE = 365,
+    T_SOURCE_POSITION_EPOCH = 366,
+    T_REF_COORD_FRAME = 367,
+    T_VELOCITY_WRT_LSR = 368,
+    T_SOURCE_MODEL = 369,
+    T_VSN = 370,
+    T_FANIN_DEF = 371,
+    T_FANOUT_DEF = 372,
+    T_TRACK_FRAME_FORMAT = 373,
+    T_DATA_MODULATION = 374,
+    T_VLBA_FRMTR_SYS_TRK = 375,
+    T_VLBA_TRNSPRT_SYS_TRK = 376,
+    T_S2_RECORDING_MODE = 377,
+    T_S2_DATA_SOURCE = 378,
+    B_GLOBAL = 379,
+    B_STATION = 380,
+    B_MODE = 381,
+    B_SCHED = 382,
+    B_EXPER = 383,
+    B_SCHEDULING_PARAMS = 384,
+    B_PROCEDURES = 385,
+    B_EOP = 386,
+    B_FREQ = 387,
+    B_CLOCK = 388,
+    B_ANTENNA = 389,
+    B_BBC = 390,
+    B_CORR = 391,
+    B_DAS = 392,
+    B_HEAD_POS = 393,
+    B_PASS_ORDER = 394,
+    B_PHASE_CAL_DETECT = 395,
+    B_ROLL = 396,
+    B_IF = 397,
+    B_SEFD = 398,
+    B_SITE = 399,
+    B_SOURCE = 400,
+    B_TRACKS = 401,
+    B_TAPELOG_OBS = 402,
+    T_LITERAL = 403,
+    T_NAME = 404,
+    T_LINK = 405,
+    T_ANGLE = 406,
+    T_COMMENT = 407,
+    T_COMMENT_TRAILING = 408
+  };
 #endif
 /* Tokens.  */
 #define T_VEX_REV 258
@@ -345,13 +351,13 @@
 #define T_COMMENT 407
 #define T_COMMENT_TRAILING 408
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 17 "vex.y"
+
+union YYSTYPE
 {
+#line 17 "vex.y" /* yacc.c:1909  */
+
 int                     ival;
 char                   *sval;
 struct llist           *llptr;
@@ -410,14 +416,18 @@ struct fanout_def	*foptr;
 struct vlba_frmtr_sys_trk	*fsptr;
 struct s2_data_source  *dsptr;
 
-}
-/* Line 1489 of yacc.c.  */
-#line 416 "y.tab.h"
-	YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
+
+#line 421 "y.tab.h" /* yacc.c:1909  */
+};
+
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE yylval;
 
+int yyparse (void);
+
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */

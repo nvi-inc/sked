@@ -1,12 +1,15 @@
       subroutine save_station_state
 ! Save the station state. This is done before selecting new stations.
 ! Used to preserve information about the station.
+      implicit none 
 
 C  COMMON BLOCKS USED
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni'
+     
       include 'downtime.ftni'
       include 'station_state.ftni'
       include 'covar.ftni'
@@ -17,6 +20,7 @@ C  COMMON BLOCKS USED
 ! History
 !  2005Jul06  JMGipson.  Better save/restore of subnet.
 !  2008Jun06 JMGipson.  Minor change in output statement.
+!  2020Jun08.  Include broadband.ftni.  restore ibb_off
 
       nstatn_save=nstatn
       nsubst_save=nsubst
@@ -52,6 +56,7 @@ C  COMMON BLOCKS USED
 ! And the broadband info.
       idata_mbps_save(1:nstatn)=idata_mbps(1:nstatn)
       isink_mbps_save(1:nstatn)=isink_mbps(1:nstatn)
+      ibb_off_save(1:nstatn)=ibb_off(1:nstatn)
       bb_bw_save(1:nstatn)=bb_bw(1:nstatn)      
 
 ! SNR info
@@ -71,12 +76,14 @@ C  COMMON BLOCKS USED
 ! History
 ! 2013May06. JMGipson. Try to restore 1-letter codes ONLY if we had observations previously.
 ! 2013May27. JMGipson. Removed fixing 1-letter code. Now handled in wrsts.f 
+! 2020Jun08.  Include broadband.ftni.  restore ibb_off 
 
 C  COMMON BLOCKS USED
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni'
       include '../skdrincl/freqs.ftni'
       include 'downtime.ftni'
       include 'station_state.ftni'
@@ -135,6 +142,7 @@ C  COMMON BLOCKS USED
       bb_bw=0.0
       idata_mbs=0
       isink_mbs=0   
+      ibb_off=0
    
       do i=1,nstatn
         iwhere=iwhere_in_string_list(cstnna_save,nstatn_save,cstnna(i))
@@ -155,6 +163,7 @@ C  COMMON BLOCKS USED
           bb_bw(i)       =bb_bw_save(iwhere)
           idata_mbps(i)  =idata_mbps_save(iwhere)
           isink_mbps(i)  =isink_mbps_save(iwhere)
+          ibb_off(i)     =ibb_off_save(iwhere)
 
  
           if(kfirst) then

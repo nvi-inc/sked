@@ -14,8 +14,6 @@ setenv CC   "gcc -c -g -I/usr/include"
 #  Following are for linux. Uncomment if appropriate.
 setenv SKED_HEAD sked_lnx.o
 # This is for 64 bit version of sked. 
-#setenv VEX_LIB "../vex/vex64.a"
-#Don't need separate versions. just need to remake vex.a
 setenv VEX_LIB "../vex/vex.a"
 setenv ARCHIV "ar -sqc"
 # End HP vs linux differences.  

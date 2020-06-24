@@ -15,7 +15,7 @@
       character*128 tape_motion_type_save(max_stn)       ! save tape motion
       character*128 tape_allocation_save(max_stn)        
       character*8   cstnna_save(max_stn)                 !name
-      character*1 cstcod_save(max_stn)                   !1 letter code
+      character*1   cstcod_save(max_stn)                 !1 letter code
      
       common /station_save_char/tape_motion_type_save,
      >  tape_allocation_save,cstnna_save, 
@@ -47,10 +47,11 @@
      
       integer idata_mbps_save(max_stn)
       integer isink_mbps_save(max_stn)
-      common /station_save_integer/idata_mbps_save,isink_mbps_save
+      integer ibb_off_save(max_stn)
+      common /station_save_integer/idata_mbps_save,isink_mbps_save,
+     > ibb_off_save
 
-      
-      
+            
 ! Optimization information
       logical        lpara_save(max_dim_esti,2)           !used if optimizing for covarinace
       common /station_save_logical/lpara_save  

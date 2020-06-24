@@ -38,6 +38,7 @@ C 970219 nrv Remove initialization and add a call to FRINIT
 C 991116 nrv Remove FRCAT call. This routine is now called by CATCMD.
 C 000106 nrv Replace FRCAT call.
 ! 2012Oct10 JMG. Modified to update version, catalog name info. 
+! 2020Jun02 JMG. Don't read obsolete hdpos.cat. 
  
 C  1. Schedule FRCAT and have it do the selection.
 C NEW: This routine is called by CATCMD, which reads the
@@ -48,7 +49,6 @@ C selected modes and calls WRFRS first.
         call frcat(ierr,knewfr,ccall)
         if (.not.knewfr .or. ierr.ne.0 .or. ccall .eq. 'a') return
       endif
-
 
       lmodes_cat_use=modes_cat
       call get_cat_version(lmodes_cat_use,lmodes_cat_version,ierr)
@@ -62,8 +62,10 @@ C selected modes and calls WRFRS first.
       call get_cat_version(lloif_cat_use,lloif_cat_version,ierr)
       ltracks_cat_use=tracks_cat
       call get_cat_version(ltracks_cat_use,ltracks_cat_version,ierr)
+      if(.false.) then 
       lhdpos_cat_use=hdpos_cat
       call get_cat_version(lhdpos_cat_use,lhdpos_cat_version,ierr)
+      endif 
 
 ! initialize frequencies.
       call freq_init

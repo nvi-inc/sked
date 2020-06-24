@@ -10,6 +10,7 @@
 ! 2006Jun22 JMGipson.  Changed name of kfreq_match-->kfreq_cat
 ! 2008Nov11  JMGipson.  Replaced call to RSPYN by call to kyes_to_prompt
 ! 2011Aug11 JMGipson. Modified error  message
+! 2020Jun02 JMG. Don't write obsolete hdpos.cat. 
 
 ! Passed
       character*1 cdo !s=standard, a=automatic. find current mode, and exit.
@@ -52,8 +53,8 @@ C     ierr=1 means too many entries, use first set only, but continue
 
       call read_rec_cat(ierr)
       if(ierr .ne. 0) return
-      call read_hdpos_cat(ierr)
-      if(ierr .ne. 0) return
+!      call read_hdpos_cat(ierr)
+!      if(ierr .ne. 0) return
       call read_track_cat(ierr)
       if(ierr .ne. 0) return
 
@@ -82,7 +83,7 @@ C     ierr=1 means too many entries, use first set only, but continue
               kcat_mode_sel(icat)=.true.
             else
               kduplicate_mode=.true. 
-              endif
+            endif
             kmissing=.false.          
           endif
         end do

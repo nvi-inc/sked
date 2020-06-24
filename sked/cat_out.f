@@ -6,7 +6,7 @@
 
 ! 2013Sep18  JMG. Was not putting out Position.cat info
 ! 2014Jan16  JMG. Some of the 'luout' were 'lutmp'. This resulted in writing to a non-open file. 
-
+! 2020Jun02 JMG. Don't write obsolete hdpos.cat. 
        
 ! Passed
       integer luout
@@ -75,11 +75,8 @@
       write(cbuf,'(a,1x,a,5x,a)') "TRACKS   ", 
      >   trim(ltracks_cat_version),  trim(ltracks_cat_use) 
       call wrt_param_line(cbuf,luout,lkind) 
-      write(cbuf,'(a,1x,a,5x,a)') "HDPOS    ", 
-     >   trim(lhdpos_cat_version),  trim(lhdpos_cat_use) 
-      call wrt_param_line(cbuf,luout,lkind) 
 
-      return
+       return
       end
 
 

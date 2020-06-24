@@ -9,6 +9,7 @@ C
       include "skcom.ftni"
       include "../skdrincl/sourc.ftni"
       include "../skdrincl/statn.ftni"
+      include "../skdrincl/broadband.ftni"
       include "../skdrincl/freqs.ftni"
       include "../skdrincl/skobs.ftni"
       include "major.ftni"
@@ -153,6 +154,7 @@ C 001011 nrv Check first source up or not.
 ! 2015Nov20 JMG. Simplified tag-along logic, particularly if tagging  along to a subnet. 
 ! 2016Jul14 JMG. TAGALONG: Modified so that takes into account time to write data if Mark6 station.
 ! 2016Aug16 JMG. Now correctly does wrap in tag-along mode.  
+! 2020Jun08 JMG. Reference to new broadband.ftni. Include bb_off(istn) in calculation of time
 
 C
 C    1. Parse command and parameters.
@@ -419,7 +421,7 @@ C         Calculate slewing just to get the cable wrap
                 if(isink_mbps(jt) .gt. 0 .and.
      >            isink_mbps(jt) .lt. idata_mbps(jt)) then
                   rec_factor= idata_mbps(jt)/isink_mbps(jt)     
-                  ut_tmp=ut_tmp+idurpre(jt)*(rec_factor-1)               
+                  ut_tmp=ut_tmp+idurpre(jt)*(rec_factor-1)+ibb_off(jt)               
                 endif
              endif
                  

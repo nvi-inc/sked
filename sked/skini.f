@@ -11,6 +11,7 @@ C
       include 'skcom.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni'
       include '../skdrincl/freqs.ftni'
       include '../skdrincl/skobs.ftni'
       include '../skdrincl/constants.ftni'
@@ -25,7 +26,6 @@ C
       include 'cat_rx.ftni'
       include 'cat_loif.ftni'
       include 'cat_rec.ftni'
-      include 'cat_hdpos.ftni'
       include 'cat_track.ftni'
       include 'flux.ftni'
       include 'pixelation.ftni'
@@ -102,6 +102,7 @@ C            the tables too.
 ! 2015Mar17 JMG. Added Mark6_off
 ! 2017Apr18 JMG. Icalde changed from 5 to 10 
 ! 2017Oct06 KLB. Added kconf_equip
+! 2020Jun08 JMG. Reference to broadband.ftni. Initialize bb_off
 ! functions
       integer fc_gwinsz,fc_gwinw
 
@@ -119,7 +120,6 @@ C LOCAL
       kcat_rx   =.false.
       kcat_loif =.false.
       kcat_rec  =.false.
-      kcat_hdpos=.false.
       kcat_track=.false.
       kcat_freq =.false.
    
@@ -249,6 +249,7 @@ C  Logical switches
       bb_bw=0.d0
       idata_mbps=0
       isink_mbps=0
+      ibb_off =0 
       iMark6_off = 0 
 
 C  Current variables

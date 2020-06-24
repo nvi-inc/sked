@@ -28,13 +28,15 @@ C  LOCAL VARIABLES:
       integer icol_wid/58/
       character*80 cname
       character*2 cfunc
-      integer ncodestmp
+      integer ncodes_sav
       integer num_sel
       integer iptr
 
 ! 2005Jun06  JMG. Completely rewritten.
 ! 2005Aug10  JMG. Extracted part of routine that reads in modes & checks for match.
-!
+! 2020Jun02  JMG. Was not initilizing ncodes_sav. 
+
+      ncodes_sav=ncodes
 !  1.1  Read in catalog.
       knfrse = .true.   !initialize
 
@@ -86,7 +88,7 @@ C  LOCAL VARIABLES:
          endif
         end do
       ELSE IF (CFUNC.EQ.'AB') THEN
-        ncodes = ncodestmp
+        ncodes = ncodes_sav
         knfrse = .false.
         goto 500
       ELSE IF (cfunc.eq.'::') THEN  !finish

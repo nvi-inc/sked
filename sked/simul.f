@@ -143,6 +143,7 @@ C 020904 nrv Only first 8 characters of source name were being unpacked.
 ! 2013Oct03 JMGipson.  Changed some source names to make it easier to read , eg. cc-->partial.
 ! 2014Jul09 JMGipson.  Removed idur/2  from epoch. This makes it easier for comparison with other things and has minimal effect on formal error.
 ! 2016Oct31 LeBail.    Removed multiplication by sin(eps) on nutation partial to make consistent with calc. 
+! 2020Apr15 JMGipson.  Fixed error in SIGN of atmsophere rate partial
 
 
 
@@ -408,7 +409,7 @@ C************ s-band sigma and iono
           ic=5+(2*istat)-1
           call atmos(sin_el(istat),cos_el(istat),atm_part)
           if(lpara(ic,2))   partial(ic)=atm_part*isign
-          if(lpara(ic+1,2)) partial(ic+1)=atm_part*del_t*24   !convert rate to hours, not days
+          if(lpara(ic+1,2)) partial(ic+1)=atm_part*del_t*24*isign   !convert rate to hours, not days
 ! Clock
           ic = 5+2*nstatn+(3*istat)-2
           if (lpara(ic,2))   partial(ic)=1*isign
@@ -500,6 +501,7 @@ C   Write out the observation record for the SOLVE output file.
               partial_scaled(i1)=partial(iptr)*(1.d3/c)*secrad*wt     !Source ps/mas
            endif
          end do
+       
 
          do i1=1,num_est
            do i2=i1,num_est

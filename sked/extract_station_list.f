@@ -6,8 +6,8 @@
 ! History
 ! 2008May22. First Version.
 ! 2011Aug12. Recognize "_" and "ALL" as special tokens. 
-! 2015Oct21. Make sure all station codes are unique! This fixex problems with strings like: KkWfWsGGsYjWs which have the same station twice!
-! 
+! 2015Oct21. Make sure all station codes are unique! This fixes problems with strings like: KkWfWsGGsYjWs which have the same station twice!
+! 2020Apr20  Fixed bug if selected "ALL" or "_" 
       integer luscn
       character*(*) csub
       integer istat_list(*)
@@ -21,19 +21,21 @@
       integer nch
       integer iwhere
 
-      if(csub .eq. "_" .or. csub .eq. "ALL") then 
-        do i=1,nstatn
-          istat_list(i)=i
-        end do
-        num_sub=nstatn 
-        goto 120
-      endif 
- 
       do i=1,nstatn
          cpo_cap(i)=cpocod(i)
          call capitalize(cpo_cap(i))
       end do
-
+ 
+      call capitalize(csub) 
+      if(csub .eq. "_" .or. csub .eq. "ALL") then 
+        do i=1,nstatn
+          istat_list(i)=i
+          csub(2*i-1:2*i) =cpocod(i)
+        end do
+        num_sub=nstatn 
+        return 
+      endif 
+ 
       call capitalize(csub)
       nch=trimlen(csub)
 
@@ -57,14 +59,13 @@
         i=i+2
         if(csub(i:i).eq. "-") i=i+1
       end do
-
 120   continue 
 
 ! Remake the two letter list.
       csub=" "
       do j=1,num_sub
         i=2*j-1
-        csub(i:i+1)=cpo_cap(istat_list(j))
+        csub(i:i+1)=cpocod(istat_list(j))
       end do 
 
       return

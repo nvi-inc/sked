@@ -29,7 +29,7 @@ OBJECTS=\
     errormsg.o extractnexttoken.o fc_gwinsz.o fc_gwinw.o \
     feetscan.o findscan.o freq_init.o frinit.o  frinp.o \
     gdate.o \
-    gdscan.o getiauname.o gnpas.o \
+    gdscan.o getiauname.o \
     hdinp.o hol2lower.o hol2upper.o hms2seconds.o \
     iday_of_year.o \
     idchk.o ifill4.o ifirst_non_blank.o ifirst_non_white.o  \

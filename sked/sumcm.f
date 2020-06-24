@@ -5,6 +5,7 @@ C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
       include 'skcom.ftni'
+      include '../skdrincl/broadband.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
       include '../skdrincl/freqs.ftni'
@@ -236,7 +237,7 @@ C 2004Feb2 JMG. Removed calculation of 8-packs, since this size is no longer uni
 ! 2017Dec05 sumcm.f:  When priting out storage in TB, give 2 decimals.  
 ! 2017Dec19 sumcm.f:  Do test on writing precision based on MAXimum amount per station rather than average. 
 ! 2019May23 JMG.  Was not printing out stuff for SNR. NBA=number of bands was being set to 0. 
-C
+! 2020Jun08 JMG.  Include broadband.ftni 
 C
 C   1. Parse command line
 C

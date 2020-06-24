@@ -155,6 +155,8 @@ C 2004Mar05  JMG Modified to be able to set up minor modes.
 ! 2017Dec04 JMG. moved opening logfile to wrlog.f 
 ! 2018Mar29 JMG. mysql is no longer hardwired in, but is in skedf.ctl
 ! 2019Mar14 JMG. Added exper command
+! 2020Jun06 JMG. Removed reference to HP and authors 
+! 2020Jun10 jmg. Changed argument of 'solve' from linestq to cmdline. 
 
 !
 C   0. Opening message
@@ -166,9 +168,8 @@ C
       ccat_pid = ' '
       cpar_pid = ' '
 
-      write(luscn,'(a)')
-     >  'sked: Automatic/Interactive VLBI Scheduling Program'
-      write(luscn,'("      JMG/NRV/AEM HP/Linux SKED ",a)') skversion
+      write(luscn,'("sked version ", a)')  skversion
+ 
 C
 C   Get process ID [this is actually a C library routine]
 C
@@ -414,7 +415,7 @@ C     no parameters for this command.
       case("1SNR")
         CALL SNRCM(linestq,'s','1')
       case("SOLVE")
-        call solve(linestq)
+        call solve(cmdline)
       case("SOURCES")
         call source_cmd(cmdline) 
       case("SRCWT")
@@ -434,6 +435,8 @@ C     no parameters for this command.
         CALL SUMOUT(linestq)
 !     Case("TAPE")   !see media above. 
 !     case("TAG")   !See ADD above  
+      case("THIN")
+        call thin_cmd(cmdline)
       case("TIMELINE")
         CALL TMLIN(linestq)
       case("TWIN_TELESCOPES")

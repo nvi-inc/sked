@@ -2,10 +2,15 @@
      >  idur,idle,ical,iset,
      >   cwrap,cwrap_new,tslew,imaxsl,mjd_out,ut_out,
      >   aznow,aznew,isrc_time, buf_time) 
+
+! 2020Jun08 JMG. include broadband.ftni. New parameter ibb_off 
+
+
       implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni'
       include '../skdrincl/skobs.ftni'
       include '../skdrincl/constants.ftni'
 
@@ -75,7 +80,7 @@ C       For start&stop, do setup on all scans if flag is set.
              stop
            endif      
            rec_factor=float(idata_mbps(istat))/float(isink_mbps(istat))
-           buf_time=iMark6_off+
+           buf_time=iMark6_off+ibb_off(istat)+
      >           float(idur)*max(0.d0,rec_factor-1.d0)                 
         endif     
 

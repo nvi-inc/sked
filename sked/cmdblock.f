@@ -374,89 +374,94 @@ CMD: 21  -----------
      >"TAPE              ",
      >"Set, list tape types ",
      >"special syntax                                                 ",
-!CMD:   3 ----------
+! CMD  3
+     >"TH",
+     <"THIN ",
+     >"Thin by removing obs",
+     >"<range> <station> <#thin>",
+!CMD:   4 ----------
      >"TI",
      >"TIMELINE          ",
      >"Set time line display  ",
      >"ON | OFF                                              ",
-!CMD:   4 --------
+!CMD:   5 --------
      >"TW",
      >"TWIN_TELESCOPES   ",
-     >"Select, list, del Twin_Telescopes ",
+     >"Select, list, del Twin_Telescopes",
      >" LIST | ADD <stat-stat> [SPLIT|TOGETHER] | DELETE <stat-stat>",
-!CMD:   5 ----------
+!CMD:   6 ----------
      >"UN",
      >"UNIT              ",
      >"Change output device   ",
      >"[PRINT | SCREEN | SAVEPS | <file> [APPEND|OVERWRITE]] ",
-!CMD:   6 ----------
+!CMD:   7 ----------
      >"UT",
      >"UNTAG             ",
      >"Remove any bad obs.    ",
      >"[<range>]                                                ",
-!CMD:   7 ----------
+!CMD:   8 ----------
      >"VS",
      >"VCC               ",
      >"Vex create clean & exit ",
      >"<filename>                                           ",      
-!CMD:   8 ---------------    
+!CMD:   9 ---------------    
      >"VC",
      >"VEC               ",
      >"Vex create & exit       ",
      >"<filename>                                                 ",
-!CMD:   9 ----------
+!CMD:   10 ----------
      >"VE",
      >"VER               ",
      >"Vex write & exit        ",
      >"[<filename>]                                            ",     
-!CMD:  10 ----------
+!CMD:  11 ----------
      >"VL",
      >"VLBA              ",
      >"Toggle full-obs. mode  ",
      >"[ON | OFF]                                                ",
-!CMD:   11 ----------
+!CMD:   12 ----------
      >"VS",
      >"VSCAN             ",
      >"Display variable scan lengths",
      >"[<source> [<subnet>]]                                    ",
-!CMD:   12 ----------
+!CMD:   13 ----------
      >"VW",
      >"VWC               ",
      >"Create Vex file        ",
      >"<filename>                                                 ",
-!CMD:   13 ----------
+!CMD:   14 ----------
      >"VR",
      >"VWR               ",
      >"Write Vex file         ",
      >"[<filename>]                                               ",
-!CMD:   14 ----------
+!CMD:   15 ----------
      >"WC",
      >"WC                ",
      >"Create sked file       ",
      >"<filename>                                                  ",
-!CMD:   15 ----------
+!CMD:   16 ----------
      >"WH",
      >"WHATSUP           ",
      >"Display sources 'up'   ",
      >"[<subnet> [FULL|MIN|NO [<time>]]]                      ",
-!CMD:   16 ----------
+!CMD:   17 ----------
      >"WR",
      >"WR                ",
      >"Write sked file        ",
      >"[<filename>]                                                ",
-!CMD:   17 ----------
+!CMD:   18 ----------
      >"WP",
      >"DISPLAY_WRAP      ",
      >"Display wraps      ",
      >"                                               ",
 
-!CMD:   18 ----------
+!CMD:   19 ----------
      >"XL",
      >"XLIST             ",
      >"Extended listings      ",
      >"[?|LIST|CLEAR|ON|OFF |FEET|AZEL|WRAP|HA|DUR|SNR|MAX|FLUX|FREQ|
      >  SKY|LONG]",
-!CMD:   19 ----------
+!CMD:   20 ----------
      >"XN",
      >"XNEW              ",
      >"New scan extended list ",

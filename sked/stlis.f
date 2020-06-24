@@ -12,6 +12,7 @@ C
 C  COMMON BLOCKS USED
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/broadband.ftni' 
       include '../skdrincl/freqs.ftni'
 ! functions
       integer ibnum
@@ -54,6 +55,7 @@ C 2003Dec10 JMGipson get rid of holleriths
 ! 2006Nov30  Use cstrec(istn,irec)
 ! 2008Jun05  Rewritten and simplifed.
 ! 2016Dec12  JMG. Minor formatting changes. 
+! 2020Jun08 JMG. New broadband.ftni 
 C
 C
 C     1. Simply list the stations selected by the user, getting the

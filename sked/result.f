@@ -51,6 +51,7 @@ C 951017 nrv Fixed gtfld call to remove linstq
 !           Made i,j integer*2
 ! 2005May24 JMGipson.  Modified to use new correlation.
 ! 2009Jul08 JMGipson. Fixed bug 
+! 2020Apr14 JMGipson. Increased size that we write out. 
 
 C        1. Pick the type of result from the command string.
 C
@@ -109,8 +110,8 @@ C
           write(ludsp,21)cparname(i),
      >	  (dnorm_tri(indx4(i,j),0),j=1,num_est)
         end do
-  20    format(14x,50(a12,1x))
-  21    format(a,1x,50(g12.4,1x))
+  20    format(14x,250(a12,1x))
+  21    format(a,1x,250(g12.4,1x))
       endif
 
 ! Invert the normal matrix.

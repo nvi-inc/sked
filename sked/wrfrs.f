@@ -41,6 +41,7 @@ C 970408 nrv Add lrecfmtname to frec call, add to WRFCLINES call
 ! 2005Nov28 JMG. All the routines now use ascii. Get rid of hollerith
 ! 2009Apr02 JMGipson. Changed name: icat_mode_freq-->icat_mode_freq_ptr
 !                                   icat_mode_rec -->icat_mode_rec_ptr 
+! 2020Jun02 JMG.  Don't write out head position
       integer renam ! function
 C  LOCAL:
       integer ierr,ic
@@ -158,9 +159,8 @@ C  5. Call to subroutine to get the head positions and write out
 C     the lines in $HEAD section. Write out lines for all stations,
 C     one code at a time.
 
-      do ic=1,num_sel
-        call fhdpos(ierr,cnahdpos(1,ic),c2code(ic))
-      end do
+! ****** No longer done. 
+  
 
 C  6. Close the temp file and rename it.
       close(lutmp)
