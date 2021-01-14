@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE SEARL(LINSTQ,luscn,ludsp)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     SEARL reads/writes station early starts
 C
@@ -28,7 +48,7 @@ C MODIFICATIONS:
 C 970314 NRV New. Copied from SELEV.
 C 970317 nrv Early must be > CAL.
 C 970321 nrv Add warning that this works only for non-Mk3 correlators.
-! 2010Mar20 JMG. Removed obsolete warning message. 
+! 2010Mar20 JMG. Removed obsolete warning message.
 C
 
 C     1. Check for some input.  If none, write out current.
@@ -51,7 +71,7 @@ C
 C     2. Something is specified.  Get each station/time combination.
 C
 C      if (itsync.gt.0) then
-C        write(luscn,9200) 
+C        write(luscn,9200)
 C9200    format('SEARL04 - Error: parameter CORSYNCH must be 0 to use ',
 C     .  ' early start.')
 C        return

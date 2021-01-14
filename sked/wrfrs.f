@@ -122,7 +122,7 @@ C     for the $CODES section are written out for one frequency code.
           if (ierr.ne.0) return
 
           call frec(cat_mode_rec(irec),rcat_mode_bw(ic),
-     >      cnahdpos(1,num_sel),itrk_xref, cfmt,cbarrelname, 
+     >      itrk_xref, cfmt,cbarrelname, 
      >      bw_stn,ierr)                                           ! read rec.cat
           if (ierr.ne.0) return
 

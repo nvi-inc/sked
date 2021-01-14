@@ -1,3 +1,22 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTine VOBINP(ivexnum,LU,iret,IERR)
       implicit none 
 
@@ -17,6 +36,7 @@ C            observations scan by scan.
 !                station in a scan because kfirst_staiton was always getting reinitialized. 
 !                Moved initialization out of station loop. 
 ! 2019Aug27 JMG. Fixed bug in converting date. Need to initialize istart because conversion routine is only setting lower bytes
+! 2019Nov20 WEH. Changed f77 line to f90 for backward compatibility
 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/freqs.ftni'
@@ -55,6 +75,7 @@ C  LOCAL:
       character*128 cmo,cstart,cout,cunit,cscan_id
       character*(max_sorlen) csor
       integer istart(5)
+      integer iii
       double precision d,start_sec
       integer idstart,idend
       logical ks2
@@ -111,7 +132,9 @@ C 1. Get scans one by one.
       
         if (mod(nobs,100).eq.0) write(lu,'(i5,$)') nobs
 
-        istart=0
+        do iii=1,5
+          istart(iii)=0
+        enddo
         iret = fvex_date(ptr_ch(cstart),istart,start_sec)
         ierr=8 ! date/time
         if (iret.ne.0) return
@@ -205,17 +228,7 @@ C       Keep good data offset and duration separate
           if (iret.ne.0) return
           il = fvex_len(cout)
 ! fixup for Mark5.     
-          if((cstrec(istn,1)(1:5) .eq. "Mark5" .or.   
-     >        cstrec(istn,1)(1:4) .eq. "none"  .or.  
-     >        cstrec(istn,1)(1:5) .eq. "Mark6") .and. il .eq. 0) then
-             ip=1
-             if(npassl(istn,icod) .eq. 0) then
-                npassl(istn,icod)=1
-              endif
-          else
-            ip =iwhere_in_string_list(cpassorderl(1,istn,icod),
-     >         npassl(istn,icod),cout(1:il))
-          endif            
+          ip=1
 
           if(ip .eq. 0) return     ! pass not found
 

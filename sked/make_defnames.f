@@ -44,6 +44,8 @@ C            added declaration of jchar
 ! 2014Jun03  Modified to make K5 use Mark5B track format   
 ! 2014Sep30  Modified to make K5 use Mark5A track format if correlated at VLBA  
 ! 2018Dec26  JMG. Fixed bug in writting out $IF for VDIF stations.
+! 2020NOV04  JMG. Removed some stuff about Headstacks, passes
+! 2020Dec02  JMG. removed debugging statements.
 
       implicit none 
 
@@ -83,14 +85,14 @@ C Local
         igroup(i)=0
       end do
 
-      iroll = 0
+         iroll = 0
       do ic=1,ncodes
         cfrq=cnafrq(ic)
         ilf=trimlen(cfrq)
         codtmp=ccode(ic)
         ilc=trimlen(ccode(ic))
         modedef_name(ic) = cfrq(1:ilf)//'.'//codtmp(1:ilc)//char(0)
- 
+       
         do is=1,nstatn
           if (nchan(is,ic).gt.0) then ! this mode defined
 
@@ -104,7 +106,8 @@ C Local
              loutput="VDIF"
           endif 
         
-          cmo=cmode(is,ic)          
+          cmo=cmode(is,ic)      
+
 C         Squeeze out any ':' character
           chd=cmo
           ix = index(cmo,":")        !this usually indicates fanout. 
@@ -227,19 +230,19 @@ C 3. IF names
 
 C 4. TRACK names
           itype=4
-          if(loutput .eq. "VDIF") then
+! Previously treated VDIF special
+!          if(loutput .eq. "VDIF") then
 !             refdef_name(itype,is,ic) = "VDIF"     
-              refdef_name(itype,is,ic)= " " 
-             goto 400
-          endif 
+!              refdef_name(itype,is,ic)= " " 
+!             goto 400
+!          endif 
           do isx=1,is-1             
             if(ktrack_match(is,ic,isx,ic) .and. 
      >        ioutput_type(is) .eq. ioutput_type(isx)) then 
               refdef_name(itype,is,ic)=refdef_name(itype,isx,ic)    
               goto 400
             endif ! all tracks match
-          enddo ! check each group so far
-          writE(*,*) "New !!!", is 
+          enddo ! check each group so far  
           igroup(itype)=igroup(itype)+1
           write(cg,'(i2.2)') igroup(itype) 
           il=trimlen(cg)
@@ -249,35 +252,11 @@ C 4. TRACK names
 400       continue
 
 C 5. HDPOS names
-          itype=5
-          do isx=1,is-1
-            kok=.true.
-            if (cnahdpos(isx,ic).eq. cnahdpos(is,ic)) then
-              do ih=1,max_headstack
-                do ip=1,max_pass
-                  if(ihddir(ih,ip,is,ic).ne.ihddir(ih,ip,isx,ic)) then
-                    kok=.false.
-                  endif
-                end do
-              end do
-              if(kok) then
-                refdef_name(itype,is,ic)=refdef_name(itype,isx,ic)          
-                goto 500
-              endif
-            endif !
-          enddo ! check each group so far
-          igroup(itype)=igroup(itype)+1
-          write(cg,'(i2.2)') igroup(itype)
-          il=trimlen(cg)
-                 
-          write(refdef_name(itype,is,ic),'(a,i2.2)')
-     >        chd(1:ilh)//'-'//codtmp(1:ilc)//cg(1:il)//"S",is              
-500       continue
+! Skip. 
+         
 
 C 6. PASS_ORDER names (same as HEAD_POS)
-          itype=6
-          refdef_name(itype,is,ic)=refdef_name(itype-1,is,ic)
-       
+          
 
 C 7. ROLL names
           itype=7

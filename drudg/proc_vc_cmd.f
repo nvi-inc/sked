@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine proc_vc_cmd(cname_vc, icode, kk4vcab, lwhich8,ierr)     
 ! Write out VC commands.
+      implicit none 
       include 'hardware.ftni'
       include '../skdrincl/freqs.ftni'
       include '../skdrincl/statn.ftni'
@@ -174,18 +194,24 @@ C         For K4, use bandwidth of channel 1
       enddo ! loop on recorders
       end
 ! **************************************************************
-      subroutine invalid_if(cbbc, cif, crack)
+      subroutine invalid_if(luscn,cbbc, cif, crack)
+! 2020Feb20 JMG. Added implicit none, changed argument list
+      implicit none
+      integer luscn
       character*(*) cbbc
       character*(*) cif
       character*(*) crack        
       write(*,*) " " 
-      write(luscn,'("Invalid_IF: Error! For ",a, " IF ",a,
+         write(luscn,'("Invalid_IF: Error! For ",a, " IF=",a,
      >  " is inconsistent with rack ", a)') cbbc,  cif, crack
   
       return
       end 
 ! ****************************************************************
-      subroutine invalid_bbc_freq(cbbc,rfvc,rfmin,rfmax)
+      subroutine invalid_bbc_freq(luscn,cbbc,rfvc,rfmin,rfmax)
+! 2020Feb20 JMG. Added implicit none, changed argument list. 
+      implicit none 
+      integer luscn 
       character*(*) cbbc
       real*8 rfvc,rfmin,rfmax
             

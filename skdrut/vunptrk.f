@@ -1,3 +1,22 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunptrk(modef,stdef,km5rec,ivexnum,iret,ierr,lu,
      &     cm,cp,cchref,csm,itrk,nfandefs,ihdn,ifanfac,modu)
       implicit none
@@ -51,6 +70,7 @@ C  LOCAL:
       character*128 cout
       integer it(4),j,nn,in,i,nch
       integer fvex_len,fvex_int,fvex_field,fget_all_lowl,ptr_ch
+      integer is
 C
 C  Initialize
 C
@@ -66,18 +86,22 @@ C
 
 C  1. The recording format
 C
+      
       ierr = 1
       iret = fget_all_lowl(ptr_ch(stdef),ptr_ch(modef),
      .ptr_ch('track_frame_format'//char(0)),
      .ptr_ch('TRACKS'//char(0)),ivexnum)
-      if (iret.ne.0) return
+      if (iret.ne.0) then
+        write(*,*)"VUNPTRK00 did not find track_frame_format ", iret 
+        return
+      endif
       iret = fvex_field(1,ptr_ch(cout),len(cout))
       NCH = fvex_len(cout)
-      IF  (NCH.GT.8.or.NCH.le.0) THEN  !
-        write(lu,
-     >  '("VUNPTRK01 - Track format name too long: ",a," ", $)') 
-     >    cout(1:nch)
-        write(lu,*) " Using first 8 characters."
+      IF  (NCH.GT.16) THEN  !
+        is=fvex_len(stdef)
+        write(lu,'("VUNPTRK01 -  for station ", a,
+     >   " track format name too long: ",a, " Using first 16 chars")') 
+     >    stdef(1:is), cout(1:nch)
         cm=cout(1:8)       
       else
          cm=cout(1:nch)

@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine spdstr(spd,cspd_out,nspd)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C SPDSTR returns a Hollerith "lspd" with the appropriate speed for
 C the value of "spd". "nspd" is the number of characters in lspd.
@@ -40,7 +60,7 @@ C        20    33.33   33.375
 C        40    66.66   67.5
 C        80   133.33  135
 C       160   266.66  270
-C       320    
+C       320
       data maxspd/23/
       data sp/0.0, 2.5, 4.21875,4.44,
      .             5.0, 8.4375, 8.88,

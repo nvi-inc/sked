@@ -103,21 +103,11 @@ C  Read the head file SKH****
       cbuf=" "
       CALL READF_ASC(lusel,IERR,IBUF,IBLEN,ILEN)
 
-      DO WHILE (IERR.GE.0.AND.ILEN.GT.0)
-C     read each head record
-        CALL HDINP(IBUF,ILEN,LUSCN,IERRCM)
-        IF  (IERRCM.NE.0) THEN  !
-          CLOSE(lusel)
-          RETURN
-        END IF  !                                                     
-        cbuf=" "
-        CALL READF_ASC(lusel,IERR,IBUF,IBLEN,ILEN)                           
-      END DO  !read each head record
 
       CLOSE(lusel)                                                    
       KNEWFR = .TRUE.                                                       
       icode_set_last=1
-      CALL GNPAS(luscn,ierr,iserr)
+!      CALL GNPAS(luscn,ierr,iserr)
       call setba
 
       RETURN

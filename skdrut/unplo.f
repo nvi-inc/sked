@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE unplo(IBUF,ILEN,IERR,LIDSTN,LCODE,LSUBGR,LIFINP,FREQLO,
      >   iv,ls,nv)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     UNPLO unpacks the record holding information on a LO configuration
 C
@@ -86,9 +106,9 @@ C
 C
 C     IF distributor channel and input
 C     May be: IFA,IFB,IFC,IFD or IF1N,IF2N,IF1A,IF2A,IF3O,IF3I
-C         or A,B,C,D or 1N,2N,1A,2A,3O,3I 
+C         or A,B,C,D or 1N,2N,1A,2A,3O,3I
 C         or 1,2,3 (i.e. allow blank after the digit)
-C         Interpret 3N as 3I 
+C         Interpret 3N as 3I
 C
       CALL GTFLD(IBUF,ICH,ILEN*2,IC1,IC2)
       i=ias2b(ibuf,ic1,1) ! decode first character
@@ -173,7 +193,7 @@ C              trailing "L" or "H" means patching
             call gtfld(ibuf,ich,ilen*2,ic1,ic2)
             nch=ic2-ic1+1
           enddo
-          return ! no more on the line 
+          return ! no more on the line
         else
           IERR = -106
           RETURN

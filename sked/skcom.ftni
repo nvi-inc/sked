@@ -46,11 +46,9 @@
       integer nsorcur(max_stn)          !curent source
       integer icalcur(max_stn)          !current calibration
       integer idurcur(max_stn)          !duration
-      integer ipascur(max_Stn)          !current pass
-      integer icodcur(max_Stn)          !current frequency code index
+       integer icodcur(max_Stn)          !current frequency code index
       integer iftcur(max_stn)           !current feet
       integer iftend_cur(max_stn)
-      integer idircur(max_stn)          !current tape direction
       integer idlcur(max_stn)           !idle time
       integer itucur(max_stn)           !tape moving
       integer ireccur(max_stn)
@@ -64,8 +62,8 @@
       common /skcom_obs_dbl/utcur,gstcur,st0cur
       common /skcom_obs/
      > nstncur,istcur,mjdcur,iyrcur,idacur,nsorcur,icalcur,
-     > idurcur,ipascur,icodcur,iftcur,iftend_cur,
-     > idircur,idlcur,lcblcur,itucur,ireccur,iprevscan
+     > idurcur,icodcur,iftcur,iftend_cur,
+     > idlcur,lcblcur,itucur,ireccur,iprevscan
 
       common /skcom_obs_ch/cmidcur,cpstcur,cprecur
 !
@@ -81,12 +79,10 @@
       integer idatst(max_stn)           !current day
       integer nsortst(max_stn)          !curent source
       integer icaltst(max_stn)          !current calibration
-      integer idurtst(max_stn)          !duration
-      integer ipastst(max_Stn)          !current pass
+      integer idurtst(max_stn)          !duration 
       integer icodtst(max_Stn)          !current frequency code index
       integer ifttst(max_stn)           !current feet
       integer iftend_tst(max_stn)
-      integer idirtst(max_stn)          !current tape direction
       integer idltst(max_stn)           !idle time
       integer itutst(max_stn)    	!tape moving
       integer irectst(max_stn)          ! for symmetry with ireccur
@@ -99,8 +95,8 @@
       common /skcom_obs_dbl/ uttst,gsttst,st0tst
       common /skcom_obs/
      >   nstntst,isttst,mjdtst,iyrtst,idatst,nsortst,icaltst,
-     >   idurtst,ipastst,icodtst,ifttst,iftend_tst,
-     >   idirtst,idltst,lcbltst,itutst, irectst
+     >   idurtst,icodtst,ifttst,iftend_tst,
+     >   idltst,lcbltst,itutst, irectst
 
       common /skcom_obs_ch/cmidtst,cpsttst,cpretst
 
@@ -344,11 +340,7 @@
 
 ! ****START of character arrays **************
 ! Define various character arrays.
-      integer nlpass
-      parameter (nlpass=62)
-      character*1   cdir(2)             !Direction: "R", "F"
-      character*(nlpass) cpass               !Pass numbers
-      CHARACTER*6   CPID                !process ID
+       CHARACTER*6   CPID                !process ID
       character*10  skversion           !Sked Version
       character*6   cprede,cmidde,cpstde  !PREOB, MIDOB, POSTOB  procedures.
 
@@ -377,7 +369,7 @@
 
       common /skcom_ch/
      >   cline,
-     >   cdir,cpass,cpid,skversion, cprede,cmidde,cpstde,cbuftmp,
+     >   cpid,skversion, cprede,cmidde,cpstde,cbuftmp,
      >   refdef_name,
 !  File names for SKED's scratch files
      >   CSKFIL,CTMFIL,CTMFI2,CLGFIL,COPFIL,

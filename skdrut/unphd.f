@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE unphd(IBUF,ILEN,IERR,lstn,lcod,ipass,
      .idir,ihd,nent)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     unphd unpacks a record containing head information
 C
@@ -19,7 +39,7 @@ C  OUTPUT:
      .        nent
       integer*2 lstn,lcod
 C     IERR    - error return, 0=ok, -100-n=error in nth field
-C     lstn - station ID, 1 character   
+C     lstn - station ID, 1 character
 C     lcod - frequency code, 2 characters
 C     ipass,idir,ihd - pass, direction, head position
 C     nent - number on this line
@@ -74,8 +94,8 @@ C    Example: 11(-350) is index 1, subpass 1, offset -350 microns
 C             42(55) is index 4, subpass 2, offset 55 microns
 C            142(55) is same as above but for headstack 2
 C    The subpass goes from 1 to the number of passes in the
-C    mode that are required to get all tracks recorded. 
-C    For example, mode A is a one-pass mode so the number is always 1; 
+C    mode that are required to get all tracks recorded.
+C    For example, mode A is a one-pass mode so the number is always 1;
 C    mode C is a two-pass mode so the number is always 1 or 2.
 C
       nent = 0
@@ -89,7 +109,7 @@ C
           ic1=ic1+1 ! skip over this character
         else
           iinc=0
-        endif 
+        endif
         call hol2char(ibuf,ic1,ic1,cp) ! pass is first char
         ip = index(cpass,cp)
         if (ip.eq.0) then ! illegal character

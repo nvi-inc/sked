@@ -67,6 +67,9 @@
       call wrt_param_line(cbuf,luout,lkind)
       write(cbuf,'(a,f8.1)')"Add_ps         ",radd_noise
       call wrt_param_line(cbuf,luout,lkind)
+      write(cbuf,'(a,f8.1)')"El_noise       ",rel_noise
+      call wrt_param_line(cbuf,luout,lkind)
+
       write(cbuf,'(a,a6)')  "SNRWts         ",lyesno(kSNRwts)
       call wrt_param_line(cbuf,luout,lkind)
       write(cbuf,'(A,a6)')  "SplitTwins      ",lyesno(ksplittwins)

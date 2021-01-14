@@ -17,10 +17,9 @@ OBJ_MOD = \
    group_mod.o \
    twin_mod.o 
 
-OBJ_FOR=  \
-    $(SKED_HEAD) \
+OBJ_FOR=   \
+    sked.o  \
     $(READ_CMDLINE)  \
-    gnpas.o       \
     adjustendtime.o \
     add_file_to_vex.o \
     addsec2ut.o \
@@ -42,7 +41,6 @@ OBJ_FOR=  \
     cablw.o  \
     cat_cmd.o \
     cat_out.o \
-    check_barrel_match.o \
     cover.o \
     chksrcup4scan.o \
     chksundist.o \
@@ -59,7 +57,6 @@ OBJ_FOR=  \
     computestatsdouble.o \
     computestatsdoublexref.o \
     comcmd.o \
-    copy_cur2vec.o \
     coverage.o \
     compute_coverage.o \
     delete_temp_files.o \
@@ -103,7 +100,6 @@ OBJ_FOR=  \
     frsel.o \
     frx.o \
     frec.o \
-    fsked.o \
     getist.o  \
     get_cat_version.o \
     get_new_fluxes.o \
@@ -126,7 +122,6 @@ OBJ_FOR=  \
     indexx8.o \
     indexxint.o \
     init_time_arrays.o \
-    incur.o \
     invert_and_con_tri.o\
     invert_or_det_tri.o \
     isecdif.o \
@@ -285,11 +280,9 @@ OBJ_FOR=  \
     vexout.o \
     vfrout.o \
     vglout.o \
-    vhdout.o \
     vifout.o \
     vlmode.o \
     vmoout.o \
-    vpoout.o \
     vsoout.o \
     vsiout.o \
     vpcout.o \
@@ -333,7 +326,7 @@ OBJ_C = \
 LDFLAGS =\
 $(MYSQL_LIB) \
 ../skdrut/skdrut.a \
-../lnfch/lnfch.a \
+../skdrlnfch/skdrlnfch.a \
 $(VEX_LIB) \
 ../curses/curses.a \
 ../matrix/matrix.a \

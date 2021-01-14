@@ -237,7 +237,7 @@ C       Write out experiment information now.
         do i=1,nstatn
           isubst(i)=i
         enddo
-        CALL GNPAS(luscn,ierr,iserr)
+!        CALL GNPAS(luscn,ierr,iserr)
         if (ierr.ne.0) then
           write(luscn,'(a)') "SKOPN03 - Warning: error in GNPAS. "//
      >    "Inconsistent or erroneous track assignments."
@@ -411,16 +411,6 @@ C    stations selected (maybe).
 
 C    Now we can read the HEAD section.
       if (khead) then
-        write(luscn,'("Re-reading HEAD.")')
-        OPEN(lusel,file=CHDFIL,iostat=IERR,status='old')
-        call reads(lusel,ierrcm,ibuf,iblen,ilen,2)
-        ibufq(1) = ilen
-        do while (ibufq(1).ne.-1)
-          call HDinp(ibuf,i2long(ibufq(1)),luscn,ierrcm)
-          call reads(lusel,ierrcm,ibuf,iblen,ilen,2)
-          ibufq(1) = ilen
-        enddo
-        close(lusel)
       endif
 C
 C    Move the satellite source names so that they are contiguous with
@@ -446,7 +436,7 @@ C
 C     Derive the number of passes in each frequency code
 
       if (ncodes.gt.0) then
-        CALL GNPAS(luscn,ierr,iserr)
+!        CALL GNPAS(luscn,ierr,iserr)
         if (ierr.ne.0) then
           write(luscn,'(a)')"SKOPN03 - Warning: error in GNPAS. "//
      >    "Inconsistent or erroneous track assignments."

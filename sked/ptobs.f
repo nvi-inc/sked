@@ -50,7 +50,7 @@ C
       KERR = 0
       KNEWSK = .TRUE.
       IF  (CFUNC.EQ.'RE') THEN  !
-        call copy_cur2vec()
+!        call copy_cur2vec()
         CALL PAKUP(ILEN,0)
         cskobs(iskrec(ircur))=cbuf
       END IF  !
@@ -69,7 +69,7 @@ C
          ISKREC(IRCUR) = NXTREC
          NXTREC = NXTREC+1
          NOBS = NOBS+1
-         call copy_cur2vec()
+!         call copy_cur2vec()
          if(CFUNC .eq. 'IN') then
 !           call copy_cur2vec()
            CALL PAKUP(ILEN,0)

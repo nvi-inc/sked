@@ -17,8 +17,10 @@
 ! 
 ! 2019Apr24 JGipson.  Default control file is /etc/skedf.ctl
 ! 2019Nov08 JGipson.  Corrected alternate from /usr/local/bin to /usr/local/bin/skedf.ctl
+! 2020Oct01 JGipson.  Location of control file is now in skedf_ctl.ftni
 
-      include '../skdrincl/mysql_common.i'
+      include 'mysql_common.i'
+      include 'skedf_ctl.ftni'
 
 ! Returned
       character*128  source_cat,station_cat,antenna_cat,position_cat,
@@ -27,7 +29,7 @@
      >               mask_cat,freq_cat,rx_cat,loif_cat,modes_cat,
      >               hdpos_cat,tracks_cat,flux_cat,flux_comments,
      >               rec_cat,cmaster_dir
-      character*128 csked              !default schedule directory
+      character*128 csked               !default schedule directory
       character*128 cscratch            !default scratch direcotry
       character*(*) cprtlan,cprtpor,cprttyp, cprport 
        
@@ -65,9 +67,6 @@ C  LOCAL VARIABLES
       logical kfound_global_file
       logical kfirst_skip    
 
-      character*32 cskedf(3)   
-      data cskedf/
-     > "/etc/skedf.ctl", "/usr/local/bin/skedf.ctl","skedf.ctl"/ 
 
 C  1. Open the default control file if it exists.   
 
@@ -88,22 +87,16 @@ C  1. Open the default control file if it exists.
 !     The last time for the local file. 
 
       kfirst_skip=.true. 
-      do j=1,3    
+      do j=1,2    
 ! We write out sections that are skipped. Code below makes sure that we close out the lines
 !   before starting to read another control file. 
          if(.not.kfirst_skip) write(*,*) " "   !close out 'skipping non-sked' line  
          kfirst_skip=.true. 
-! If already found the global file, don't need to check the alternative.
-        if(j .eq. 2 .and. kfound_global_file) goto 500    !quick exit. 
-! If we are the start of the third round and haven't found the global file, 
 ! write a warning message but try to read the local file. 
-        if(j .eq. 3 .and. .not.kfound_global_file) then
+        if(j .eq. 2 .and. .not.kfound_global_file) then
          write(luscn,
      > '("WARNING! sked_rdctl: Did not find global skedf.ctl file:",a)')
-     >       cskedf(1)(1:trimlen(cskedf(1)))
-         write(luscn,
-     > '("                or alternate global skedf.ctl file:",a)') 
-     >       cskedf(2)(1:trimlen(cskedf(2)))                 
+     >       trim(cskedf(1))
         end if
 
         itmplen = trimlen(cskedf(j))

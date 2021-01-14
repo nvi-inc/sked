@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine valid_hardware_blk()
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 !      block data
 ! Used to initialize by block data, but doesn't work for some linux systems.
 !
@@ -22,15 +42,16 @@
       crack_type(15)=    'LBA'
       crack_type(16)=    'Mark5'
       crack_type(17)=    'VLBA5'
-      crack_type(18)=    'DBBC_DDC'                              
+      crack_type(18)=    'DBBC_DDC'
       crack_type(19)=    'DBBC_DDC/Fila10g'
       crack_type(20)=    'DBBC_DDC/VSI2'
-      crack_type(21)=    'DBBC_PFB'                         
-      crack_type(22)=    'DBBC_PFB/Fila10g'    
-      crack_type(23)=    'RDBE'  
+      crack_type(21)=    'DBBC_PFB'
+      crack_type(22)=    'DBBC_PFB/Fila10g'
+      crack_type(23)=    'RDBE'
       crack_type(24)=    'VLBAC'
-      crack_type(25)=    'CDAS'   
-      crack_type(26)=    'unknown'
+      crack_type(25)=    'CDAS'
+      crack_type(26)=    'BB'
+      crack_type(27)=    'unknown'
 
 ! Valid recorder types
       crec_type(1)=     'none'

@@ -1,3 +1,22 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE FRINP(IBUF,ILEN,LU,IERR)
 
 C     This routine reads and decodes one line in the $CODES section.
@@ -26,6 +45,7 @@ C     IERR - error number
 
 C  LOCAL:
       integer ix,n
+      integer iii
 
       integer*4 itrk_map(max_headstack,max_trk)  !Has map of track mappings.
 
@@ -66,7 +86,6 @@ C
 C  History
 C     880310 NRV DE-COMPC'D
 C     891116 NRV Cleaned up format, added fill-in of LBAND
-C            nrv implicit none
 C     930421 nrv Re-added: store track assignments
 C 951019 nrv Add extension of LO lines to include per channel
 C 951116 nrv Change to frequency sequencey per station
@@ -106,9 +125,10 @@ C 2003Jul25 JMG  ITRAS changed to function
 ! 2015Jun05 JMG Modified to use new version of itras. 
 ! 2016Dec05 JMG. Fixed bug in reading in samplate rate. Previously  applied the sample rate to "1,ns". Now to "1,nstatn" 
 ! 2018Jul05 JMG. Better error messages. Previously error code printed as ****
-! 2018Oct. Modifed so samprate applies only to stations specified in preceding "F" line.
+! 2018Oct   JMG  Modified so samprate applies only to stations specified in preceding "F" line.
 ! 2018Dec22 JMG. Fixed bug using undefinfed variable 'nstav' and added implicit none. 
-C
+! 2020Jun22 JMG Fixed bug introduced 2018OCT. 
+
 C
 C     1. Find out what type of entry this is.  Decode as appropriate.
 C
@@ -153,7 +173,7 @@ C
       IF  (IERR.NE.0) THEN
         IERR = -(IERR+100)
         write(lu,*) "FRINP01: Error in field ",ierr, " of this line: "
-        write(lu,'("--->  ", 40a2)') ibuf(1:40) 
+        write(lu,'("--->  ", 40a2)') (ibuf(iii),iii=1,40)
 
         RETURN
       END IF 
@@ -210,13 +230,6 @@ C         modify this when it gets user input on the formatter type.
 C         This is used by SPEED.
 !          idum = ichmv(LMFMT(1,is,ICODE),1,LM,1,16) ! recording format
           cmfmt(is,icode)=cm
-C         Initialize S2 mode to blank. It's probably safe to put 
-C         LMODE into LS2MODE.
-C         Not safe because the mode may be already there from the equip line.
-          if(cs2mode(is,icode) .eq. " ") then
-             cs2mode(is,icode) = cm
-             cmode(is,icode) = " "
-          endif
 C         Determine fanout factor here. Fan-in code is commented for now.
           ifan(is,icode)=0
           ix=index(cmode(is,icode), "1:")
@@ -398,9 +411,12 @@ C 5. This is the sample rate line.
 
 ! 2018Oct. Modifed so samprate applies only to stations specified in preceding "F" line.
 ! Previously applied to all stations!
+! Undo this change!  Schedule files produced by sked have only one R line. 
+! Also the commented code below would have is=0 for some stations. 
       if (lchar.eq. "R") then ! sample rate    
         do j=1,nstatn
-          is=istsav(j)
+!          is=istsav(j)
+          is=j
           samprate(is,icode)=srate
         end do 
       endif ! sample rate

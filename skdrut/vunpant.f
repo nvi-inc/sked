@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunpant(stdef,ivexnum,iret,ierr,lu,
      > cNAANT,cAXIS,AXISOF,SLRATE,ANLIM1,ANLIM2,DIAMAN,ISLCON)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     VUNPANT gets the antenna information for station
 C     STDEF and converts it.
@@ -22,7 +42,7 @@ C 970306 nrv Handle XY axis types.
 C 970718 nrv Incorrect error returns for axis limits fixed.
 C 970930 nrv For XY axis types check the matching axis names as they
 C            appear in the VEX file, not as sk/dr keeps them.
-C 990630 nrv Axis offset has only 1 parameter. This is an error in 
+C 990630 nrv Axis offset has only 1 parameter. This is an error in
 C            the VEX parameter tables, but correct in VEX example
 C            document.
 C 990913 nrv Change spelling from "ant_diam" to "antenna_diam"
@@ -81,7 +101,7 @@ C
       iret = fget_station_lowl(ptr_ch(stdef),
      .ptr_ch('ant_name'//char(0)),
      .ptr_ch('ANTENNA'//char(0)),ivexnum)
-      if (iret.eq.0) then 
+      if (iret.eq.0) then
         iret = fvex_field(1,ptr_ch(cout),len(cout))
         NCH = fvex_len(cout)
         IF  (NCH.GT.8.or.NCH.le.0) THEN  !
@@ -89,7 +109,7 @@ C
           iret=-1
         else
           cnaant=cout(1:nch)
-        ENDIF 
+        ENDIF
       endif
 C
 C  2. Axis type. Get two fields.
@@ -113,11 +133,11 @@ C
       else if(cout2(1:3).eq.'yew') then ! XYEW
         cdum="xyew"
       endif
-      call capitalize(cdum) 
+      call capitalize(cdum)
       call axtyp(cdum,iax,1) ! check for legal sked axis type
       if (iax.eq.0) then
         ierr=-2
-        write(lu,'("VUNPANT02 - Axis type not recognized: ",a,":",a)') 
+        write(lu,'("VUNPANT02 - Axis type not recognized: ",a,":",a)')
      .  cout(1:nch1),cout2(1:nch2)
       else
         caxis=cdum
@@ -186,7 +206,7 @@ C       if (caxis(1:3) .eq. cax) i1=2
         if (iret.ne.0) return
         iret = fvex_units(ptr_ch(cunit),len(cunit)) ! slewing rate units
         if (iret.ne.0) return
-        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r) 
+        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r)
         if (iret.ne.0) then
           ierr=-4
           write(lu,
@@ -210,7 +230,7 @@ C       if (caxis(1:3) .eq. cax) i1=2
       enddo ! two slewing rates
 
 C  5. Antenna limits
-C   cout field#    1   2   3       4      5   6      7      
+C   cout field#    1   2   3       4      5   6      7
 C       sample   &ccw:az:-90 deg: 90 deg:el: 0 deg: 88 deg;
 C       sample   &n  :az: 90 deg:270 deg:el: 0 deg: 88 deg;
 C       sample   &cw :az:270 deg:450 deg:el: 0 deg: 88 deg;
@@ -228,7 +248,7 @@ C       sample   &cw :az:270 deg:450 deg:el: 0 deg: 88 deg;
         if (iret.ne.0) return
         cax=cout(1:2)
         cax(1:1)=upper(cax(1:1))
-        if (caxis(1:1) .eq. cax(1:1)) then ! first axis is first 
+        if (caxis(1:1) .eq. cax(1:1)) then ! first axis is first
           i1=3
           i2=6
         else ! second axis is first
@@ -239,7 +259,7 @@ C       sample   &cw :az:270 deg:450 deg:el: 0 deg: 88 deg;
         if (iret.ne.0) return
         iret = fvex_units(ptr_ch(cunit),len(cunit))
         if (iret.ne.0) return
-        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r) 
+        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r)
         almin1 = r
         if (iret.ne.0) then
           ierr=-5
@@ -251,7 +271,7 @@ C       sample   &cw :az:270 deg:450 deg:el: 0 deg: 88 deg;
         if (iret.ne.0) return
         iret = fvex_units(ptr_ch(cunit),len(cunit))
         if (iret.ne.0) return
-        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r) 
+        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r)
         almax1 = r
         if (iret.ne.0) then
           ierr=-5
@@ -261,7 +281,7 @@ C       sample   &cw :az:270 deg:450 deg:el: 0 deg: 88 deg;
         if (iret.ne.0) return
         iret = fvex_units(ptr_ch(cunit),len(cunit))
         if (iret.ne.0) return
-        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r) 
+        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r)
         almin2 = r
         if (iret.ne.0) then
           ierr=-5
@@ -272,7 +292,7 @@ C       sample   &cw :az:270 deg:450 deg:el: 0 deg: 88 deg;
         iret = fvex_units(ptr_ch(cunit),len(cunit))
         if (iret.ne.0) return
         iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r)
-        almax2 = r 
+        almax2 = r
         if (iret.ne.0) then
           ierr=-5
           write(lu,9909) nl,i1
@@ -305,7 +325,7 @@ C  6. Antenna diameter
         if (iret.ne.0) return
         iret = fvex_units(ptr_ch(cunit),len(cunit))
         if (iret.ne.0) return
-        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r) 
+        iret = fvex_double(ptr_ch(cout),ptr_ch(cunit),r)
         IF  (IERR.LT.0) THEN
           Ierr = -6
           write(lu,'("VUNPANT04 - Invalid antenna diameter value.")')

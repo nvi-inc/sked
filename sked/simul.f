@@ -12,7 +12,7 @@ CHS At the end the contribution, the observations make to the mne, is
 CHS added to the yet existing mne. Of course there are 2 modes:
 CHS
 CHS nsubc = 0 means, that the contribution is really taken over
-CHS nsubc = 1,2,3,4  means, that we are just testing configurations
+CHS nsubc = 1,2,3... 10  means, that we are just testing configurations
 CHS
 CHS iadd    1 for adding contribution, -1 for subtracting contribution
 CHS
@@ -48,7 +48,6 @@ C   COMMON BLOCKS USED
 C  LOCAL VARIABLES
       double precision t0,t_now,del_t
       save t0
-
 
 ! Used to hold tokenized line
       integer MaxToken
@@ -100,8 +99,8 @@ C      - holders for source, procedure names
       character*1 c1
       equivalence(itemp,c1)
 
-      double precision small
-      parameter (small=1.d-14)         !small diagonal element of normal
+       integer job
+      double precision rcond 
 C
 C  HISTORY
 C     880315 NRV DE-COMPC'D
@@ -271,14 +270,14 @@ C     iband is the band index for X-band
       endif
       call snrac(nst,istn,isor,icod,-1,mjd,ut,ierr)
 
-      if(nsubc .ne. 0) then
-        dnorm_tri(1:num_tri_est,nsubc)=dnorm_tri(1:num_tri_est,nsubc-1)
-        if(nsubc .eq. -1) then   !keep this from being done for now
-          do i1=1,num_est
-            iptr=indx4(i1,i1)
-            dnorm_tri(iptr,1)=dnorm_tri(iptr,1)+small  !this keeps non-singular by adding small diagonal term
-          end do
-        endif
+      if(dnorm_tri(1,0) .eq. 0) then
+         do i1=1,num_est
+           iptr=indx4(i1,i1)
+           dnorm_tri(iptr,0)=small  !this keeps non-singular by adding small diagonal term
+         end do
+      endif
+      if(nsubc .ne. 0) then 
+        dnorm_tri(1:num_tri_est,nsubc)=dnorm_tri(1:num_tri_est,nsubc-1)          
       endif
 
       if(nsubc.eq.0) then ! insert/delete mode
@@ -344,7 +343,9 @@ C************ Compute S-band sigma and ionosphere correction.
               sigmaion = ffact(1,icod)*dsqrt(sigma**2 + ssigma**2)
               sigmasnr = dsqrt(sigmaion**2 + sigma**2)       !NOT noise weighted for solve
 C************ s-band sigma and iono
-              sigma=dsqrt(sigmasnr**2+radd_noise**2) !now rss with noise
+              sigma=dsqrt( sigmasnr**2+radd_noise**2+
+     >                    (rel_noise/sin_el(i))**2  +
+     >                    (rel_noise/sin_el(j))**2  ) !now rss with noise
               wt=1./sigma
             else
               write(ludsp,9901) asnr,sasnr,csorna(isor),
@@ -500,8 +501,7 @@ C   Write out the observation record for the SOLVE output file.
            else
               partial_scaled(i1)=partial(iptr)*(1.d3/c)*secrad*wt     !Source ps/mas
            endif
-         end do
-       
+         end do      
 
          do i1=1,num_est
            do i2=i1,num_est
@@ -516,6 +516,16 @@ C   Write out the observation record for the SOLVE output file.
 CHS++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       enddo ! j=i+1,nstatn
       enddo ! i=1,nstatn-1
+
+! Invert the matrix for use in optimization.
+      if(nsubc .eq. 0) then
+        dnorm_inv(1:num_tri_est)=dnorm_tri(1:num_tri_est,0)  !normal equations so far
+! Invert the normal matrix.
+        job=11           !compute the inverse AND the rcond
+        call invert_and_con_tri(dnorm_inv,rcond,num_est,job)
+      endif 
+
+
 CHS-------------------------------------------------------------
 CHS Cover is called in order to determine the scans involved in
 CHS sky coverage computations. This only is done, when a scan is

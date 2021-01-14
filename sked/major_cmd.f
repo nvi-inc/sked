@@ -17,6 +17,7 @@ C History:
 ! 2014Jan22  Was not correctly reading in MinAngle
 ! 2017Feb14  Increased dimension of lyt_list from char*4 to char*5
 ! 2017Dec20  Added SplitTwins
+! 2020Oct22  Added in El_noise
 C
 C   COMMON BLOCKS USED
       include '../skdrincl/skparm.ftni'
@@ -50,7 +51,7 @@ C   LOCAL VARIABLES
 
 ! valid command list.
       integer icmd_list_len
-      parameter (icmd_list_len=23)
+      parameter (icmd_list_len=24)
       character*20 lcmd_list(icmd_list_len)
       character*20 lcmd_caps(icmd_list_len)
       character*65 lhelp(icmd_list_len)
@@ -114,20 +115,22 @@ C   LOCAL VARIABLES
 !19   
      >"AddPS",
      >" <real>     Amount of noise to add (ps)",
-!20 
+!20   
+     >"ElNoise",
+     >" <real>     Amount of 1/sin(el) noise to add (ps)",
+!21 
      >"SNRWts",    
      >" [YEs|No]   Use SNR to weight observations",
-!21
+!22
      >"LastHrs",
      >" <real>     OBSOLETE! Use TimeWindow",
-!22
+!23
      >"ObsWts",
      >" <real>     OBSOLETE! Use SnrWts",
-!23
+!24
      >"SplitTwins",
      >" [Yes|No]   Schedule twin telescopes independently"/
 
-   
       integer iyt_list_len
       parameter (iyt_list_len=6)
       character*5 lyt_list(iyt_list_len)
@@ -167,7 +170,7 @@ C   LOCAL VARIABLES
         end do
     
         icmd=istringMinMatch(lcmd_caps,icmd_list_len,lcmd)
-         if(icmd .eq. 0) then
+        if(icmd .eq. 0) then
            write(luscn,'(a,a)') "major_cmd: Not found: ",ltoken(itoken)
            return
         else if(icmd .le. 0) then
@@ -187,7 +190,7 @@ C   LOCAL VARIABLES
         select case(lcmd)  
         case("LIST")                      
           call major_out(ludsp,'d')
-        case("OBS_WTS") 
+        case("OBSWTS") 
 ! This is obsolete! should use SNRWTS
           icmd=istringMinMatch(lwt_list,iwt_list_len,ltoken(itoken))
           if(icmd .le. 0) goto 200
@@ -234,16 +237,16 @@ C   LOCAL VARIABLES
            case("SKYCOV") 
              kOptBySky=kvalue
            end select
-! Follwoing all take integer
-        case("ADDPS",      "BEST",  "FILLBEST", "FILLMINSUB",
+! Following all take a number 
+        case("ADDPS","BEST", "ELNOISE","FILLBEST", 
+     >       "FILLMINSUB",
      >       "FILLMINTIME","LASTHRS","MAXSLEWTIME", "MAXANGLE", 
      >       "MINANGLE",  "MINBETWEEN",
      >       "MINSUBNETSIZE", "MINSUNDIST", "NUMSUBNET","TIMEWINDOW")
-
           read(ltoken(itoken),'(f20.0)',err=200) rval
      
           select case(lcmd)
-          case("ADDPS")
+          case("ADDPS","ADD_PS")
             radd_noise=rval
           case("BEST") 
             if(rVal .gt. 100 .or. rval .lt. 0) then
@@ -251,7 +254,8 @@ C   LOCAL VARIABLES
               goto 200
             endif
             rBestPerCent=rval/100. 
-
+          case("ELNOISE") 
+            rel_noise=rval
           case("FILLBEST") 
             IFillBest=rval
             if(ifillbest .gt. 100) then

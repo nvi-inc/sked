@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
 	SUBROUTINE SKDSHFT(IERR)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C   Shift a schedule
 
@@ -16,7 +36,7 @@ C 990427 nrv Require 4-digit input year.
 ! 2007Jan24 JMG. Input part modified.
 ! 2013Jul17 JMG. No longer need to find 'modular' or 'prepass' or 'cont'
 ! 2015Mar30 JMG. got rid of obsolete arg in drchmod
-! 2019Jun10 JMG. Got rid of call to NR caldat. Replaced with gdate. 
+! 2019Jun10 JMG. Got rid of call to NR caldat. Replaced with gdate.
       include '../skdrincl/skparm.ftni'
       include 'drcom.ftni'
       include '../skdrincl/skobs.ftni'
@@ -66,7 +86,7 @@ C Output:
       double precision TimeExpEnd_New !Jday of shifted experiment
       double precision TimeExpSkd     !Schedule time or shifted schedule time
       double precision TimeExpFnd     !Time in new experiment
-      double precision dsecond        !Seconds part of day 
+      double precision dsecond        !Seconds part of day
 
       integer iwrite_pos              !position to write time
       integer iobs                    !Counter over observations
@@ -229,7 +249,7 @@ C
           RETURN
         ENDIF
       end do
-C     
+C
       ichngp=1
       imodp=1
       iprep=1
@@ -323,9 +343,9 @@ C
 ! located first observation to shift.
 200   continue
       TimeExpFnd=0
-      num_obs_new=0 
+      num_obs_new=0
       do while(TimeExpSkd .lt. TimeExpEnd_New)
-        Julian=Int(TimeExpSkd)                   !Get integer and fractional part of the day. 
+        Julian=Int(TimeExpSkd)                   !Get integer and fractional part of the day.
         dsecond=(TimeExpSkd-Julian)*86400.d0     !this is fractional part.
         call seconds2hms(dsecond,ih_skd,im_skd,is_skd)
 
@@ -388,8 +408,8 @@ C
       end do !copy to end
 
       write(luscn,'("Wrote:", a,a,i5,a)')
-     >    coutname(1:trimlen(coutname))," with ",num_obs_new,    
-     >     " observations." 
+     >    coutname(1:trimlen(coutname))," with ",num_obs_new,
+     >     " observations."
 
 C
 990   close(lu_outfile)

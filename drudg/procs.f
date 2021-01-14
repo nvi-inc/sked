@@ -1,16 +1,39 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
         SUBROUTINE PROCS
 C PROCS writes procedure file for the Field System.
 C Version 9.0 is supported with this routine.
-
+   
+      implicit none 
       include 'hardware.ftni'           !common block containing info on hardware
       include 'drcom.ftni'
       include '../skdrincl/freqs.ftni'
       include '../skdrincl/statn.ftni'
       include '../skdrincl/skobs.ftni'
       include '../skdrincl/data_xfer.ftni'
-      include 'bbc_freq.ftni'
 C
-C History
+C History Now with most recent at top. 
+! 2020Jun30  Got rid of test on kmissing (which checked if missing tape info)
+! 2019Aug25  Merged in changes from VGOS version. Mostly reading PROCS section from schedule file
+!
+!  
 C 930714  nrv  created,copied from procs
 C 940308  nrv  Added a check for "NW" to make the correct BBC
 C              IF input 
@@ -272,7 +295,7 @@ C 2003Sep04 JMGipson. Added postob_mk5a for mark5a modes.
 ! 2012.02.21 JMG. Modified to issue TPICD only in some cases. WEH changed his mind. 
 ! 2014.01.17 JMG. Moved 'setup' stuff into separate subroutine. Got rid of unused variables.
 ! 2014Jan21 JMG.  Commented out calls to loader/unloader since no more tapes.  
-! 2015Mar30 JMG. Removed obsolete arg from drchmod.    
+! 2015Mar30 JMG.  Removed obsolete arg from drchmod.    
 
 C Called by: FDRUDG
 C Calls: TRKALL,IADDTR,IADDPC,IADDK4,SET_TYPE,PROCINTR
@@ -308,15 +331,7 @@ C     integer nspd
       character*1 lwhich8               ! which8 BBCs used: F=first, L=last
       character*2 cifinp_save(max_chan,max_frq)
   
-C
 C INITIALIZED VARIABLES:      
-
-      if (kmissing) then
-        write(luscn,'(a)') 
-     > ' PROCS00: Missing or inconsistent head/track/pass information.'
-        write(luscn,'(a)')
-     >' Your procedures may be incorrect, or may cause a program abort.'
-      endif
 
       if(cstrack(istn).eq. "unknown" .or.
      >   cstrec(istn,1) .eq. "unknown") then
@@ -387,6 +402,15 @@ C
         return
       END IF
       call procintr
+! For a BB rack generate the proc file from the schedule.
+! 2019Aug27: Fixed index. was itsn...
+      if(cstrack(istn) .eq. "BB") then
+        write(luscn,"(' Read $PROCS from sked file ...',$)")
+        call proc_from_sked(ierr)
+        call drchmod(prcname,ierr)
+        return
+      endif
+
 ! write short exper_init
       call proc_write_define(lu_outfile,luscn," ")  !this initializes this routine
 
@@ -503,7 +527,7 @@ C Therefore, use index 1 for all the tests in this section.
       if (kpcal_d) then 
 !      if (kvrec(ir).or.kv4rec(ir).or.km3rec(ir).or.km4rec(ir)
 !     >   .or.Km5Disk) then
-        if ((km4rack.or.kvracks).and.
+        if ((km4rack.or.kvracks.or.kv5rack).and.
      .      (.not.kpiggy_km3mode.or.klsblo
      .      .or.((km3be.or.km3ac).and.k8bbc))) then
           call proc_pcalf(icode,lwhich8)
@@ -532,12 +556,12 @@ C 9. Write out standard tape loading and unloading procedures
 
 C 10. Finally, write out the procedures in the $PROC section of the sked file.
 C Read each line and if our station is mentioned, write out the proc.
-      if(ksked_proc) then
-        call proc_sked_proc(ierr)
-        if(ierr .ne. 0) then
-          write(*,*) "Error writing sked_proc section"
-        endif
-      endif
+!      if(ksked_proc) then
+!        call proc_sked_proc(ierr)
+!        if(ierr .ne. 0) then
+!          write(*,*) "Error writing sked_proc section"
+!        endif
+!        endif
 
 9000  continue
       call proc_write_define(-1,luscn," ")  !this flushes a buffer.

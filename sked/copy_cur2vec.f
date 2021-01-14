@@ -9,6 +9,7 @@
 ! functions
       real speed
 !     JMG 2003May29
+! 2020Nov05 JMGipson. Git rid of 
 ! copy current measurement into old measurement.
       integer istat
       integer i
@@ -25,8 +26,6 @@
           IFT_vec(istat,inew)  =   IFT_vec(istat,iold)
           iftend_vec(istat,inew) = iftend_vec(istat,iold)
           itu_vec(istat,inew)  =   itu_vec(istat,iold)
-          IPAS_vec(istat,inew) =   IPAS_vec(istat,iold)
-          IDIR_vec(istat,inew) =   IDIR_vec(istat,iold)
           Idur_vec(istat,inew) =   Idur_vec(istat,iold)
           Idl_vec(istat,inew)  =   Idl_vec(istat,iold)
           ICOD_vec(istat,inew) =   ICOD_vec(istat,iold)
@@ -43,9 +42,7 @@
           NSOR_vec(istat,inew) = 0
           IFT_vec(istat,inew)  = 0
           iftend_vec(istat,inew) = 0
-          itu_vec(istat,inew)  = 0
-          IPAS_vec(istat,inew) = 0
-          IDIR_vec(istat,inew) = 0
+          itu_vec(istat,inew)  = 0   
           Idur_vec(istat,inew) = 0
           Idl_vec(istat,inew)  = 0
           ICOD_vec(istat,inew) = 0
@@ -86,7 +83,7 @@
 ! Compute tape end.
       do i=1,nstncur
          istat=istcur(i)
-         IFTEND_cur(istat) = IFTCUR(istat)+ IDIRcur(istat)*
+         IFTEND_cur(istat) = IFTCUR(istat)+ 
      >    (IDURcur(istat)+
      >     itucur(istat)*ITEARL(istat))*SPEED(ICODcur(istat),istat)
       end do
@@ -97,9 +94,7 @@
          NSOR_vec(istat,inew) =   NSORcur(istat)
          IFT_vec(istat,inew)  =   IFTcur(istat)
          iftend_vec(istat,inew) = iftend_cur(istat)
-         itu_vec(istat,inew)  =   itucur(istat)
-         IPAS_vec(istat,inew) =   IPAScur(istat)
-         IDIR_vec(istat,inew) =   IDIRcur(istat)
+         itu_vec(istat,inew)  =   itucur(istat) 
          Idur_vec(istat,inew) =   Idurcur(istat)
          Idl_vec(istat,inew)  =   Idlcur(istat)
          ICOD_vec(istat,inew) =   ICODcur(istat)

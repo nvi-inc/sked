@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine timin(cbuf,cti,ctiformat,cctiformat,iyear)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
       include '../skdrincl/skparm.ftni'
 C Decode time commands read from the SNAP file.
 C 980916 nrv Extracted from lstsum
@@ -11,7 +31,7 @@ C Input
       integer iyear ! from SNAP file, modified on output if
 C                     the time field contains the year
 C Output
-      character*(*) cti ! time field 
+      character*(*) cti ! time field
       character*(*) ctiformat ! its appropriate format statement
       character*(*) cctiformat ! format for reading characters
 C Local

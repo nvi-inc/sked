@@ -1,8 +1,20 @@
  This file contains a brief description of the changes made to sked
+2021-01-14 JMG Added VIEN to correlator list in prset.f
+2020Nov04 Modified master_cmd and return_master_line to be more forgiving if they cannot open a file. 
+          Previously sked would die. Not it issues an error messsage and continues. 
+2020Oct29 Location of skedf.ctl now in include file "skedf_ctl.ftni" 
+2020Oct13 seop.f. Initialized ierr4=0
+2020Oct03 Rewrote parts of soplot_pol.f and find_stat_vis.f to remove obsolete non-integer do loop.
+          make_def_names: Now generates TRACK info for vdif stations 
+2020Oct02 Got rid of references and code dealing with S2 stations:  prout.f
+          In skdrut: frinit.f , speed.f, stinp.f, ttape.f, unpvt.f vstinp.f, vunpdas.f
+          In skdrincl: freqs.ftni, statn.f 
+2020Oct02 vmoinp.f Got read of references to passes, headstacks, S2       
+2020Sep12 Cleaned up some code in lscur.f.  Fixed checking first scan in chcmd.f 
 2020Jun10 Changed argument of 'solve' subroutine from holerith to character: solve.f, fsked.f
           Also if no filename is specified, will use skedfile name as a template. Previously used cexper
 2020Jun09 ../skdrincl/ttape.f. got rid of "THIN","THICK","SHORT", added "MARK6","FLEXBUFF"
-2020Jun08 separated ../skdrincl/broadband.ftni out of ../skdrincl/statn.ftni
+2020Jun08 Moved ../skdrincl/broadband.ftni out of ../skdrincl/statn.ftni
           Introduction of new parameter ibb_off: broadband_cmd.f, broadband_out.f, chcmd.f,
           save_station_state.f, skini.f, when_at_next_source.f 
 2020Jun06 gnpas.f. Got rid of a lot of obsolete code dealing passes, headstacks.  
@@ -12,11 +24,11 @@
 2020Jun04 ../skdrut.f: Simplifed gnpas.f by getting rid of all references to passes etc.
 2020Jun02 Fixed unitilized variable in frcat.f
 2020Jun02 Got rid of reading/writing/etc hdpos.cat:  skcls.f 
-2020Apr20 extract_staiton_list.f. Fixed bug if selecting all the stations 
+2020Apr20 extract_station_list.f. Fixed bug if selecting all the stations 
 2020Apr15 simul.f. Fixed sign in atmosphere rate partial
 2020Apr14 result.f Changed number of elements written out
 2019Aug14 ../skdrut/vread.f, vglinp.f, errormsg.f:  Made better error messages. 
-2019Jun24 read_mode_cat: Was always printing errror message even when there wasn't. (Wrote to screen instead of lerr_msg') 
+2019Jun24 read_mode_cat: Was always printing errror message even when there wasn't. (Wrote to screen instead of 'lerr_msg') 
 2019Jun13 read_mode_cat:  Better error messages on parsing errros. 
 2019Jun13 NR stuff: Got rid of caldat.  Added iday_of_year. 
 2019May23 sumcm.f.  Was not printing our SNR historgram. NBA=numbands was being set to 0. 

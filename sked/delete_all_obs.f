@@ -26,9 +26,7 @@ C   COMMON BLOCKS USED
       eleva=-99.d0  !this is el of stations.
       azimu=-99.d0
 !
-      ipascur=1
       iftcur=0
-      idircur=1
 
       kobc=.false.
 

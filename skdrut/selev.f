@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE SELEV(LINSTQ,luscn,ludsp)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     SELEV reads/writes station elevation limits
 C
@@ -34,7 +54,7 @@ C   930225 nrv implicit none
 C   950405 nrv Use 2-letter station codes for listings.
 c   950411 nrv Call IGTST2 for input of 2-letter codes
 C 951017 nrv Fixed gtfld call to remove linstq
-C 960415 nrv Do not return on initial error, find all. 
+C 960415 nrv Do not return on initial error, find all.
 C
 C
 C     1. Check for some input.  If none, write out current.

@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE LISTS()    !LIST ONE STATION'S SCHEDULE
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C This routine lists on the printer a schedule
 C
@@ -46,9 +66,11 @@ C LOCAL:
       integer iyr,idayr,ihr,imin,isc,mjd,mon,ida,ical,icod
       integer mjdpre,ispre,iyr2,idayr2,ihr2,imin2,isc2
       integer*2 lfreq,lcbpre,lcbnew
+      character*2 cwrap_pre
+      character*2 cwrap_new
       double precision UT,GST,utpre ! previous value required for slewing
       integer nstnsk,istnsk,isor,nsat
-      character*7 cwrap ! cable wrap string returned from CBINF 
+      character*7 cwrap ! cable wrap string returned from CBINF
 C NSTNSK - number of stations in current observation
 C ISTNSK - which station corrresponds to ISTN
       integer nlobs,nlines,ntapes,ierr,ilen,npage
@@ -68,7 +90,6 @@ C     integer*2 LAXIS(2,7),
       integer iobs
       LOGICAL KUP ! true if source is up at station
       logical kwrap
-      integer*2 HHR
       character*2 csize
       integer iheader_Space
 
@@ -77,7 +98,7 @@ C     integer*2 LAXIS(2,7),
       double precision conv_s2 ! speed scaling for feet-->minutes
       integer ifeet
       double precision ffeet0_k4 ! initial counts
-      DATA HHR/2HR /
+   
 C
 C SUBROUTINES CALLED:
 C  FMP routines to read schedule file
@@ -121,12 +142,13 @@ C 970307 nrv Use pointer array ISKREC to insure time order of obs.
 C 971003 nrv Add a check for S2 and determine tape changes for it separately.
 C 980916 nrv Change date header on source page to yyyy.ddd
 C 981202 nrv Add warning message about negative slewing times.
-C 990527 nrv Add option for S2 and K4 non-VEX outputs. 
+C 990527 nrv Add option for S2 and K4 non-VEX outputs.
 C 991118 nrv Removed LAXIS variable and use AXTYP subroutine.
 C 991209 nrv Add ITUSE to iftold calculation.
 ! 2007   jmg Removed obsolete call to m3inf.  Not used.
 ! 2007Jul20 JMG.  Added character LD
 ! 2013Sep19  JMGipson made sample rate station dependent
+! 2014Apr23  JMG.  Changed lcbpre, lcbnow to cwrap_pre, cwrap_now. Updated call to slewo.f
 C
 C 1. First initialize counters.  Read the first observation,
 C unpack the record, and set the PREvious variables to the
@@ -201,7 +223,8 @@ C
       MJDPRE = MJD
       UTPRE = UT
       ISPRE = ISOR
-      CALL CHAR2HOL('  ',LCBPRE,1,2)
+
+      cwrap_pre=" "
 C
       IC = TRIMLEN(LSKDFI)
       WRITE(LUSCN,100) cSTNNA(ISTN),LSKDFI(1:ic) ! new
@@ -323,13 +346,13 @@ C
       if (kwrap) then ! print cable wrap
         IF (cs.EQ.'S') THEN
           WRITE(LUPRT,1137)
-        ELSE 
+        ELSE
           WRITE(luprt,1080)
         ENDIF
       else ! no cable wrap output
         IF (cs.EQ.'S') THEN
           WRITE(LUPRT,9137)
-        ELSE 
+        ELSE
           WRITE(luprt,9080)
         ENDIF
       endif
@@ -397,13 +420,9 @@ C THEN BEGIN new page
 C ENDT new page
           ENDIF
           IDIR=+1
-          IF (LDIR(ISTNSK).EQ.HHR)IDIR=-1
-          if (ks2) then
-C           knewtp = ift(istnsk).eq.0.and.ipas(istnsk).eq.0
-C           replaced with:
-            knewtp = IPAS(istnsk).LT.IPASP.OR.
-     .      (IPAS(istnsk).EQ.IPASP.AND.(IFT(istnsk).LT.(IFTOLD-300)))
-          else if (idir.ne.0) then
+      
+   
+          if (idir.ne.0) then
             KNEWTP = KNEWT(IFT(ISTNSK),IPAS(ISTNSK),IPASP,IDIR,
      .      IDIRP,IFTOLD)
           else
@@ -441,19 +460,19 @@ C CONVERT BACK TO DOUBLE
      .           LHSIGN,IHAH,IHAM,HAS)
           ENDIF
 C
-          if (tslew.lt.0.0) then 
+          if (tslew.lt.0.0) then
             WRITE(luprt,9331)
 9331        FORMAT('  THE FOLLOWING SOURCE REQUIRES NEGATIVE ',
      .             'SLEWING TIME.  INFORM THE SCHEDULER!'/)
                   NLINES = NLINES + 2
           endif
           IF (KUP) THEN !source is up
-            lcbnew=lcable(istnsk)
+            cwrap_new=ccable(istnsk)
             CALL SLEWo(ISPRE,MJDPRE,UTPRE,ISOR,ISTN,
-     .           LCBPRE,LCBNEW,TSLEW,0,dum)
+     >            cwrap_pre,cwrap_new,TSLEW,0,dum)
             TSLEW = TSLEW/60.0
             MJDPRE = MJD
-            LCBPRE = LCBNEW
+            cwrap_pre=cwrap_new
             ISPRE = ISOR
             UTPRE = UT+IDUR(ISTNSK)
           ELSE !source not up
@@ -551,7 +570,7 @@ C     5. Now write out the observation line.
             else
               write(luprt,8516) IPAS(ISTNSK),LDIR(ISTNSK),IFT(ISTNSK)
 8516          format(I3,A1,' ',I5,' ',' ________________'/)
-            endif 
+            endif
           endif ! wid 137/80
           endif ! cable/no cable
 C

@@ -8,6 +8,8 @@
       character*(*) cmaster_file    !master file
       character*(*) cexper          !experiment code
 ! returned
+  
+
       character*(*) line            !line corresponding to exper
       integer iyr_mst_start   
       logical kfound                ! if true, then found. If false,not found.    
@@ -17,6 +19,7 @@
 ! History
 !  2007Nov20. First version. 
 !  2015Oct23. Print update date of master file. 
+!  2020Nov04. Print error message if we can't open the file. 
 
 ! local
 ! used to  extract tokens
@@ -27,6 +30,7 @@
       integer i   !count 
       character*8 cexper_master  
       integer ind 
+      integer istat
       logical kline_closed
       logical kintensive
     
@@ -35,8 +39,9 @@
 
       kintensive = index(cmaster_file,"-int") .ne. 0
 ! Open the master file. Extract the station list, start & end times
-      open(13,file=cmaster_file)
-      write(*,'(a, $)') "Checking ", trim(cmaster_file) 
+      write(*,'("Checking ",a, $)')  trim(cmaster_file) 
+      open(13,file=cmaster_file,err=500,iostat=istat)
+ 
       kline_closed=.false. 
 ! skip the header
       do i=1,10
@@ -85,8 +90,12 @@
 200    continue
        kfound = .false.   
        if(.not. kline_closed) write(*,*) " " 
-       close(13)         
+       close(13)      
        return
+
+500    continue
+       kfound = .false. 
+       write(*,'("I/O error ",i4, " opening file. Skipping it.")') istat
        end 
 
        

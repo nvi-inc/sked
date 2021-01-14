@@ -1,7 +1,27 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE TTAPE(LINSTQ,luscn,ludsp)
+      implicit none
 C
 C     TTAPE reads/writes station tape type. This routine reads
-C     the TAPE_TYPE lines in the schedule file and handles the 
+C     the TAPE_TYPE lines in the schedule file and handles the
 C     TAPE command.
 C
       include '../skdrincl/skparm.ftni'
@@ -75,8 +95,9 @@ C 021003 nrv Adjust K4 output for speed being in dm internally.
 ! 2009Sep22 JMG. Added Mark5B as a valid mode
 ! 2014Dec02 JMG. Mark5C support
 ! 2020Jun09 JMG. Added MARK6, got rid of THICK,THIN,SHORT
+! 2020Oct02  JMG. Removed all references to S2
 
-      IF  (NSTATN.LE.0.or.ncodes.le.0) THEN  
+      IF  (NSTATN.LE.0.or.ncodes.le.0) THEN
         write(luscn,*)
      >    "TTAPE00 - Select frequencies and stations first."
         RETURN
@@ -88,7 +109,6 @@ C
       CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
       IF  (IC1.EQ.0) THEN  !no input
         kk4=cterna(1)(1:2).eq."K4"
-        ks2=cterna(1)(1:2).eq."S2"
 ! write header
         if(ks2 .or. kk4) then
           WRITE(LUDSP,'(a)')
@@ -100,13 +120,7 @@ C
 
         do i=1,nstatn
           WRITE(LUDSP,"(1X,A,2X,A,' ',$)") cpoCOD(I),cSTNNA(i)
-          if (cstrec(i,1)(1:2).eq.'S2') then
-            if (cs2speed(i).eq. 'LP') s2sp=SPEED_LP
-            if (cs2speed(i).eq.'SLP') s2sp=SPEED_SLP
-            ival = idint(0.1 + maxtap(i)/(s2sp*5.d0)) ! feet/(ips*5) = min
-            write(ludsp,9113) ival,maxtap(i),cs2speed(i),s2sp
-9113        format(i6," min (",i6," feet)",2x,a," (",f3.1," ips)")
-          elseif (cstrec(i,1)(1:2).eq.'K4') then
+          if (cstrec(i,1)(1:2).eq.'K4') then
             k4sp = speed(1,i)*1000.0
             ival = idint(0.1 + maxtap(i)/(60.d0*k4sp)) ! min=m/(60*m/s)
             write(ludsp,9114) ival,maxtap(i),k4sp
@@ -129,8 +143,8 @@ C
      .        cTapeType(i)='Thick'
             if (maxtap(i).lt.5000) cTapeType(i)='Short'
             if(cstrec(i,1) .eq. "Mark5A" .or.
-     >         cstrec(i,1) .eq. "Mark5B" .or. 
-     >         cstrec(i,1) .eq. "Mark5C" .or. 
+     >         cstrec(i,1) .eq. "Mark5B" .or.
+     >         cstrec(i,1) .eq. "Mark5C" .or.
      >         cstrec(i,1) .eq. "K5") then
                write(ludsp,'(a)') cstrec(i,1)
             else
@@ -159,14 +173,11 @@ C
         endif
 C       Station ID is valid. Check tape type now.
         if (istn.gt.0) then ! individual station
-          ks2 = cstrec(istn,1)(1:2).eq.'S2'
           kk4 = cstrec(istn,1)(1:2).eq.'K4'
         else ! all stations
-          ks2 = cstrec(1,1)(1:2).eq.'S2'
           kk4 = cstrec(1,1)(1:2).eq.'K4'
           do i=2,nstatn
-            if((ks2 .and. cstrec(i,1)(1:2) .ne. "S2") .or.
-     >         (kk4 .and. cstrec(i,1)(1:2) .ne. "K4")) then
+            if(kk4 .and. cstrec(i,1)(1:2) .ne. "K4") then
               write(luscn,
      >       "('TTAPE99:  All stations must be identical to use _ ',a)")
      >        cstnna(i)
@@ -178,10 +189,10 @@ C       Station ID is valid. Check tape type now.
           write(luscn,'(a)') 'TTAPE93 - Select K4 recording mode first.'
           return
         endif ! need speed
-!        if (.not.ks2.and..not.kk4) then ! Mk3/4
-        if (.not.ks2) then ! Mk3/4
+
+
           CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2) ! type
-          IF  (IC1.GT.0) THEN 
+          IF  (IC1.GT.0) THEN
             nch=min0(ikey_len,ic2-ic1+1)
             ckeywd=" "
             idum = ichmv(lkeywd,1,linstq(2),ic1,nch)
@@ -192,7 +203,7 @@ C       Station ID is valid. Check tape type now.
               if(istn .eq. 0) then
                  write(luscn,'($)')
               else
-                write(luscn,'(" for ",a)') cstnna(istn) 
+                write(luscn,'(" for ",a)') cstnna(istn)
               endif
               write(luscn,'("  Valid types: ",10a)') (list(i),i=1,6)
               return
@@ -204,7 +215,7 @@ C       Station ID is valid. Check tape type now.
                   ckeywd="Mark5B"
                else if(ikey .eq. 6) then
                   ckeywd="Mark5C"
-               else if(ikey .eq. 7) then 
+               else if(ikey .eq. 7) then
                   ckeywd="K5"
                endif
                if(istn .eq. 0) then
@@ -222,8 +233,8 @@ C       Station ID is valid. Check tape type now.
           else ! use defaults for type and density
             kdefault = .true.
           endif ! type/use defaults
-        
-          if(.not. kdefault .and. ikey .gt. 0) then 
+
+          if(.not. kdefault .and. ikey .gt. 0) then
             if(list(ikey).eq. "SHORT" .or. list(ikey).eq."THIN") then
               CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
               IF  (IC1.EQ.0) THEN  !no matching density
@@ -243,67 +254,12 @@ C       Station ID is valid. Check tape type now.
               END IF  !invalid type
             endif
           endif ! density
-        else if (ks2) then
-          CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2) ! length in min
-          IF  (IC1.GT.0) THEN 
-            nch=ic2-ic1+1
-            ival = ias2b(linstq(2),ic1,nch)
-            if (ival.le.0) then ! invalid length
-              write(luscn,9205) ival
-9205          format('TTAPE05 Error - Invalid tape length ',i5,'. '
-     .        'Must be > 0.') 
-              return
-            END IF  !invalid length
-            kdefault = .false.
-            CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2) ! speed
-            IF  (IC1.EQ.0) THEN  !no speed
-              write(luscn,'(a)')
-     >         "TTAPE06 Error - You must also specify SLP or LP speed."
-              RETURN
-            endif ! no speed
-            nch=min0(ikey_len,ic2-ic1+1)
-            ckeywd=" "
-            idum = ichmv(lkeywd,1,linstq(2),ic1,nch)
-            ikeys2=istringminmatch(lists2,ilist_lens2,ckeywd)
-            if (ikeys2.eq.0) then ! invalid speed
-              write(luscn,9207) ckeywd
-9207          format('TTAPE03 Error - invalid S2 speed: ',a,
-     .        ', must be SLP or LP.') 
-              return
-            END IF  !invalid speed
-          else ! use defaults for length and speed 
-            kdefault = .true.
-          endif ! type/use defaults
-        else if (kk4) then
-          CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2) ! length in min
-          IF  (IC1.GT.0) THEN 
-            nch=ic2-ic1+1
-            ival = ias2b(linstq(2),ic1,nch)
-            if (ival.le.0) then ! invalid length
-              write(luscn,9208) ival
-9208          format('TTAPE08 Error - Invalid tape length ',i5,'. ',
-     .        'Must be > 0.') 
-              return
-            END IF  !invalid length
-            kdefault = .false.
-          else ! use defaults for length and speed 
-            kdefault = .true.
-          endif ! type/use defaults
-        endif 
+
 
 C   3. Now set parameters in common.
         DO  I = 1,NSTATN
           if ((istn.eq.0).or.(istn.gt.0.and.i.eq.istn)) then ! this station
-            if (cstrec(i,1)(1:2).eq."S2") then
-              if (lists2(ikeys2) .eq. "LP") then
-                cs2speed(i)="LP"
-                s2sp = SPEED_LP
-              else
-                cs2speed(i)="SLP"
-                s2sp = SPEED_SLP
-              endif 
-              maxtap(i)=int(0.1+ival*5.d0*s2sp) ! convert to feet
-            else if (cstrec(i,1)(1:2) .eq. "K4") then
+            if (cstrec(i,1)(1:2) .eq. "K4") then
               k4sp = speed(1,i) ! for code 1
               maxtap(i)=ival*k4sp*60.d0 ! convert to meters
             else
@@ -315,7 +271,7 @@ C   3. Now set parameters in common.
               else if(ikey .lt. 1) then
                  maxtap(i)=1.e6
                  bitdens(i,1)=1e6
-               
+
               else if (list(ikey) .eq. "THICK") then
                 maxtap(i)=thick_length
                 do icode=1,NCODES
@@ -345,17 +301,17 @@ C   3. Now set parameters in common.
                     bitdens(i,icode)=33333
                   enddo
                 endif
-                if(cstrec(i,1) .eq. "Mark5A".or. 
+                if(cstrec(i,1) .eq. "Mark5A".or.
      >             cstrec(i,1) .eq. "Mark5B") then
                   cstrec(i,1)=cstrec_old(i)          !restore the tape type
                 endif
-              else if(cstrec(i,1) .eq. "Mark5A" .or. 
+              else if(cstrec(i,1) .eq. "Mark5A" .or.
      >                cstrec(i,1) .eq. "Mark5B" .or.
-     >                cstrec(i,1) .eq. "K5") then 
+     >                cstrec(i,1) .eq. "K5") then
                 do icode=1,ncodes
                   bitdens(i,icode)=1.d11   !Very high density means we don't need to worry about it.
                 end do
-                maxtap(i)=10000         !set to 10 thousand feet.            
+                maxtap(i)=10000         !set to 10 thousand feet.
               endif
             endif
           endif ! this station

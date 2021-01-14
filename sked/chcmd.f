@@ -244,20 +244,22 @@ C
       if(cmdcod .eq. "CH" .or. cmdcod .eq. "UT") then      
         CALL LSHED(LUDSP,nsubst,isubst)
         khead=.false. 
-        istat=istcur(1)
-        isource=nsorcur(istat)
-  
-        call ChkSrcUp4Scan(istat,isource,nceles,
+
+! Check if source is up for scan on first observation. 
+        do i=1,nstncur
+          istat= istcur(i)
+          isource=nsorcur(istat)
+          call ChkSrcUp4Scan(istat,isource,nceles,
      >    csorna(isource),cstnna(istat), MJDCUR(istat),
      >    UTCUR(istat), Idurcur(istat),cwrap_new,ludsp,kdisplay,ierr)
- 
-        do i=1,nstncur
-          idurst(istcur(i))=idurcur(istcur(i))
+        end do 
+
+        do i=1,nstncur  
+           idurst(istcur(i))=idurcur(istcur(i))
         enddo
- 
         call snrac(nstncur,istcur,isource,icodcur(istat),ludsp,
      >    mjdcur(istat),utcur(istat),ierr)
-        if(cmdcod .eq. "UT") then
+          if(cmdcod .eq. "UT") then
            write(*,*) "Removing"
            call remove_Bad_snr(isource,icodcur(istat))
         endif 
@@ -449,7 +451,6 @@ C         Calculate slewing just to get the cable wrap
             nspre(jt)=-1           !set it as if the antenna has not been used. 
           endif 
     
-
           CALL AUCHK(cmdcod,MINIDL,NSPRE,MJDPRE,UTPRE,idurpre,idlpre,
      >       cwrap_pre,KAUTIM,ierr_auchk,istbad)
 ! Ignore errors in tape positioning on the first source.

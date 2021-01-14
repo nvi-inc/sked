@@ -10,8 +10,8 @@
       parameter (MaxCmd=MxCmd1+MxCmd2+MxCmd3+MxCmd4)
 
       character*2 cmdshort(MaxCmd)
-      character*18 CmdList(MaxCmd)   !length is also max_nccmd
-      character*29 cmdbrief(MaxCmd)  !brief description of command.
-      character*120 cmdsyntax(MaxCmd) !more detailed syntax.
+      character*18 CmdList(MaxCmd)      !length is also max_nccmd
+      character*36 cmdbrief(MaxCmd)     !brief description of command.
+      character*120 cmdsyntax(MaxCmd)   !more detailed syntax.
       common /cmdlist/cmdshort,cmdlist,cmdbrief,cmdsyntax
 

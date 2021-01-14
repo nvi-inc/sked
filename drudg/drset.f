@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE DRSET(LINSTQ)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C   DRSET reads certain parameter values from the $PARAM section
 C
@@ -23,7 +43,7 @@ C   LOCAL VARIABLES
 C               - Key word, longest is 22 characters
       character*2 ckey
       integer MaxPr
-      parameter (MaxPr=48)
+      parameter (MaxPr=49)
       character*15 listPr(MaxPr)
       character*2  listPrShort(MaxPr)
 
@@ -37,6 +57,7 @@ C               - Key word, longest is 22 characters
      > "GET",       "HEAD",       "IDLE",       "JAVA",
      > "LOOKAHEAD", "MAXSCAN",    "MIDOB",      "MIDTP",
      > "MINBETWEEN","MINIMUM",    "MINSCAN",    "MINSUBNET",
+     > "MARK6_OFF",
      > "MODSCAN",   "MODULAR",    "NOREWIND",
      > "PARITY",     "POSTOB",
      > "POSTPASS",  "PREOB",      "PREPASS",    "PRFLAG",
@@ -52,6 +73,7 @@ C               - Key word, longest is 22 characters
      >"GT","HD","ID","JA",
      >"LO","XS","MI","MT",
      >"MB","MN","MS","SM",
+     >"M6",
      >"MD","MO","NR","PA","PO",
      >"PS","PR","PP","PF",
      >"PI","SP","SA","SO",
@@ -115,7 +137,7 @@ C  Character values
 C  Numerical values
       elseif  (ckey.eq.'SP'.OR.ckey.eq.'PA'.OR.ckey.eq.'SO'.OR.
      .         ckey.eq.'HD'.OR.ckey.eq.'TP'.OR.ckey.eq.'TE'.or.
-     >         ckey.eq.'CH') then
+     >         ckey.eq.'CH'.or.ckey .eq.'M6') then
         INUM = IAS2B(LINSTQ(2),IC1,IC2-IC1+1)
         IF  (INUM.lt.0) THEN
           write(luscn,'("DRSET04 - Invalid parameter value.")')
@@ -123,6 +145,8 @@ C  Numerical values
         END IF
         IF (ckey.eq.'SP') THEN
           ISETTM = INUM
+        else if(ckey .eq. 'M6') then
+          imark6_off=inum
         ELSE IF (ckey.eq.'CH') THEN
           ITCTIM = INUM                    !tape change time.
         ELSE IF (ckey.eq.'PA') THEN
@@ -141,10 +165,10 @@ C  Numerical values
       else if(ckey .eq. 'SF') then   !srcfloor takes two parameters. Read 2nd.
           CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
       endif
- 
+
 C  5.  Test to see if there is more to the line which we need to
 C      decode.  If so, go back to parse some more.
- 
+
 900   IF ((LINSTQ(1)-ICH).GT.0) GOTO 100
 C
       RETURN

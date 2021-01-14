@@ -1,8 +1,28 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunps2g(modef,stdef,ivexnum,iret,ierr,lu,
      .cpassl,npassl)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
-C     VUNPS2G gets the group order for S2 recorders 
-C     for station STDEF and mode MODEF. 
+C     VUNPS2G gets the group order for S2 recorders
+C     for station STDEF and mode MODEF.
 C     All statements are gotten and checked before returning.
 C     Any invalid values are not loaded into the returned
 C     parameters.
@@ -54,7 +74,7 @@ C  1.1 <group>
       ierr = 11
       i=1
       do while (i.le.max_pass.and.iret.eq.0)
-        iret = fvex_field(i,ptr_ch(cout),len(cout)) ! get field 
+        iret = fvex_field(i,ptr_ch(cout),len(cout)) ! get field
         if (iret.eq.0) then
           il=fvex_len(cout)
           cpassl(i)=cout(1:il) ! save the pass-order list

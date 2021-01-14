@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine equip_type(cr1)
 C  equip_set displays the current equipment and prompts the user
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C  to change if desired.
       include 'hardware.ftni'
       include 'drcom.ftni'
@@ -62,8 +82,8 @@ C LOCAL:
 C 0. Determine current types.
 
         max_rack_local = max_rack_type
-   
-! 2012Sep13 
+
+! 2012Sep13
 !      max_rec_local = max_rec_type-1
        max_rec_local = max_rec_type
         if(Km5A_piggy .or.km5p_piggy) then
@@ -86,7 +106,7 @@ C 0. Determine current types.
            ifirst_rec=1
         else
            ifirst_rec=2
-        endif           
+        endif
 
 C 1. Batch input
 
@@ -120,11 +140,11 @@ C 1. Batch input
 C 2. Interactive input
 
       else ! interactive
-      
+
 100     continue
         WRITE(LUSCN,"(a8,' equipment: Rack=',a12,'   Recorder=',a8)")
      &   cantna(ISTN),cstrack(istn),cstrec(istn,1)
- 
+
         write(luscn,'(a)')
      &  '| Select rack          | Select Rec 1 | Select Rec 2 | Start|'
 ! We subtract 1 from max_equip_lines, max_rack_type and max_rec_type
@@ -258,7 +278,7 @@ C Now modify the common variables and send warnings.
      >        a8,' to ',a)
               cstrack(istn)=crack_type(irack)
             endif ! change
-C Retain switching from V mode to M if it's a Mk4 or VLBA4 
+C Retain switching from V mode to M if it's a Mk4 or VLBA4
 C formatter because they can't record V modes.
             if( cmode(istn,1) .eq. "VLBA" .and.
      >          (cstrack(istn)(1:5) .eq. "Mark4" .or.

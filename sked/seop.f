@@ -3,6 +3,9 @@ C
 C     SEOP sets parameters for optimization
 C
 C   History
+
+!  Now recent at top
+! 2020Oct13 JMG.  Initialized ierr4 to 0. 
 C   NRV 910905 Replacement for Heinz's many-question version of PARAM
 C   NRV 911026 Changed first line with major/minor options
 C   nrv 920706 added 2nd line of parameters, for noise floor
@@ -37,7 +40,7 @@ C  LOCAL:
       integer*2 ic
       character*1 cc
 ! AEM 20041217 int->int*4 passed to C-module
-      integer*4 izero,errret,ix,iy,ixcol,i4,i4x
+      integer*4 izero,ierr4,ix,iy,ixcol,i4,i4x
 ! AEM 20041217 int->int*2 passed to C-module
       integer*2 ikey
 ! AEM 20050113 add new variables for precise positioning in "Optimize"
@@ -58,11 +61,11 @@ C     inx - index within a column for setting typed values
       data cerpna/'   XP   ','   YP  ','  DUT  ','  PSI   ','  EPS   '/
   
 
-
+      ierr4=0
       ierr=0
       izero=0
-      call start_mn(errret)
-      if (errret.ne.1) then
+      call start_mn(ierr4)
+      if (ierr4.ne.1) then
         write(luscn,9901)
 9901    format('Invalid terminal type, can''t use cursor sensing.')
         ierr=-1

@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE LABSNP(nlabpr,iyear,inew)
 C  Write tape labels from reading the SNAP file
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C NRV 901206 New routine
 C nrv 930412 implicit none
@@ -105,7 +125,7 @@ C 2. Loop over SNAP records
         endif !non=comment line
       enddo !read loop
 901   if (clabtyp.ne.'POSTSCRIPT'.and. clabtyp .ne. 'DYM0') then
-        if (clabtyp.eq.'LASER+BARCODE_CARTRIDGE'.or.cprttyp.eq.'FILE') 
+        if (clabtyp.eq.'LASER+BARCODE_CARTRIDGE'.or.cprttyp.eq.'FILE')
      .  call blabl(luprt,nout,cexper,cstnna,cstcod,
      .  iy1,id1,ih1,im1,iy2,id2,ih2,im2,ilabrow,cprttyp,clabtyp,cprport)
       else

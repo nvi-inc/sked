@@ -5,11 +5,13 @@
 ! 2011Apr25  Added MaxAngle
 ! 2013Oct08  Changed rMinSunAngle to 4 deg from 15deg
 ! 2017DEC20  KOL added a parameter ksplittwins
+! 2020Oct22  Addedel_noise
       include '../skdrincl/skparm.ftni'
       include 'major.ftni'
 ! Default values. These are used if not set in schedule.
       rcovar_win=-1      	!indicate not set
       radd_noise=30
+      rel_noise = 0
       rBestPerCent=60.0/100.0   !Keep 60% by default
 
       ksnrwts  =.true.

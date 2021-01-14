@@ -29,7 +29,6 @@ C     CALLED SUBROUTINES: SNRAC
 C
 C    LOCAL VARIABLES
       integer ibnum !functions
-      LOGICAL KSK   !print something
       logical kstat(max_stn)   !this station is in this obs
 C      - true if station is schedule for this observation
       integer ihr,imin,isc,j,k,i,ic,ierr,iba,ib,is,js,ibl
@@ -80,12 +79,14 @@ C 981113 nrv Output only the last 2 digits of the stored 4-digit year.
 ! 2010Jan05 JMG. Formatting changes to get lines to line up.\
 ! 2010Jan25 JMG. Changed index order of azimu, eleva 
 ! 2010Mar20 JMG. Removed obsolete dependence on KBSELN, KPART. 
+! 2020Sep12 JMG. Cleaned up some obscure code. 
 C
 C
 C     1. First set up the correct carriage control character.
 C     If no stations were specified, set up for all.
 C     Then print headers as requested.
 C
+
       IF  (NSTN.EQ.0) THEN  !default is SU default stations
         NSTN=NSUBST
         DO  I=1,NSTN
@@ -114,31 +115,31 @@ C  current observation, then list it.
           endif
         END DO
       END DO  !
-
-      if(ic .lt. 1) return     
+      if(ic .eq. 0) return     
   
 C
       IF  (ISORCM.GT.0.AND.NSORcur(ISTCUR(1)).NE.ISORCM) RETURN
 C
-C  If any elevation of the subnet stations of the current obs
-C  is below the limit, list it
-      KSK = .FALSE.
-      I=1
-      DO WHILE (I.LE.nstncur.AND..NOT.KSK) !loop on current obs stns
+! Check all the stations in the subnet. 
+! If any of these are A) Below the elevation limit AND B) a requested station
+! print this scan. Otherwise exit.     
+     
+      if(ellim .ge. 90.d0) goto 10 
+      do i=1,nstncur
         J=ISTCUR(I)
-        DO K=1,NSTN !loop on requested stations
-          IF (J.EQ.ISTN(K)) THEN !this stn requested
+        DO K=1,NSTN !loop on requested stations        
+          IF (J.EQ.ISTN(K)) THEN !this stn requested. Find the elevation. 
             CALL CVPOS(NSORcur(J),J,MJDCUR(J),UTCUR(J),
-     .                 AZ,EL,HAR,DEC,X30,Y30,X85,Y85,KUP)
+     >                 AZ,EL,HAR,DEC,X30,Y30,X85,Y85,KUP)
             ELX=EL*rad2deg
-            IF (ELX.LT.ELLIM) KSK=.TRUE.
+            IF (ELX.LT.ELLIM) goto 10 
           ENDIF !this stn requested
         ENDDO! loop on requested stations
-        I=I+1
       ENDDO !loop on current obs stations
-      IF (.NOT.KSK) RETURN
-      
-C
+! none of the stations in this scan were below el limit. 
+      return
+
+10    continue 
       J = ISTCUR(1)
       call gtban(icodcur(j),nba,iband)
       call seconds2hms(utcur(j),ihr,imin,isc)
@@ -221,14 +222,11 @@ C
         end do
       endif
 
-
       IF  (kxfeet) THEN  !counters
         DO  I = 1,NSTN !list footage counters
           J = ISTN(I)
           IF (KStat(J)) THEN  !this one
-             write(LUDSP,'(A1,A1,I6.6," ",$)',ERR=999)
-     >        cpass(ipascur(j):ipascur(j)),cdir((idircur(j)+3/2)),
-     >       IFTCUR(J)
+             write(LUDSP,'("1F",I6.6," ",$)',ERR=999),IFTCUR(J)
 C            endif ! new tape/not
           ELSE  !not this one
             write(LUDSP,'(8x," ",$)',ERR=999)

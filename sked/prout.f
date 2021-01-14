@@ -18,6 +18,7 @@ C  COMMON BLOCKS USED:
 ! Recent history (in reverse order)
 ! 2016Jan04  JMG Changed MINIMUM to MINSLEW
 ! 2017Oct06 KOL. Added kconf_equip
+! 2020Oct02 JMG. Removed all references to S2
 
 
 ! functions
@@ -35,8 +36,7 @@ C  LOCAL VARIABLES:
       integer iend
 
       double precision k4sp
-      real s2sp
-      integer i2
+         integer i2
       character*5 cTapeDens
 
       character*5 cbaseline
@@ -345,13 +345,6 @@ C TAPE_TYPE line
           do i=2,nstatn
             if(cstrec(i,1) .ne. cstrec(1,1)) ksame=.false.
           end do
-        else if(cterna(1)(1:2) .ne. "S2") then
-!               Previously checked for identical bit density.
-!               But VLBA and MK4 high density differ slightly
-          do i=2,nstatn
-            if((maxtap(i).ne.maxtap(1)) .or.
-     >         (abs(bitdens(i,1)-bitdens(1,1)).gt. 1000.)) ksame=.false.
-          end do
         endif             
 
         if(ksame) then
@@ -383,13 +376,6 @@ C TAPE_TYPE line
           else if(cstrec(i,1) .eq. "K5") then
             cbuf(nch:nch+1)="K5"
             nch=nch+3
-          else if (cterid(i)(1:2) .eq. "S2") then
-            if(cs2speed(i) .eq. "LP")  s2sp=SPEED_LP
-            if(cs2speed(i) .eq. "SLP") s2sp=SPEED_SLP
-            ilen = nint(maxtap(i)/(5.0*s2sp))
-            write(*,*) maxtap(i), s2sp,ilen
-            write(cbuf(nch:),'(i4," ",a4)') ilen, cs2speed(i)
-            nch=nch+10
           else if (cterid(i)(1:2) .eq. "K4") then
             k4sp = speed(1,i) ! speed for code 1 in m/s
             ival = idint(0.1 + maxtap(i)/(60.d0*k4sp)) ! min=m/(60*m/s)

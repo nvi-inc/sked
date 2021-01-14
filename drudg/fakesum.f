@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine fakesum
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     FAKESUM makes a fake LVEX output from the schedule.
 C
@@ -55,7 +75,7 @@ C
 
       ic=trimlen(lskdfi)
       WRITE(LUSCN,100) cSTNNA(ISTN),LSKDFI(1:ic) ! new
-100   FORMAT(' FAKEsum output for ',A,' from schedule ',A) 
+100   FORMAT(' FAKEsum output for ',A,' from schedule ',A)
 
       ituse=1
 
@@ -89,7 +109,7 @@ C THEN BEGIN Current station in observation
           if (cdir(istnsk)(1:1) .eq. "R") idir=-1
           IFTOLD = IFT(ISTNSK)+IFIX(IDIR*(ituse*ITEARL(istn)+
      .      IDUR(ISTNSK)) *speed(icod,istn))
-          IHEAD=ihdpos(1,IPAS(ISTNSK),istn,icod)
+          IHEAD=1
 C       Create scan ID from start time and source
 C       ddd-hhmm_source
 C       Use scan IDs already generated.

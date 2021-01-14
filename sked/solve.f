@@ -44,16 +44,14 @@ C
 C  1. Make sure there is enough information.
 
       if (nsourc.eq.0.or.nstatn.eq.0.or.nobs.eq.0) then
-        write(luscn,9102)
-9102    format('Select sources and stations first, and'
-     .  ' generate the observations.')
-        goto 900
+        write(luscn,'(a)') "Select sources and stations first, and "
+     &          //' generate the observations.'
+        return
       endif
 
       if (.not.ksnrwts) then
-        write(ludsp,9801)
-9801    format('Solve: Equal weights were selected. Can''t ',
-     .  'compute sigmas for solve unless SNR weights are selected.')
+        write(ludsp,'(a)') "Solve: Equal weights were selected. Can't "
+     &   //"compute sigmas for solve unless SNR weights are selected."
         return
       endif
 
@@ -82,24 +80,21 @@ C  2. Create the output file.
       CLOSE(lutmp,status='delete')
       OPEN (lutmp,file=lfilout,status='NEW',iostat=IERR)
       if (ierr.ne.0) then
-        write(luscn,9201) ierr,lfilout(1:nch)
-9201    format('SOLVE01: Error ',i5', trying to create SOLVE output',
-     .  ' file ',a)
-        goto 900
+        write(luscn,9201) ierr,trim(lfilout)
+9201    format('SOLVE01: Error ',i5,
+     &  ' trying to create SOLVE output file ',a)
+        return
       else
-        write(luscn,9291) lfilout(1:nch)
-9291    format('SOLVE02: Opened output file ',a)
+        write(luscn,"('SOLVE02: Opened output file ',a)") trim(lfilout) 
       endif
 
 C  2.5 Write experiment name on first line
 
-      write(lutmp,9202) cexper
-9202  format('$EXPER ',a)
+      write(lutmp,"('$EXPER ',a)") cexper
 
 C  3. Write out the source list.
 
-      write(lutmp,9301) nsourc
-9301  format('$SOURCES',i6)
+      write(lutmp,"('$SOURCES',i6)") nsourc
       do i=1,nsourc
         CALL RADED(SORP50(1,I),SORP50(2,I),0.D0,IRH1,IRM1,RS1,
      .  L1,IDD1,IDM1,DS1,LDUM,IDUM,IDUM,DUM)
@@ -141,9 +136,9 @@ C     First observation
         endif
       end do
 
-      write(lutmp,9501) nobs,iy1,im1,id1,ih1,mi1,is1,
-     .                       iy2,im2,id2,ih2,mi2,is2
-9501  format('$OBS',i6,1x,6(i2,1x),6(i2,1x))
+      write(lutmp,"('$OBS',i6,1x,6(i2,1x),6(i2,1x))") 
+     &  nobs,iy1,im1,id1,ih1,mi1,is1, iy2,im2,id2,ih2,mi2,is2
+
       do i=1,nobs
         cbuf=cskobs(iskrec(i))
         call simul(0,iskrec(i),1,.false.,.true.)

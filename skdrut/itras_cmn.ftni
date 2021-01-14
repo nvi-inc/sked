@@ -1,4 +1,5 @@
 ! Common array that holds different track assignments.
+      implicit none 
       include '../skdrincl/skparm.ftni'
         
       integer max_track_map

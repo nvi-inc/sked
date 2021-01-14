@@ -1,8 +1,28 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunpfrq(modef,stdef,ivexnum,iret,ierr,lu,
      .bitden,srate,csg,frf,csb,cchref,vbw,csw,cbbref,
      .cpcalref,nchandefs)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
-C     VUNPFRQ gets the channel def statements 
+C     VUNPFRQ gets the channel def statements
 C     for station STDEF and mode MODEF and converts it.
 C     It also gets bit density and sample rate.
 C     All statements are gotten and checked before returning.
@@ -20,7 +40,7 @@ C 970114 nrv Remove polarization, shift up all subsequent field numbers.
 C            (pol was not read or stored anyway)
 C 970124 nrv Move initialization to start.
 C 971208 nrv Add phase cal ref.
-!  2018Aug06 JMGipson. If the VEX file does not contain the 1-letter band identifier, try to figure it out. 
+!  2018Aug06 JMGipson. If the VEX file does not contain the 1-letter band identifier, try to figure it out.
 C
 C  INPUT:
       character*128 stdef ! station def to get
@@ -39,8 +59,8 @@ C                    <0 indicates invalid value for a field
       double precision frf(max_chan) ! RF frequency
       character*2 csb(max_chan) ! net SB
       character*6 cchref(max_chan) ! channel ID
-      character*6 cbbref(max_chan) ! BBC ref 
-      character*6 cpcalref(max_chan) ! pcal ref 
+      character*6 cbbref(max_chan) ! BBC ref
+      character*6 cpcalref(max_chan) ! pcal ref
       double precision vbw(max_chan) ! video bandwidth
       character*3 csw(max_chan) ! switching
       integer nchandefs ! number of channel defs found
@@ -80,10 +100,10 @@ C  1.1 Subgroup
 
         ierr = 11
         iret = fvex_field(1,ptr_ch(cout),len(cout)) ! get subgroup
-        
+
         if (iret.ne.0) return
-        NCH = fvex_len(cout)  
-        csg(ic)=" "             
+        NCH = fvex_len(cout)
+        csg(ic)=" "
         if (nch.gt.1) then
           ierr = -1
           write(lu,'("VUNPFRQ02 - Band ID must be 1 character.")')
@@ -98,7 +118,7 @@ C  1.2 RF frequency
 
         ierr = 12
         iret = fvex_field(2,ptr_ch(cout),len(cout)) ! get frequency
-     
+
         if (iret.ne.0) return
         iret = fvex_units(ptr_ch(cunit),len(cunit))
         if (iret.ne.0) return
@@ -108,23 +128,23 @@ C  1.2 RF frequency
           ierr=-2
         else
           frf(ic) = d/1.d6
-        ENDIF 
-   
+        ENDIF
+
 ! Figure out the Band if it is was not specified.
         if(csg(ic) .eq. " ") then
            if(frf(ic) .gt. 2000.0 .and. frf(ic) .lt. 3000.0) then
               csg(ic)="S"
            else if(frf(ic) .gt. 3700.0 .and. frf(ic) .lt. 6500.0) then
-              csg(ic)="C" 
+              csg(ic)="C"
            else if(frf(ic) .gt. 8000.0 .and. frf(ic) .lt. 9500.0) then
               csg(ic)="X"
            endif
-        endif  
+        endif
 
 C  1.3 Net SB
 
         ierr = 13
-        iret = fvex_field(3,ptr_ch(cout),len(cout)) ! get sideband  
+        iret = fvex_field(3,ptr_ch(cout),len(cout)) ! get sideband
         if (iret.ne.0) return
         cout(1:1) = upper(cout(1:1))
         if (cout(1:1).ne.'U'.and.cout(1:1).ne.'L') then
@@ -149,7 +169,7 @@ C  1.4 Bandwidth
           vbw(ic) = d/1.d6
         endif
 
- 
+
 
 C  1.5 Channel ID
 
@@ -177,7 +197,7 @@ C  1.6 BBC ref
           cbbref(ic)=cout(1:nch)
         endif
 
-C  1.7 Phase cal 
+C  1.7 Phase cal
 
         ierr = 17
         iret = fvex_field(7,ptr_ch(cout),len(cout)) ! get pcal ref

@@ -85,7 +85,6 @@ C
               if (.not.kdone(is2)) then ! try this one
                 if(cmode(is1,ic) .eq. cmode(is2,ic) .and.
      .             nchan(is1,ic).eq.nchan(is2,ic).and.
-     .             npassf(is1,ic).eq.npassf(is2,ic).and.
      >             cbarrel(is1,ic) .eq. cbarrel(is2,ic) .and.   
      .             ifan(is1,ic).eq.ifan(is2,ic).and.
      .             ntrakf(is1,ic).eq.ntrakf(is2,ic).and.

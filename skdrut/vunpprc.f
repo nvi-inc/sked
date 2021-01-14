@@ -1,6 +1,26 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunpprc(modef,stdef,ivexnum,iret,ierr,lu, cpre)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
-C     VUNPPRE gets the procedure prefix if any 
+C     VUNPPRE gets the procedure prefix if any
 C     for station STDEF and mode MODEF and converts it.
 C     All statements are gotten and checked before returning.
 C     Any invalid values are not loaded into the returned
@@ -48,7 +68,7 @@ C
         if (nch.gt.8) then
           ierr = -1
           write(lu,'("VUNPPRC01 - Prefix must be <=8 characters.")')
-        else 
+        else
           cpre=cout(1:nch)
         endif
       endif ! got one

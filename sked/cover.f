@@ -20,7 +20,6 @@ CHS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/skobs.ftni'
       include 'major.ftni'
-
  
 C
 C INPUT:
@@ -30,8 +29,7 @@ C INPUT:
 
 C LOCAL:
       real*8 t_win      !covariance window
-      integer i,k,kk
-     
+      integer i,k,kk    
 
 ! Store some stuff about the current obs
       do i=1,nstatn

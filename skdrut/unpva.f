@@ -1,6 +1,26 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE unpva(IBUF,ILEN,IERR,LIDANT,LNAANT,LAXIS,
      .AXISOF,SLRATE,ANLIM1,ANLIM2,DIAMAN,LIDPOS,LIDTER,lidhor,
      .ISLCON,ipcount)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     UNPVA unpacks a record containing antenna information.
 C
@@ -64,7 +84,7 @@ C
      .   ((JCHAR(IBUF,IC1).LT.OCAPA.OR.JCHAR(IBUF,IC1).GT.OCAPZ)
      ..and.(jchar(ibuf,ic1).lt.OSMALLA.or.jchar(ibuf,ic1).gt.OSMALLZ)
      ..and.(JCHAR(IBUF,IC1).LT.Oone .OR.JCHAR(IBUF,IC1).GT.Onine)))
-     .  THEN 
+     .  THEN
         IERR = -101
         RETURN
       END IF
@@ -163,7 +183,7 @@ C     else
 C       idter = id
 C     END IF
 C
-C     The horizon ID (optional, blank if not there). 
+C     The horizon ID (optional, blank if not there).
 C
       CALL GTFLD(IBUF,ICH,ILEN*2,IC1,IC2)
       call char2hol ('  ',LIDHOR,1,2)

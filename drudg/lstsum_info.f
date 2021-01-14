@@ -1,9 +1,29 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine lstsum_info(kskd)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C LSTSUM_INFO gets the information for the lstsum routine.
 C Information is retrieved from common or by reading the
 C .snp file directly.
-C 
+C
       include 'hardware.ftni'
       include '../skdrincl/statn.ftni'
       include 'drcom.ftni'
@@ -31,7 +51,7 @@ C Local
 
 C 4.1 Whether we have a .skd file or not, read line 1 of SNAP file
 C     Read first line of SNAP file to get year, experiment name, station.
-C     If the first line in the SNAP file is a comment, then all the header 
+C     If the first line in the SNAP file is a comment, then all the header
 C     lines are probably there.
 
       ierr=-1
@@ -84,7 +104,7 @@ C    Read line 3 to get XYZ position
           kazel = .false.
         else ! it's there
           ix=index(cbuf_in(6:),' ')
-          read(cbuf_in(6+ix:),*,err=991,end=990,iostat=IERR) 
+          read(cbuf_in(6+ix:),*,err=991,end=990,iostat=IERR)
      .    xpos,ypos,zpos
           kazel = .true.
         endif
@@ -114,7 +134,7 @@ C       because the "kk4" or "ks2" flag gets set.
 C       Read line 4 (T line)
         read(lu_infile,'(a)',err=991,end=990,iostat=IERR) cbuf_in !T line
 C       Read line 5 (drudg version comment)
-        read(lu_infile,'(a)',err=991,end=990,iostat=IERR) cbuf_in 
+        read(lu_infile,'(a)',err=991,end=990,iostat=IERR) cbuf_in
 C       Read line 6 (equipment)
         read(lu_infile,'(a)',err=991,end=990,iostat=IERR) cbuf_in
         call read_snap6(cbuf_in,crack,creca,crecb,ierr)
@@ -140,7 +160,7 @@ C    so look at the actual commands.
             kk4 = index(cbuf_in,'STA=RECORD').ne.0.or.
      .            index(cbuf_in,'STB=RECORD').ne.0
             ks2 = index(cbuf_in,'FOR,SLP').ne.0.or.
-     .            index(cbuf_in,'FOR,LP').ne.0 
+     .            index(cbuf_in,'FOR,LP').ne.0
 !            kscan = index(cbuf_in,'SCAN_NAME').ne.0
           enddo
         endif ! decode header line 6/read .snp

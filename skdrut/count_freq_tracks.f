@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE count_freq_tracks(cbnd,nbnd,luscn)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C   COMMON BLOCKS USED
       include '../skdrincl/skparm.ftni'
@@ -13,7 +33,7 @@ C   COMMON BLOCKS USED
 !  2006Oct06  Assume cbarrel=" " is valid.
 !  2008Jun10  Wasn't counting tracks if recorder was S2?
 ! 2013Sep19  JMGipson made sample rate station dependent
-! 2016Dec05 JMGipson. Error in setting the sample rate. Used first stations VC BW. Now uses stations BW. 
+! 2016Dec05 JMGipson. Error in setting the sample rate. Used first stations VC BW. Now uses stations BW.
 
 ! functions
       integer itras
@@ -80,10 +100,10 @@ C                        Two-thirds of the data on a switched track are used
                       endif
                     endif
 !C                 Add another 0.978 for magnitude bit
-! This is wrong! Contribution of magnitude bit is ~ 0.2411 sign 
-! Quick derivation:  
+! This is wrong! Contribution of magnitude bit is ~ 0.2411 sign
+! Quick derivation:
 ! 1-bit efficiency is 0.571429
-! 2-bit efficiency is 0.63662 
+! 2-bit efficiency is 0.63662
 ! (2-bit)/(1-bit) = 0.63622/0.571529=sqrt(1.241184)
 
                     if (itras(iul,2,ih,iv,ip,is,ic).ne.-99) then
@@ -124,7 +144,7 @@ C
         do ic=1,ncodes
           if (samprate(is,ic).eq.0) samprate(is,ic)=2.0*vcband(is,1,ic)
         enddo
-      end do 
+      end do
 
       RETURN
       END

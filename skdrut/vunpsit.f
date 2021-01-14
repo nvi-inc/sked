@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunpsit(stdef,ivexnum,iret,ierr,lu,
      .cidpos,cNAPOS,POSXYZ,POSLAT,POSLON,cOCCUP,nhz,azh,elh)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     VUNPSIT gets the site information for station
 C     STDEF and converts it.
@@ -80,7 +100,7 @@ C  2. Site ID. Standard 2-letter code.
       iret = fvex_field(1,ptr_ch(cout),len(cout))
       if (iret.ne.0) return
       NCH = fvex_len(cout)
-      IF  (NCH.gt.2) THEN 
+      IF  (NCH.gt.2) THEN
         write(lu,'("VUNPSIT02 - Site code must be 2 characters")')
         ierr=-2
       else

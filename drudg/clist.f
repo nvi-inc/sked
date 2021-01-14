@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE CLIST(kskd)
+      implicit none
 C
 C This routine reads a SNAP schedule file and makes a
 C listing with all of the commands for one observation
@@ -145,7 +165,7 @@ C END OF FILE DETECTED
 C
 C WE HAVE A COMMAND IN THE BUFFER
 
-C125   IF ((ctmp(1:6).NE.'SOURCE'.and.ctmp(1:6).ne.'source') 
+C125   IF ((ctmp(1:6).NE.'SOURCE'.and.ctmp(1:6).ne.'source')
 C     ..and. (ctmp(1:6).NE.'SCAN_N'.and.ctmp(1:6).ne.'scan_n')
 125   IF ((ctmp(1:6).NE.'SCAN_N'.and.ctmp(1:6).ne.'scan_n')
      ..and. ((ctmp(1:1).eq.CHAR(34).and.il.lt.40)

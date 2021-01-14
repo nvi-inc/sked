@@ -779,9 +779,7 @@ C
      >         knov,islew_info)
             if (tslew.gt.0.0) TSLW(KJ) = TSLW(KJ)+TSLEW
 
-C           IDTPRE(KJ) = (MJDCUR(J1)-MJD1)*1440+(UTCUR(J1)+IDURcur(J1))/60.D0
-            IDIRPR(KJ) = IDIRcur(KJ)
-            IPASPR(KJ) = IPAScur(KJ)
+C           IDTPRE(KJ) = (MJDCUR(J1)-MJD1)*1440+(UTCUR(J1)+IDURcur(J1))/60.D0       
             IFTPRE(KJ) = IFTCUR(KJ)
             NSPRE(KJ) = NSORcur(KJ)
             cwrap_pre(KJ) = cwrap_cur(KJ)

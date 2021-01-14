@@ -1,6 +1,26 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE LABLOG(clogfile,cvsn_use,clab_row,clab_col,cfile,ierr)
 C  Write tape labels from reading the log file.
 !  Arguments are:
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 !
 !  Based on labsnp
 !  2005Jul28 JMGipson
@@ -194,7 +214,7 @@ C 1.  Initialize variables
          cstcod(1)=ltoken(3)(1:1)
          goto 30
 ! Second
-      else if(cline(iline)(24:36) .eq. "drudg version") then 
+      else if(cline(iline)(24:36) .eq. "drudg version") then
 ! Parse the line that looks like:
 !2005.055.18:04:38.83:" R4162     2005 SVETLOE  S  Sv. This is 4 before "drudg", or 1 after.
         ind=trimlen(cline(iline))
@@ -227,11 +247,11 @@ C 1.  Initialize variables
       else
         goto 10
       endif
-    
+
 ! Come here if we don't get the station information.
 29    continue
       rewind(lu_infile)
-      write(*,*) "Did not find station and session information."      
+      write(*,*) "Did not find station and session information."
       write(*,*) "Using default values."
 
 30    continue

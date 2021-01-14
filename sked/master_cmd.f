@@ -86,6 +86,8 @@ C   LOCAL VARIABLES
       integer itmp                 !short term dummy variable
       integer iyear
       logical kfound_line          !did we find the entry in the master file?
+      integer j                    !counter 
+      character*8 lmaster_ext(2)/"-int.txt",".txt"/
 
 ! valid command list.
       integer ilist_len
@@ -157,18 +159,13 @@ C   LOCAL VARIABLES
 !      write(*,*) "Starting with year ", itime_vec(1)+1
         
       do i=iyear,0, -1
-! First try normal master file.     
-        write(cmaster_file,'(a,"master",i2.2, a)')
-     >      cmaster_dir(1:itmp),i,".txt"  
-        call return_master_line(cmaster_file,cexper,ldum,
+        do j=1,2       
+           write(cmaster_file,'(a,"master",i2.2, a)')
+     >       cmaster_dir(1:itmp),i,lmaster_ext(j)
+            call return_master_line(cmaster_file,cexper,ldum,
      >         iyr_mst_start, kfound_line)   
-        if(kfound_line) goto 110
-
-        write(cmaster_file,'(a,"master",i2.2, a)')
-     >      cmaster_dir(1:itmp),i,"-int.txt"
-        call return_master_line(cmaster_file,cexper,ldum,
-     >        iyr_mst_start, kfound_line)  
-        if(kfound_line) goto 110
+            if(kfound_line) goto 110
+        end do 
       end do
       write(luscn,'(a)') "Master_cmd: Did not find experiment code!"
       return     

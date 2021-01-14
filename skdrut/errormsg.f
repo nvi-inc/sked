@@ -1,11 +1,31 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine errormsg(iret,ierr,cgroup,luscn)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C ERRORMSG prints informatiave error messages about VEX
 C parsing and interpreting errors. Errors that sked/drudg
 C catch are printed from within the VUNPxxx routines.
-C A positive IERR returned from the VUNPxxx routines means 
-C there was a problem in the parser and IERR indicates which 
-C field. 
+C A positive IERR returned from the VUNPxxx routines means
+C there was a problem in the parser and IERR indicates which
+C field.
 C A negative IERR returned from the VUNPxxx routines means
 C an error in the content that sked/drudg caught and an
 C error message is printed at that time, but no message
@@ -149,5 +169,5 @@ C     2. Print error messages by group.
       endif ! non-zero ierr
 
       return
-      end  
+      end
 

@@ -66,6 +66,7 @@ C     930803 nrv Initialize nsorobs upon rewind
 ! 2010Mar26 JMG. Changed stutcm ->utstcm, enutcm->utencm for consistency with jdstcm and jdencm
 !        Also changed start scan to be => Utstcm, jdstcm.  Previously was strictly >. Hence if 
 !        you did an li 170000 and the first scan was at 170000, you wouldn't list it.
+! 2020Nov05 Removed referneces to direction, pasess
 
 C     1. First make sure that sources and stations have been selected.
 C
@@ -118,9 +119,7 @@ C
 ! initialize "current variables"
             NSORcur(I)= -1
             IFTCUR(I)=  0
-            itucur(i)=  1
-            IPAScur(I)= 1
-            IDIRcur(I)= 1
+            itucur(i)=  1         
             ICODcur(I)= 0
           END DO
           KRWND = .FALSE.
@@ -143,7 +142,7 @@ C
             IRCUR = IRCUR+1
             cbuf=cskobs(iskrec(ircur))
             CALL UNPAK(IUNERR,0)        !move into Curs variables
-            call copy_cur2vec() !and from curs into vec.
+!            call copy_cur2vec() !and from curs into vec.
           END DO
           IF (IUNERR.NE.0) THEN ! requested record is bad
             write(luscn,'(a)') "GTOBS10 - Invalid record requested."//
@@ -172,7 +171,7 @@ C
         IF (IRCUR.LT.NOBS) IRCUR = IRCUR+1
         cbuf=cskobs(iskrec(ircur))
         CALL UNPAK(IUNERR,0)            !move into Curs variables
-        call copy_cur2vec()   		!and from curs into vec.
+!        call copy_cur2vec()   		!and from curs into vec.
 
         J = ISTCUR(1)
         DO WHILE (IRCUR.LT.NOBS.AND.                        
@@ -181,7 +180,7 @@ C
           cbuf=cskobs(iskrec(ircur))
 
           CALL UNPAK(IUNERR,0)        	!move into Curs variables
-          call copy_cur2vec() 	     	!and from curs into vec.
+!          call copy_cur2vec() 	     	!and from curs into vec.
           J = ISTCUR(1)
         END DO  !read up to start                                   
         IF (IUNERR.NE.0) THEN
@@ -218,7 +217,7 @@ C         Move the next record into the buffer for unpacking.
           cbuf=cskobs(iskrec(ircur))
 
           CALL UNPAK(IUNERR,0)        !move into Curs variables
-          call copy_cur2vec() !and from curs into vec.
+!          call copy_cur2vec() !and from curs into vec.
 
           IF (IUNERR.EQ.0)  THEN ! check the observation
             IRCNT = IRCNT + 1                                                 

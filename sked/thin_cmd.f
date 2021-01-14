@@ -221,6 +221,6 @@ C  LOCAL VARIABLES
       return
 ! common error return
 900   continue
-      write(*,*) "Format: Thin Time-Range Station #"
+      write(*,*) "SYNTAX: THIN Time-Range Station #-obs-to-delete"
       return
       end

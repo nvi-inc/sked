@@ -37,8 +37,7 @@ C  LOCAL
       character*36 csubpass
       logical km3,km4,kv,km3mode
       logical km5b_rec               !Mark5B  recorder 
-      logical kvdif                  !Vdif recorder
-      data csubpass/'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'/
+      logical kvdif                  !Vdif recorder    
       integer ptr_ch,trimlen
       character*28 cp,ctr,cbit,chd,cit,cfr
 
@@ -49,7 +48,7 @@ C  LOCAL
 C  1. TRACKS
 
       call fcreate_block(ptr_ch("TRACKS"//char(0)))
-      write(luscn,'("TRACKS: ")')
+      write(luscn,'("TRACKS: xxx")')
 
 C  2. Write each fanout_def line.
 
@@ -58,18 +57,20 @@ C  2. Write each fanout_def line.
         call getist(ic,itype,ist,ipr,npx)
         do ipx=1,npx ! each group
           isp=ipr(ipx) ! station index to use to write out this group
-! Don't have to put out track commands for VDIF
-          ind=index(refdef_name(itype,isp,ic),"VDIF")
-          if(ind .ne. 0) cycle 
+
 C def
           call fcreate_def(ptr_ch(refdef_name(itype,isp,ic)))
           il=trimlen(refdef_name(itype,isp,ic))
           write(luscn,'(a," ",$)') refdef_name(itype,isp,ic)(1:il)
 
+! Don't have to put out track commands for VDIF
+          ind=index(refdef_name(itype,isp,ic),"VDIF")
+          if(ind .ne. 0) cycle 
+
 C Track assignment array has these fields:
 C itras(isb,ibit,ihd,chan,subpass,stn,code)
 
-          do ipass=1,npassf(isp,ic) ! each subpass
+          do ipass=1,1
             ichan = 0
             do ihd=1,max_headstack
               do ib=1,nchan(isp,ic)
@@ -81,7 +82,7 @@ C Indenting is getting too deep, so bring it out again
             if (it.gt.-3) then ! do this def
 C subpass
 C             NCH = ichmv_ch(IBUF,nch,csubpass(ipass:ipass))
-              cp = csubpass(ipass:ipass)
+              cp = "A"
               call null_term(cp)
 C Track ID
               if (ibit.eq.1) ichan = ichan+1 ! increment channel 
@@ -128,7 +129,7 @@ C ... and add the track list
         enddo ! each group
       enddo ! codes
     
-      write(*,*) " " 
+      write(*,*) " here  " 
       itype=9
       do ic=1,ncodes ! codes
         call getist(ic,itype,ist,ipr,npx)
@@ -140,7 +141,7 @@ C ... and add the track list
 C def
 !          call fcreate_def(ptr_ch(refdef_name(itype,isp,ic)))
 !          il=trimlen(refdef_name(itype,isp,ic))
-          write(luscn,'(a," ",$)') refdef_name(itype,isp,ic)(1:il)
+          write(luscn,'(a," ",$)') trim(refdef_name(itype,isp,ic))
        end do 
       end do      
       write(*,*) " " 
@@ -164,7 +165,9 @@ C 3. Write track_frame_format for each type in this schedule.
           km3=.true.
         case("VLBA","VLBAG")
           kv=.true.
-        case("MARK4","VLBA4","VLBA5","K4-1","K4-2","K4-1/K3","K4-2/K3",
+        case("MARK4")
+          km4=.true.
+        case("VLBA4","VLBA5","K4-1","K4-2","K4-1/K3","K4-2/K3",
      >       "K4-1/M4","K4-2/M4","MARK5", "DBBC","NONE",
      >   "DBBC_DDC", "DBBC_PFB","DBBC_DDC/FILA10G","DDC_PFB/FILA10G")  
 ! Now look at the kind of recorder...
@@ -177,8 +180,6 @@ C 3. Write track_frame_format for each type in this schedule.
              else
                 km5b_rec=.true.
              endif
-          case("MARK4")
-             km4=.true.
           case("MARK5C","FLEXBUFF")
              kvdif=.true.
           end select 
@@ -213,7 +214,7 @@ C 3. Write track_frame_format for each type in this schedule.
       endif
 
       if (kvdif) then
-        call fcreate_def(ptr_ch('VDIF'//char(0)))
+        call fcreate_def(ptr_ch('VDIF_format'//char(0)))
         if(kvlba_corr) then 
            cfr = "VDIF5032"
         else

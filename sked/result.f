@@ -1,11 +1,12 @@
-      subroutine result(linstq)
-CHS----------------------------------------------------------------
-CHS General purpose
-CHS Result was created in order to display the correlation matrix,
-CHS the formal errors of the solve-for parameters and the sky coverage
-CHS evaluation number covs.
+      subroutine result(cmdline)
+!----------------------------------------------------------------
+! General purpose
+! Result was created in order to display the correlation matrix,
+! the formal errors of the solve-for parameters and the sky coverage
+! evaluation number covs.
 C
 CHS++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
@@ -16,18 +17,17 @@ CHS++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ! functions
       integer istringminmatch
       integer*4 indx4
-      integer i2long,trimlen,ichmv
-C
+      integer trimlen
 C Input:
-      integer*2 linstq(*) ! command line
+      character*(*) cmdline 
 
 C LOCAL:
       double precision sig(max_dim_esti)
-      integer*2 job                            !flag to indicate what we do 10=compute rcond
+      integer*2 job                              !flag to indicate what we do 10=compute rcond
       double precision rcond                     !rconderminate
 
 
-      integer nch,ierr,ich,ifc,iec,idummy
+      integer nch,ierr,iec,idummy
       integer*2 i,j
       integer*2 lkeywd(12)
       character*2 ctype
@@ -52,26 +52,23 @@ C 951017 nrv Fixed gtfld call to remove linstq
 ! 2005May24 JMGipson.  Modified to use new correlation.
 ! 2009Jul08 JMGipson. Fixed bug 
 ! 2020Apr14 JMGipson. Increased size that we write out. 
+! 2020Oct13 JMG. changed argument from linstq (Hollerith) to cmdline
 
 C        1. Pick the type of result from the command string.
 C
       ierr=0 
-      ICH=1
-      CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IFC,IEC)
-      if (ifc.ne.0) then !type of result specified 
-        nch=iec-ifc+1
-        ckeywd=" "
-        idummy = ichmv(lkeywd,1,linstq(2),ifc,nch)
+      if(cmdline .eq. " ") then
+         ctype="FE"
+      else 
+        ckeywd=cmdline 
         idummy = istringMinMatch(list,ilist_len,ckeywd)
         if(idummy .eq. 0) then
           write(luscn,'(a)') "RESULT01 - Invalid key word.  Must be"//
-     >    " one of COVERAGE, COVARIANCE, CORRELATION, or FE"
+     >    " one of COVARIANCE, CORRELATION, or FE"
           ierr=1
           return 
         endif !error
-        ctype=listshort(idummy)
-      else
-        ctype = 'FE'
+        ctype=listshort(idummy)   
       endif !type of display specified
 C
 

@@ -1,7 +1,27 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE SOINP(cbuf,lu,IERR)
 ! Parse source info contained in cbuf.
 ! 2007Jul03 JMG. Rewritten to use ASCII
 ! This can handle both sources and satellites (although we don't use satellites anywhere?)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 ! Typical source line looks like:
 !  0008-264 $        00 11  1.24676914  -26 12 33.3762017 2000.0 0.0
@@ -135,9 +155,9 @@ C  OUTPUT:
 ! Read in the epoch.
         ierr=9
         read(ltoken(9),*,end=900) epoch
-        
+
         IF  (EPOCH.NE.2000.0) THEN  !"convert to J2000"
-          IEP = EPOCH+.01 
+          IEP = EPOCH+.01
           IF  (IEP.EQ.1950) THEN ! reference frame rotation
             call prefr(rarad,decrad,1950,r,d)
             RARAD = R
@@ -154,7 +174,7 @@ C  OUTPUT:
       endif
       nsourc=nsourc+1
 
-      
+
       ierr=0
       RETURN
 

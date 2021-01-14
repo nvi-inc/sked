@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
 	SUBROUTINE TMSUB(IYR,IDAYR,IHR,MIN,ISC,IDUR,IYR2,IDAYR2,IHR2,MIN2,
-     .           ISC2)!,SUBTRACT TWO TIMES C#870115:16:10#
+     .           ISC2)
+      implicit none
 C
 C     TMSUB subtracts a time, in seconds, from the input
 C     and returns the difference
@@ -10,6 +30,8 @@ C     IYR - Year of start time
 C     IDAYR - day of the year for start time
 C     IHR, MIN, ISC - start time
 C     DUR - duration, seconds
+      integer IYR,IDAYR,IHR,MIN,ISC,IDUR
+      integer IYR2,IDAYR2,IHR2,MIN2,ISC2
 C
 C
 C  OUTPUT:
@@ -19,6 +41,7 @@ C     IDAYR2 - day of stop
 C     IHR2, MIN2, ISC2 - stop time
 C
 	logical LEAP
+        integer iday0
 C
 C  MODIFICATIONS
 C  880411 NRV DE-COMPC'D

@@ -2,11 +2,13 @@
 C
 C     SOPLT plots source ra/dec in polar coordinates.
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
       include 'skcom.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
+       
 ! passed
       logical kplot_stat        !if true, plot stations
       integer istn(*)           !index into stations.
@@ -28,9 +30,9 @@ C  LOCAL
       real*8 rlat,rlon
       real*8 ras,decs
       real*8 rha, rdec
-      real*8 rha_del
-      real*8 del_deg
+      real*8 rha_del     
       real*8 xd,yd
+      integer idel_az    
       integer sonum
       integer i,j,k
       integer iyr
@@ -40,6 +42,7 @@ C  LOCAL
 C
 C  HISTORY
 !  2006Oct26 JMGipson. Based loosely on soplt.
+! 2020Oct03 JMGipson.  Replaced Real*8 del_deg-->idel_az 
 
 C  lutmp, ctmfil is for the data file
       open(lutmp,file=ctmfil,status='unknown',iostat=ierr)
@@ -138,13 +141,13 @@ C     Today's sun position is marked with "S"
 ! Now plot the circles for the stations.
 
       el_min=5.0
-      del_deg=2.0
+      idel_az=2 
       do i=1,nstn !stations
         j=istn(i)
         rlat=stnpos(2,j)
         rlon=-stnpos(1,j)
-        call find_stat_vis(rlon,rlat,el_min,del_deg,rhadec)
-        do k=1,180
+        call find_stat_vis(rlon,rlat,el_min,idel_az,rhadec)
+        do k=1,360/idel_az 
 !          rha=rhadec(1,k)
 !          rdec=rhadec(2,k)
           call equal_area_proj(rhadec(1,k),rhadec(2,k),xd,yd)

@@ -378,7 +378,7 @@ CMD: 21  -----------
      >"TH",
      <"THIN ",
      >"Thin by removing obs",
-     >"<range> <station> <#thin>",
+     >"<range> <station> <#obs to remove>",
 !CMD:   4 ----------
      >"TI",
      >"TIMELINE          ",
@@ -386,7 +386,7 @@ CMD: 21  -----------
      >"ON | OFF                                              ",
 !CMD:   5 --------
      >"TW",
-     >"TWIN_TELESCOPES   ",
+     >"TWIN_TELESCOPES  ",
      >"Select, list, del Twin_Telescopes",
      >" LIST | ADD <stat-stat> [SPLIT|TOGETHER] | DELETE <stat-stat>",
 !CMD:   6 ----------

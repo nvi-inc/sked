@@ -50,7 +50,7 @@ C      - holders for source, procedure names
       logical keep_index
 
 C                   - temporary station code and cable wrap holder
-      integer IPAS(MAX_STN),IDIR(MAX_STN),IFT(MAX_STN),IDUR(MAX_STN)
+      integer IFT(MAX_STN),IDUR(MAX_STN)
 C              - temp holders for pass, dirn and footage count
       integer ich,ic1,ic2,idumy,ical,iyr,ida,ihr,imin,isc,mjd,
      >   idurx,idle,i,nst,nch,ni,j,ist,isor,icod,ib
@@ -174,37 +174,19 @@ CHS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       I = 1
 
       DO WHILE (IC1.NE.0.AND.I.LE.NST) ! decode footage counters
-        ipas(i) = index(cpass(1:nlpass),cbuf(ic1:ic1))
-        if(ipas(i) .lt. 1) then
-           write(*,*) "Pass for station ", i, "is invalid: ", ipas(i)
-           goto 999
-        endif 
-        IDIR(I) = -1
-C        IF (JCHAR(IBUF,IC2-4).EQ.OCAPF) IDIR(I) = +1
-C        IFT(I) = IAS2B(IBUF,IC2-3,4)
-        IF (JCHAR(IBUF,IC1+1).EQ.OCAPF) IDIR(I) = +1
         nch = ic2-ic1+1
         IFT(I) = IAS2B(IBUF,IC1+2,nch-2)
-        if(ipas(i) .lt. 1) then
-           write(*,*) "Footage for station ", i, "is invalid: ", ift(i)
-           goto 999
-        endif 
-
         CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
         I = I+1
       END DO  !decode footage counters
 
       IF  (I.EQ.1) THEN  !no counters
         DO  NI = 1,NST
-          IPAS(NI) = 1
-          IDIR(NI) = 1
           IFT(NI) = 0
         END DO  !
       END IF  !no counters
       IF  (I.GT.1.AND.I.LT.(NST+1)) THEN  !too few counters
-        DO  NI = I,NST
-          IPAS(NI) = IPAS(I-1)
-          IDIR(NI) = IDIR(I-1)
+        DO  NI = I,NST 
           IFT(NI) = IFT(I-1)
         END DO  !
       END IF  !too few counters

@@ -1,7 +1,27 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine newscan(istn,isor,icod,istart,
      .      idstart,idend,ifeet,ipas,idrive,cbl,ierr)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
-C   NEWSCAN forms the inputs into a standard sked/drudg hollerith 
+C   NEWSCAN forms the inputs into a standard sked/drudg hollerith
 C   observation. This routine and ADDSCAN determine the internal
 C   format for the observation.
 
@@ -58,7 +78,7 @@ C     Cal time. Define as 10 for now
       nch = nch + 1 + IB2AS(ICAL,IBUF,NCH+1,3)
 C     Freq code
       NCH = ICHMV(IBUF,NCH+1,LCODE(ICOD),1,2)
-C     Preob 
+C     Preob
       NCH = 1 + ICHMV_ch(IBUF,NCH+1,'PREOB ')
 C     Start time
       if (istart(1).ge.2000) iyr = istart(1)-2000

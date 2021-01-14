@@ -1,0 +1,2 @@
+      character*80 cskedf(2)   
+      data cskedf/"/space/sked/sked_cat/skedf.ctl", "skedf.ctl"/ 

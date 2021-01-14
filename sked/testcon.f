@@ -1,4 +1,6 @@
       subroutine testcon(isrc_num, istn,nstn,iSubNet)
+
+! 2020Oct13 JMG.  Was testing on nobs=1, should be nobs=0. 
 CHS General purpose
 C  Testcon was created in order to check a subconfiguration and assign a score to it.
 
@@ -69,32 +71,24 @@ C LOCAL:
         end do
       endif  
 
-! Debugging.
-      if(kdissub) then
-           write(*,'(i4,(f8.2,1x)," | ", a)')
-     >       NumTrial,sky_score,  ctrial_scan(iSubNet)(1:80)
-      endif
-
 !      koptbysky=.false. 
 !      write(*,*) "Koptybysky: ",kOptbySky
 ! if sky coverage option is turned on, exit now.
-      if(kOptBySky) then
-         call store(NumTrial,sky_score,sky_score,iSubNet)
-         return
-      endif
-
+      covar_score=0.d0
+      if(kOptBySky .or. nobs .eq. 0) goto 100 
+            
 ! Optimizing by covariance.
 ! Compute contribution of this subnet to normal equations.
       dnorm_tmp(1:num_tri_est)=dnorm_tri(1:num_tri_est,iSubNet)  !normal equations so far
       job=11                                                     !compute inverse
+!      write(*,*) dnorm_inv(1:2)," | ", dnorm_tmp(1:2) 
 
       call invert_and_con_tri(dnorm_tmp,rcond,num_est,job)
-  
     
+      
 ! In this part the subconfiguration is tested due to an optimization criterion.
 ! 1. Compute relative (%) decrease of the diagonal elements for optimized parameters.
-! 2. Compute sum of relative decrease as score. THis is the "goodness" of this scan.
-      covar_score=0.0d0      
+! 2. Compute sum of relative decrease as score. THis is the "goodness" of this scan.    
       do iopt=1,num_opt
         iptr=indx4(ixref_opt2est(iopt),ixref_opt2est(iopt))     
 ! Find the change of the diagonal elements that are optimized..
@@ -103,6 +97,14 @@ C LOCAL:
 !        write(*,*) "----", sqrt(dnorm_inv(iptr)), sqrt(dnorm_tmp(iptr))
         covar_score=covar_score+diag_change
       enddo ! i=1,npara
+
+100   continue 
       call store(NumTrial,sky_score,covar_score,iSubNet)
+! Debugging.
+!      if(.true.) then 
+      if(kdissub) then
+           write(*,'(i4,2(f9.4,1x)," | ", a)')
+     >       NumTrial,sky_score,covar_score,  ctrial_scan(1)(1:80)
+      endif
 
       end

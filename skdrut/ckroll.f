@@ -1,7 +1,27 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE ckroll(ndefs,nsteps,irtrk,inc_period,reinit_period,
      .istn,icode,croll)
 C
-C     CKROLL stores and checks the barrell roll definition. 
+      implicit none  !2020Jun15 JMGipson automatically inserted.
+C     CKROLL stores and checks the barrell roll definition.
 C     If the roll is a canned one then CROLL gets set to
 C     a standard name. If the roll is non-standard then
 C     CROLL is set to M.
@@ -42,7 +62,7 @@ C 2. Check the roll against the two canned rolls.
 
       kmatch = .false. ! initialize
       croll = " "
-      do ir=1,2 
+      do ir=1,2
         if (croll.eq." ".and.inc_period.eq.ircan_inc(ir).and.
      .     reinit_period.eq.ircan_reinit(ir).and.
      .     ndefs.eq.nrcan_defs(ir).and.nrcan_steps(ir).eq.nsteps) then ! continue

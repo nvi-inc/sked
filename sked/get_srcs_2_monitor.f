@@ -441,9 +441,10 @@ C   COMMON BLOCKS USED
 !     since iyear,imonth,idate
 
 ! 2006Jun13 JMGipson.  Changed location of common.
+! 2020Jun04 JMG. Changed it back. 
 
       implicit none
-      include "../skdrincl/mysql_common.i"          !common area.
+      include "mysql_common.i"          !common area.
 ! functions
       integer iwhere_in_string_list
       integer trimlen
@@ -637,9 +638,10 @@ C   COMMON BLOCKS USED
 !     since iyear,imonth,idate
 
 ! 2006Jun13 JMGipson.  Changed location of common.
+! 2020Nov04 JMipson. Changed it again.
 
       implicit none
-      include "../skdrincl/mysql_common.i"          !common area.
+      include "mysql_common.i"          !common area.
       include "../skdrincl/constants.ftni"
 ! functions
       integer iwhere_in_string_list

@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE PROCINTR
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C This routine writes out the header information for proc files.
 C into lu_outfile.
@@ -21,7 +41,7 @@ C 991210 nrv Write equipment name from common.
 C 991214 nrv Remove calling parameters, not nneeded.
 ! 2005Aug08 JMGipson.  Simplified.
 ! 2006Nov30 Use cstrec(istn,irec) instead of 2 different arrays
-! 2018Jul20 Moved writing of drudg version to subrotine. 
+! 2018Jul20 Moved writing of drudg version to subrotine.
 
 C Input
 !    None.
@@ -40,7 +60,7 @@ C
      > cprfx,cexper,cstnna(istn),cpocod(istn)
 
       call write_drudg_version_line(lu_outfile)
-   
+
 
       write(lu_outfile,'(5a,$)')
      >   '"< ',cstrack(istn),' rack >< ',cstrec(istn,1), ' recorder 1>'

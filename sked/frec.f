@@ -1,4 +1,4 @@
-      SUBROUTINE frec(crec_mode,bw_default,chdposname,itrk_xref,
+      SUBROUTINE frec(crec_mode,bw_default,itrk_xref,
      >    crecfmtname,cbarrelname,bw_stn,ierr) ! read rec.cat
 
 !
@@ -8,6 +8,7 @@
 ! 2006Jul26 JMGipson. Output track assignment following station name.
 !                     MAke sure that when writing out stations, don't go past end of line.
 ! 2018Jul10 JMGipson. Write out valid track layouts if did not find track 
+! 2020Oct05 JMGipson. Don't return cnahdpos
 
 
       include '../skdrincl/skparm.ftni'
@@ -100,8 +101,8 @@ C  1. Open the catalog and get the mode.
         if(istn .ne.0) then    
           kfound(istn)=.true.
           num_track_found(istn)=num_track_found(istn)+1
-          chdposname(istn)=ltoken(3)
-
+!          chdposname(istn)=ltoken(3)
+        
         
           itrk=iwhere_in_string_list(cat_rec_trk,num_cat_rec_trk,
      >         ltoken(4))  !find the track assginm.

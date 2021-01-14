@@ -10,6 +10,7 @@ C
 !2015Dec01  JMGipson. Added SHAO 
 !2017Oct07  KOL. Added conf_equip
 !2018Oct05  KOL. Added UTAS
+!2021-01-13 JMG Added Vien 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
@@ -65,10 +66,12 @@ C               - Key word, longest is 22 characters
       character*6 ListAM(2),ListAS(2),listOnOff(2)
       
       integer num_corr
-      parameter (num_corr=16)
-      character*10 lcorr(num_corr)/"ATNF","BONN","CRL","CRTN","GSI",
-     > "HAYS","JPL","MITA","NICT","PENT","TSUK","VLBA","WASH","SHAO",
-     > "TBD","UTAS"/
+      parameter (num_corr=18)
+      character*10 lcorr(num_corr)
+     >  /"ATNF","BONN","CRL","CRTN","GSI",
+     >   "HAYS","JPL","MITA","NICT","PENT",
+     >   "SHAO","TBD","TSUK","UTAS","VIEN",
+     >   "VLBA","WASH","TBD"/
 
       integer iyt_list_len
       parameter (iyt_list_len=6)
@@ -210,8 +213,6 @@ C
       ckey=listPrshort(ikey)
       Cparam=listpr(ikey)
     
-
-
       if (ckey.eq.'JA'.or.ckey.eq.'GT') then ! call java program
         call parcmd(ckey)
         return
@@ -511,7 +512,7 @@ C         description goes from here to the end of the line
             ccorname=ckeywd
           else
             write(*,*)"WARNING!!!  PRSET: Invalid correlator: ",ckeywd
-            write(*,'("Must be one of ",20(a,1x))') 
+            write(*,'("Must be one of ",22(a,1x))') 
      >                    (Trim(lcorr(i)),i=1,num_corr)
           endif 
         ENDIF ! code

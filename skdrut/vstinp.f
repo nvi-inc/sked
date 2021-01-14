@@ -1,3 +1,22 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE VSTINP(ivexnum,lu,ierr)
 C
 C     This routine gets all the station information
@@ -20,6 +39,7 @@ C 010615 nrv Initialize lstrec2 to blanks.
 ! 2006Nov30 JMGipson. Modified to check recorder type.
 ! 2016Nov29 JMG. Rack changed to character*20 from character*8 
 ! 2019Sep03 JMG. Correct length for station name.  Added implicit none 
+! 2020Oct02  JMG. Removed all references to S2 
 C
 C INPUT:
       integer ivexnum ! vex file number 
@@ -38,13 +58,12 @@ C LOCAL:
       logical kline
       integer ierr1
       real SLRATE(2),ANLIM1(2),ANLIM2(2)
-      character*4 cs2sp
       character*8 cocc,crec
       character*20 crack
       character*8 cant,cter,csit
       character*4 caxis
 
-      integer islcon(2),ns2tp
+      integer islcon(2)
       real AZH(MAX_HOR),ELH(MAX_HOR)
       real DIAM
       real sefd(max_band),par(max_sefdpar,max_band)
@@ -108,7 +127,7 @@ C     2. Now call routines to retrieve all the station information.
 
         CALL vunpdas(stndefnames(i),ivexnum,iret,IERR,lu,
      .    cIDT,cter,nstack,maxt,nr,lb,sefd,par,npar,
-     .    crec,crack,ctapemo,ite,itl,itg,cs2sp,ns2tp,ctlc)
+     .    crec,crack,ctapemo,ite,itl,itg,ctlc)
    
         if (iret.ne.0.or.ierr.ne.0) then 
           write(lu,'(a,a,/,"iret=",i5," ierr=",i5)')
@@ -181,9 +200,10 @@ C
         cstrack(i)=crack         
 
         if(.not.kvalid_rec(crec)) then        
+            nch=max(1,trimlen(crec))
             write(lu,'(a)') "VSTINP: for station "// 
      >         stndefnames(i)(1:il)//" unrecognized recorder type: "//
-     >         trim(crec)// "setting to none!"
+     >         crec(:nch)// "setting to none!"
             crec='none'
         endif   
         cstrec(i,1)=crec
@@ -199,9 +219,6 @@ C
         nheadstack(i)=nstack ! number of headstacks
         maxtap(i) = maxt     ! tape length
         nrecst(i) = nr       ! number of recorders
-        ns2tapes(i) = ns2tp  ! number of S2 tapes
-!        idummy = ichmv(ls2speed(1,i),1,ls2sp,1,4) ! rack type
-        cs2speed(i)=cs2sp(1:4)
         tape_motion_type(i)=ctapemo   ! tape motion
         itearl(i)=ite                 ! early start time
         itlate(i)=itl                 ! late stop time

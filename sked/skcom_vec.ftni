@@ -8,13 +8,11 @@
       integer ida_vec(max_stn,max_obs)           ! day
       integer nsor_vec(max_stn,max_obs)          !_vecent source
       integer ical_vec(max_stn,max_obs)          ! calibration
-      integer idur_vec(max_stn,max_obs)          !duration
-      integer ipas_vec(max_stn,max_obs)          ! pass
+      integer idur_vec(max_stn,max_obs)          !duration 
       integer icod_vec(max_stn,max_obs)          ! frequency code index
       integer ift_vec(max_stn,max_obs)           ! feet
       integer iftend_vec(max_stn,max_obs)        ! feet at end of obs
-      integer idir_vec(max_stn,max_obs)          ! tape direction
-      integer idl_vec(max_stn,max_obs)           !idle time
+       integer idl_vec(max_stn,max_obs)           !idle time
       integer itu_vec(max_stn,max_obs)           !tape moving
       integer*2 lcbl_vec(max_stn,max_obs)        !cable wrap indicator.
       double precision ut_vec(max_stn,max_obs)   !ut
@@ -29,8 +27,8 @@
       common /skcom_vec/
      > nstn_vec,ist_vec,mjd_vec,mjdr_vec,iyr_vec,ida_vec,nsor_vec,
      > ical_vec,
-     > idur_vec,ipas_vec,icod_vec,ift_vec,iftend_vec,
-     > idir_vec,idl_vec,lcbl_vec, itu_vec,
+     > idur_vec,icod_vec,ift_vec,iftend_vec,
+     > idl_vec,lcbl_vec, itu_vec,
      > ut_vec,utr_vec,gst_vec,st0_vec,
      > cmid_vec,cpst_vec,cpre_vec
 

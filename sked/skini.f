@@ -195,6 +195,9 @@ C LOCAL
       ISORTM=5
    
       ITAPTM=1
+      nhorz=0
+      azhorz=0
+      elhorz=0
 
       iwscn = fc_gwinw()
       if (iwscn.lt.1.or.iwscn.gt.999) IWSCN=79
@@ -274,8 +277,6 @@ C
         IDURcur(I) = 0
         IDLCUR(I) = 0
         ICODcur(I) = 0
-        IPAScur(I) = 1
-        IDIRcur(I) = 1
         IFTCUR(I) = 0
         ITUCUR(i) = 1
         MAXPAS(I) = 1
@@ -298,9 +299,7 @@ C
         ICALtst(I) = 0
         IDURtst(I) = 0
         IDLtst(I) = 0
-        ICODtst(I) = 0
-        IPAStst(I) = 1
-        IDIRtst(I) = 1
+        ICODtst(I) = 0 
         IFTtst(I) = 0
         itutst(i) = 0
         cpretst=" "
@@ -428,11 +427,7 @@ C     "CAN'T WASTE TAPE" ERRORS.
 C     FILE NAMES AND CARTRIDGES
 C     The number of LUs with cursor sensing
       IBLEN = IBUF_LEN
-      cpass=
-     >  '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-      cdir(1)="R"
-      cdir(2)="F"
-     
+      
 C     INITIALIZE PROCEDURE FLAGS TO YYNN
 C     NRV 971006 Don't need prepass as default any more.
       KFLG(1) = .TRUE.

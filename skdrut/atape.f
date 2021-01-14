@@ -1,7 +1,27 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE ATAPE(LINSTQ,luscn,ludsp)
+      implicit none
 C
-C     ATAPE reads/writes station tape allocation type. This routine 
-C     reads the TAPE_ALLOCATION lines in the schedule file and handles 
+C     ATAPE reads/writes station tape allocation type. This routine
+C     reads the TAPE_ALLOCATION lines in the schedule file and handles
 C     the ALLOCATION command.
 C
       include '../skdrincl/skparm.ftni'
@@ -58,7 +78,7 @@ C
           il=trimlen(tape_allocation(i))
           WRITE(LUDSP,'(1X,A2,2X,A8,2x,a)') cpoCOD(I),cSTNNA(I),
      >        tape_allocation(i)(1:il)
-        END DO  
+        END DO
         return
       END IF  !no input
 C
@@ -94,7 +114,7 @@ C       Station ID is valid. Check tape type now.
      >      list
             return
           END IF  !invalid type
-        endif 
+        endif
 
 C   3. Now set parameters in common.
 

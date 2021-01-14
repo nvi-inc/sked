@@ -1,7 +1,27 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       Subroutine prtmp(iopt)
 C  PRTMP prints the temp file
 c  NRV 910703
 C  nrv 950925 Change to simply call "printer". Landscape or
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C             portrait is handled by each listing type.
 C  nrv 951015 Revert to using cprtpor and cprtlan , and if blank
 C             then "printer" will handle them.
@@ -21,7 +41,7 @@ C 970207 nrv Add iopt to call and use it instead of iwidth.
       if (klab) then ! labels
         ierr = printer(labname,'l',cprtlab)
       else ! normal prinout
-        call drchmod(tmpname,ierr) 
+        call drchmod(tmpname,ierr)
         if (iopt.eq.0) then
           ierr = printer(tmpname,'t',cprtpor)
         else if (iopt.eq.1) then
@@ -43,6 +63,6 @@ C 970207 nrv Add iopt to call and use it instead of iwidth.
            close(luprt,status='delete')
          endif
       end if
-   
+
       RETURN
       END

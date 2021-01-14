@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE SNAPINTR(IFUNC,IYR)
+      implicit none  
 C
 C This routine writes out the header information for snap files and
 C vlba pointing files in the LU_OUTFILE.
@@ -45,7 +65,8 @@ C
 ! this is the start of the line
 ! 2006Nov30 Use cstrec(istn,irec) instead of 2 different arrays
 ! 2007Dec07 Modified so that  prints version as ....
-! 2018Jul20 Moved writing of drudg version to subrotine. 
+! 2018Jul20 Moved writing of drudg version to subrotine.
+! 2020Jun30 Don't output tape pases, lenghth. Instead print out terid, terna, recorder.
 
       IF (IFUNC.EQ.1) THEN
         cprfx='"'
@@ -74,14 +95,21 @@ C     write antenna line
      > cpocod(istn), cstnna(istn),
      > (stnxyz(i,istn),i=1,3), coccup(istn)
 
+! 2020Jun30
+        write(lu_outfile,'(a,a,1x,a8,1x,a)') cprfx,
+     >   cterid(istn)(1:4),cterna(istn)(1:8),cstrec(istn,1)
+
+! Below commented out
 C     Write terminal line
-      if(cstrec(istn,1) .eq. "Mark5A") then
-        write(lu_outfile,'(a,a4,1x,a8,1x,"Mark5A")') cprfx,
-     >   cterid(istn)(1:4),cterna(istn)(1:8)
-      else
-        write(lu_outfile,'(a,a4,1x,a8,1x,i4,1x,i8)') cprfx,
-     >   cterid(istn)(1:4),cterna(istn)(1:8),maxpas(istn),maxtap(istn)
-      endif
+!      if(cstrec(istn,1) .eq. "Mark5A") then
+!        write(lu_outfile,'(a,a,1x,a8,1x,"Mark5A")') cprfx,
+!     >   cterid(istn)(1:4),cterna(istn)(1:8)
+!      else
+!        write(lu_outfile,'(a,a4,1x,a8,1x,i4,1x,i8)') cprfx,
+!     >   cterid(istn)(1:4),cterna(istn)(1:8),maxpas(istn),maxtap(istn)
+!      endif
+!      write(*,*) "TERID ", cterid(istn)
+!      write(*,*) "TERNA ", cterna(istn)
 
 C  Write drudg version
       call write_drudg_version_line(lu_outfile)

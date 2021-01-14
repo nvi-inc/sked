@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE unpfcat(IBUF,ILEN,IERR,
      .LFR,LC,lsub,lrx)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     UNPFR unpacks the lines in the FREQ.CAT catalog
 C
@@ -39,7 +59,7 @@ C     Name - 8 characters
 C
       CALL GTFLD(IBUF,ICH,ILEN*2,IC1,IC2)
       NCH = IC2-IC1+1
-      IF  (NCH.GT.8) THEN 
+      IF  (NCH.GT.8) THEN
         IERR = -101
         RETURN
       END IF
@@ -53,7 +73,7 @@ C
       IF  (NCH.GT.2) THEN
         IERR = -102
         RETURN
-      END IF 
+      END IF
       call char2hol ('  ',LC,1,2)
       IDUMY = ICHMV(LC,1,IBUF,IC1,NCH)
 C
@@ -61,7 +81,7 @@ C     sub group name, 8 characters
 C
       CALL GTFLD(IBUF,ICH,ILEN*2,IC1,IC2)
       NCH = IC2-IC1+1
-      IF  (NCH.GT.8) THEN 
+      IF  (NCH.GT.8) THEN
         IERR = -103
         RETURN
       END IF

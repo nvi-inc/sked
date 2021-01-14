@@ -132,14 +132,8 @@ C   Tape pass, direction, footage for each station
 C  Generate footages in local buffer, then move in.
       nch=nch+1
       do i=1,Nstncur
-        J = ISTcur(I)
-        if(idircur(j) .eq. -1) then
-         lchar="R"
-        else
-         lchar="F"
-        endif
-        write(cbuf(nch:nch+8),'(a1,a1,i6.6)')
-     >      cpass(ipascur(j):ipascur(j)),  lchar,iftcur(j)
+        J = ISTcur(I)       
+        write(cbuf(nch:nch+8),'("1F",i6.6)') iftcur(j)
          nch=nch+9
       end do
 
@@ -219,13 +213,7 @@ C  Generate footages in separate buffer, then move in
       nch=nch+1
       do i=1,Nstntst
         J = ISTtst(I)
-        if(idirtst(j) .eq. -1) then
-         lchar="R"
-        else
-         lchar="F"
-        endif
-        write(cbuf(nch:nch+8),'(a1,a1,i6.6)')
-     >      cpass(ipastst(j):ipastst(j)),  lchar,ifttst(j)
+        write(cbuf(nch:nch+8),'("1F",i6.6)') ifttst(j)
          nch=nch+9
       end do
 

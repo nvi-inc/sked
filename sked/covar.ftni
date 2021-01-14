@@ -27,6 +27,7 @@
       common /sk_covar_string/cparname,cpardim
 
 ! info for trial scans.
+!  MaxTrial is in skparm.ftni 
       integer NumTrial                               !number of trial scans
 !      integer*2 ltrial_scan(ibuf_len,MaxSubNet)              !trail scan
       character*(ibuf_len*2) ctrial_scan(MaxSubNet)
@@ -38,8 +39,9 @@
       double precision covar_trial_vec(max_trial)              !rank score
       integer itrial_key(max_trial)                            !used to sort trials by rank.
 
-      common /sk_trial/NumTrial, ctrial_scan,ctrial_vec,
-     >     nsub_trial_vec,itrial_key
+      common /sk_trial/NumTrial,   nsub_trial_vec,itrial_key
+      common /sk_trial_ch/ctrial_scan,ctrial_vec
+
       common /sk_trial_dbl/ sky_trial_vec,covar_trial_vec
 
 

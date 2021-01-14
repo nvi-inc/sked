@@ -2,15 +2,17 @@
 ! History
 ! 2011Apr25  Added MaxAngle
 ! 2013Sep13  Made rMinAngle, rMaxAngle and rMinSunAngle real and changed their names.
+! 2020Oct22  Added rel_noise
       real    rcovar_win        !covariance window
       real    radd_noise        !additive noise
+      real    rel_noise 
       real    rBestPercent      !number of obs to return as best
       real    rMinAngle         !Minimum angle (degrees)
       real    rMaxAngle         !Maximum angle
       real    rSunMinAngle      !minium sun distance
 
-      common /major_modes_real/rcovar_win,radd_noise,rBestPerCent,
-     >   rMinAngle,rMaxAngle,rSunMinAngle
+      common /major_modes_real/rcovar_win,radd_noise,rel_noise, 
+     >   rBestPerCent, rMinAngle,rMaxAngle,rSunMinAngle
 
       integer iMinBetween       !minimum time in seconds between observing a source   
       integer iMaxSlewTime

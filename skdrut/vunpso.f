@@ -1,5 +1,25 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       SUBROUTINE vunpso(sodef,ivexnum,iret,ierr,lu,
      >   cname1,cname2,rarad,decrad,iep)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     VUNPSO gets the source information for source sodef.
 C     **NOTE** Satellites as sources not supported yet.
@@ -56,7 +76,7 @@ C
       if (iret.eq.0) then
         iret = fvex_field(1,ptr_ch(cout),len(cout))
         NCH = fvex_len(cout)
-        IF  (NCH.GT.max_sorlen.or.NCH.le.0) THEN 
+        IF  (NCH.GT.max_sorlen.or.NCH.le.0) THEN
           write(lu,'("VUNPSO01 - IAU name too long, using first ",i3,
      .    " characters")') max_sorlen
           ierr=-1
@@ -132,7 +152,7 @@ C
         iep=2000
       else if (cout(1:nch).eq.'B1950') then
         iep=1950
-      else 
+      else
         Ierr = -5
         write(lu,'("VUNPSO05 - Invalid epoch, only J2000 or B1950")')
       endif

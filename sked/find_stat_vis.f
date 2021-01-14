@@ -1,18 +1,19 @@
-      subroutine find_stat_vis(rlong,rlat, el_min,del_deg,rhadec)
+      subroutine find_stat_vis(rlong,rlat, el_min,idel_az,rhadec)
 ! Find station visibility limits.
       implicit none
       include "../skdrincl/constants.ftni"
+! 2020Oct03. Changed argument real del_deg to to integer idel_az 
 
 
 ! on entry:
       double precision rlong     !longitude (radians)
       double precision rlat      !latitude
       double precision el_min    !minimum elevation
-      double precision del_deg   !spacing in degrees
+      integer idel_az 
 ! on output
       double precision rhadec(2,*)  !contains unit vectorS along minimum elevation.
 !                                !1st entry corresponds to az,el=(0, el_min)
-!                                !2nd to                         (del_deg,el_min)
+!                                !2nd to                         (idel_az,el_min)
 !                                ! etc.
 ! functons
       real*8 dot8
@@ -21,6 +22,7 @@
       double precision xvec(3),yvec(3),zvec(3)
       double precision src_vec(3)
       double precision cos_elmin,sin_elmin
+      integer iaz 
       double precision az
       double precision xyz(3)
       integer icnt
@@ -48,7 +50,8 @@
 
 
       icnt=0
-      do az=0.0, twopi,del_deg*deg2rad
+      do iaz=0, 360-idel_az, idel_az
+        az=dble(iaz)*deg2rad 
         src_vec(1)=cos_elmin*cos(az)
         src_vec(2)=cos_elmin*sin(az)
         src_vec(3)=sin_elmin

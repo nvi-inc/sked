@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
         SUBROUTINE LABEL(PCODE,kskd,cr1,cr2,cr3,cr4,inew)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C This routine types labels for Mark III tapes
 
@@ -59,7 +79,6 @@ C NLAB - number of labels across a page
       character*1 cid1
       character*2 cid2
       character*20 response
-      integer*2 hhr
       integer i
       character upper
 
@@ -70,7 +89,7 @@ C NLAB - number of labels across a page
 
 C INITIALIZED:
       DATA IPASP/-1/, IFTOLD/0/
-      DATA  HHR/2HR /
+    
 
 C SUBROUTINES CALLED:
 C  UNPSK - unpacks schedule file entry
@@ -108,7 +127,7 @@ C            C routines.
 C 970228 nrv Remove IIN and use CLABTYP to determine what type of output.
 C 970228 nrv Use labname for output file.
 C 970312 nrv Add call to READ_SNAP1 to read first line freeform.
-C 970827 nrv Add startlab to make_pslabel call. Add prompts for 
+C 970827 nrv Add startlab to make_pslabel call. Add prompts for
 C            starting position of label.
 C 971014 nrv Add better S2 logic.
 C 971028 nrv Force new tape when starting a schedule (this was needed for
@@ -132,6 +151,7 @@ C 000705 nrv Use standard KNEWT for S2 also.
 !            tape_label ctape_num. This is so we can use this for VSN#s
 ! 2006Oct17 JMGipson. Added argument to cclose(fp, clabtyp). Clabyp indicates kind of printer.
 ! 2007May25 JMGipson made lstcod, lstnna, lexper ASCII (cstcod,cstnna,cexper)
+! 2020Oct17 Got rid of HDDR 
 
 C 1. First get set up with schedule or SNAP file.
 
@@ -198,7 +218,7 @@ C  we assume it is already open.
           ENDIF
 
           IF (clabtyp.eq.'LASER+BARCODE_CARTRIDGE'.or.
-     .        cprttyp.eq.'FILE') THEN 
+     .        cprttyp.eq.'FILE') THEN
 C                            !set up laser printer
             NLAB=3           !3 labels across on laser paper
             if (kbatch) then
@@ -250,7 +270,7 @@ C
         endif
         if (inew.eq.1) then ! start a new file
           if (cprport.eq.'PRINT') then ! temp file name
-            cout = labname 
+            cout = labname
           else ! specified file name
             cout = cprport
           endif
@@ -340,7 +360,7 @@ C             leave it alone
                       ilabcol=ilabcolin
                     else ! try again
                       goto 910
-                    endif ! take it/try again 
+                    endif ! take it/try again
                   endif ! force/ask
                 else ! take it
                   ilabrow=ilabrowin
@@ -392,9 +412,7 @@ C
      .    CALL TMADD(IYR,IDAYR,IHR,iMIN,ISC,IDUR(ISTNSK),IYR2,IDAYR2,
      .               IHR2,iMIN2,ISC2)
           IDIR=+1
-          IF (ISTNSK.NE.0)  THEN
-            IF (LDIR(ISTNSK).EQ.HHR) IDIR=-1
-          ENDIF
+        
           KNEW=.TRUE.
           IF(ISTNSK.NE.0) then
 C           if (ks2) then
@@ -499,7 +517,7 @@ C         NOB(NOUT) = NOB(NOUT)+1
       else
         IF (clabtyp.eq.'LASER+BARCODE_CARTRIDGE'
      .        .or.cprttyp.eq.'FILE') THEN !close laser printer
-          WRITE(luprt,'(a)') CHAR(27)//'&l6D'//CHAR(27)//'(8U'// 
+          WRITE(luprt,'(a)') CHAR(27)//'&l6D'//CHAR(27)//'(8U'//
      >      CHAR(27)//'(s3T'// char(13)
         ENDIF
 C if pcode is 1 (one station) or 3 (last station) then close file

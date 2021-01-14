@@ -59,7 +59,7 @@ C     integer*2 scan_name(8),scan_namep(8)
       equivalence (icb,lcb),(cst,lst)
       integer iptr
 
-      integer IPAS(MAX_STN),IDIR(MAX_STN),IFT(MAX_STN),IDUR(MAX_STN)
+      integer IFT(MAX_STN),IDUR(MAX_STN)
       integer idstop(max_stn)
    
       integer ihd(max_pass),nh
@@ -76,11 +76,9 @@ C     integer*2 scan_name(8),scan_namep(8)
       integer itu_early(max_stn)
       logical knewtp,knewt
       integer*2 lcbpre(max_stn),lcb_new
-      integer idirp(max_stn),iftpre(max_stn),isorp(max_stn)
+      integer iftpre(max_stn),isorp(max_stn)
       integer mjdpre(max_stn),iftnew(max_stn),mjd1(max_stn)
-      integer ipasp(max_stn)    
-      data c_subpass/'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'/
-      
+     
 C  1. SCHED
 
       call fcreate_block(ptr_ch("SCHED"//char(0)))
@@ -149,10 +147,7 @@ C
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
       I = 1
       DO WHILE (IC1.NE.0.AND.I.LE.NST) ! decode footage counters
-        ipas(i) = index(cpass(1:nlpass),cbuf(ic1:ic1))
-        IDIR(I) = -1
-        if(cbuf(ic1+1:ic1+1) .eq. "F") idir(i)=+1
-
+  
         nch = ic2-ic1+1
         read(cbuf(ic1+2:ic2),*) ift(i)
 
@@ -160,16 +155,12 @@ C
         I = I+1
       END DO  !decode footage counters
       IF  (I.EQ.1) THEN  !no counters
-        DO  NI = 1,NST
-          IPAS(NI) = 1
-          IDIR(NI) = 1
+        DO  NI = 1,NST   
           IFT(NI) = 0
         END DO  !
       END IF  !no counters
       IF  (I.GT.1.AND.I.LT.(NST+1)) THEN  !too few counters
-        DO  NI = I,NST
-          IPAS(NI) = IPAS(I-1)
-          IDIR(NI) = IDIR(I-1)
+        DO  NI = I,NST   
           IFT(NI) = IFT(I-1)
         END DO  !
       END IF  !too few counters
@@ -278,10 +269,9 @@ C***********************************************
             if (irecst(is).eq.1) then
               knewtp = .true.
             else
-              knewtp = KNEWT(IFT(j),IPAS(j),IPASP(is),IDIR(j),
-     .                IDIRP(is),IFTpre(is))
+             knewtp =. false. 
             endif
-            if (knewtp.or.idir(j).ne.idirp(is)) then ! don't change anything
+            if (knewtp) then ! don't change anything
               MJD1(is)=JULDA(1,IDA,IYR-1900)
               ut1(is)=hms2seconds(ihr,imin,isc)
               iyr1(is)=iyr
@@ -312,19 +302,13 @@ C             time1 is previous data_stop + slew + cal = new data_valid
               ut1(is)=hms2seconds(ihr1(is),imin1(is),isc1(is))
               ideltat(j) = isecdif(mjd,ut,mjd1(is),ut1(is))
 C             iftnew is footage at time1
-              iftnew(is) = iftpre(is) + ifix(idirp(is)*
-     .                 ((tslew+ical)*speed(icod,is)))
+              iftnew(is) = iftpre(is) + (tslew+ical)*speed(icod,is)
             endif ! calculate new ref time
 C         Save values for the next scan calculation
             mjdpre(is) = mjd
-            utpre(is) = ut + idur(j)
-            iftpre(is) = ift(j) + ifix(idir(j)*
-     .                   (itu_early(is)*itearl(is)+
-     .                   idur(j)*speed(icod,is)))
+            utpre(is) = ut + idur(j)   
             lcbpre(is) = icb(j)
-            isorp(is) = isor
-            idirp(is) = idir(j)
-            ipasp(is) = ipas(j)
+            isorp(is) = isor          
 C           data_valid=off time is scan start + station's duration
 C           (should add any idle time here to account for non-zero postob)
             call tmadd(iyr,ida,ihr,imin,isc,idur(j),

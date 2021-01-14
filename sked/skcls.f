@@ -88,7 +88,8 @@ C 000523 nrv Add separator lines between VEX sections.
 ! 2014May22  JMG. Set kvlba flag which indicates will be correlated at Socorro. VEX file is slightly modified. 
 ! 2014Jun03 JMG. kvlba-->kvlba_corr. Added kbonn_corr,and placed $SCHEDULING PARAMs at end of VEX file
 ! 2020Jun02 JMG. Don't write obsolete head stuff 
-C
+! 2020Oct01 JMG. Fixed some format statements that did not work 
+
        cs2fil=" "
        KERR = 1
        kvexout=.false.
@@ -163,34 +164,34 @@ C     Check for file existence. If no access to file, return. If create
 C     command and file exists, return. If replace command and file doesn't
 C     exist, return. If file doesn't exist and cannot create, return.
 
-        ilen = trimlen(cs2fil)
+!        ilen = trimlen(cs2fil)
         inquire(file=cs2fil,exist=ex)
         if (ex) then
           iok = rwopen(cs2fil)
           if (iok.eq.-1) then
-            write(luscn,9210) cs2fil(1:ilen)
-9210        format('SKCLS02: You do not have access to the file 'A)
+            write(luscn,9210) trim(cs2fil)
+9210        format('SKCLS02: You do not have access to the file ',A)
             knewfi = .false.
             return
           end if
           IF (cmdcod.eq.'EC'.OR.cmdcod.eq.'WC' .or.
      .        cmdcod.eq.'VEC'.OR.cmdcod.eq.'VWC') then
-            WRITE(LUSCN,9220) CS2FIL(1:ilen)
-9220        FORMAT ('SKCLS03 - Error: 'A' already exists')
+            WRITE(LUSCN,9220) trim(cs2fil)
+9220        FORMAT ('SKCLS03 - Error: ',A,' already exists')
             knewfi = .false.
             RETURN
           END IF
         ELSE  ! doesn't exist
           IF (cmdcod.eq.'ER'.OR.cmdcod.eq.'WR'.or.
      .        cmdcod.eq.'VER'.OR.cmdcod.eq.'VWR') then
-            WRITE(LUSCN,9230) CS2FIL(1:ilen)
-9230        FORMAT ('SKCLS04 - Error: 'A' does not exist')
+            WRITE(LUSCN,9230) trim(cs2fil)
+9230        FORMAT ('SKCLS04 - Error: ',A,' does not exist')
             RETURN
           END IF
           open(lufil,file=cs2fil,status='unknown',iostat=ierr)
           if (ierr.ne.0) then
-            write(luscn,9240) cs2fil(1:ilen)
-9240        format('SKCLS05 - Cannot create file: 'A)
+            write(luscn,9240) trim(cs2fil)
+9240        format('SKCLS05 - Cannot create file: ',A)
             return
           end if
           close(lufil,status='KEEP')
@@ -203,7 +204,7 @@ C     existing file.
      .      cmdcod.eq.'VER'.OR.cmdcod.eq.'VWR') then
           NC =-1 
           DO WHILE (NC.LT.0)
-            WRITE(LUSCN,9250) CS2FIL(1:ilen)
+            WRITE(LUSCN,9250) trim(cs2fil)
 9250        FORMAT('Replace ',A,'? (Y/N) ',$)
             CALL read_cap_char(cans)
             if (cans.eq.'N') then
@@ -212,8 +213,7 @@ C     existing file.
               nc=0
             endif
           END DO
-          WRITE(LUSCN,9260) CS2FIL(1:ilen)
-9260      FORMAT('Replacing file ',A)
+          WRITE(LUSCN,"('Replacing file ',A)") trim(cs2fil)
         END IF
  
 C  3.0 Check schedule for all sources/stations selected.
@@ -328,17 +328,6 @@ C  Write the VEX format file.
           call vex_begin_section_comment('$FREQ')
           call vfrout ! $FREQ
           call vex_end_section_comment(  '$FREQ')
-! no longer need to do this. 
-          if(.false.) then         
-!          if(.not. kvlba_corr) then 
-            call vex_begin_section_comment('$HEAD_POS')
-            call vhdout ! $HEAD_POS
-            call vex_end_section_comment(  '$HEAD_POS')
-            call vex_begin_section_comment('$PASS_ORDER')
-            call vpoout ! $PASS_ORDER
-            call vex_end_section_comment(  '$PASS_ORDER')
-          endif 
-
 
           call vex_begin_section_comment('$IF')
           call vifout ! $IF
@@ -436,14 +425,14 @@ C  5.0 Close the temporary write file and rename to appropriate name.
 c        KERR = rename(CTMFI2,CS2FIL)
         IF  (KERR.LT.0) THEN
           i = trimlen(ctmfi2)
-          WRITE(LUSCN,9500) KERR,CTMFI2(1:i),CS2FIL(1:ilen)
+          WRITE(LUSCN,9500) KERR,CTMFI2(1:i),trim(cs2fil)
 9500      FORMAT('SKCLS08 - Error ',I3,' renaming ',A,' to ',A)
           WRITE(LUSCN,9510)
 9510      FORMAT('Re-issue EC, ER, WC, or WR command.')
           RETURN
         END IF
         KERR=0
-        WRITE(LUSCN,9520) CS2FIL(1:ilen)
+        WRITE(LUSCN,9520) trim(cs2fil)
 9520    FORMAT('SKED output file ',A,' finished.')
  
 C  6.0 Give user a chance to change their mind on aborting when changes

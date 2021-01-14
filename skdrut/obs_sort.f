@@ -1,3 +1,22 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
       subroutine obs_sort(luscn,num_obs)
 C OBS_SORT sorts the index array for observations by time.
 C 000606 nrv New. Algorithm from Numerical Methods.
@@ -9,6 +28,7 @@ C 03July11 JMG Modified to use sktime.
 ! 04Oct15  JMGipson. Completely rewritten.
 ! 2005Nov30. Made the num_obs an argument. Previously used nobs.
 ! 2006OCt03. Modified to use ctime2dmjd to find djday
+      implicit none  !2020Jun15 JMGipson automatically inserted.
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/skobs.ftni'
 C Input

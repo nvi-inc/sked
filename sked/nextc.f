@@ -154,7 +154,7 @@ C added by JMGipson
          endif
          if(nobs .eq. 0) then
             do i=1,num_est
-               dnorm_tri(indx4(i,i),0)=1.e-6
+               dnorm_tri(indx4(i,i),0)=small 
             end do 
           endif   
           num_tri_est=num_est*(num_est+1)/2

@@ -1,4 +1,24 @@
+*
+* Copyright (c) 2020 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
 	subroutine bbbuf(imode,icod,fr)
+      implicit none  !2020Jun15 JMGipson automatically inserted.
 
 C     BBBUF creates buffers that hold the lines with bbsynth commands
 C     This routine is called only for switched sequences
@@ -32,7 +52,7 @@ C LOCAL
       do ix=1,nchan(istn,icod)
         if(mod(iz,5) .eq. 0) then
           cbuf= ' bbsynth = '
-	  iy = 11 
+	  iy = 11
         endif
 
 	if (fr(ix).ne.0.0) then
