@@ -40,7 +40,6 @@ C               - percentages for time slewing, observing, cal.
       real sitobb(max_stn),tottapes
       double precision adgb,adgBM5
       double precision dmax_store_gBM5   !Maximum storage
-      real dgB(max_stn)                    !Gbytes of data (with parity bit.)
       real dgBM5(max_stn)                  !Mark5 Gigabytes recorded
 C               - total time observing, cal., slewing
       integer ioff
@@ -158,7 +157,15 @@ C  INITIALIZED
           
 !      
 C
-C  HISTORY
+! Updates, most recent first.
+! 2021-01-14 JMG Removed calculation of storage space left over from tape. (included parity bit.
+! 2020-06-08 JMG  Include broadband.ftni 
+! 2019-05-23 JMG  Was not printing out stuff for SNR. NBA=number of bands was being set to 0. 
+! 2017-12-19 JMG  sumcm.f:  Do test on writing precision based on MAXimum amount per station rather than average. 
+! 2017-12-05 JMG sumcm.f:  When priting out storage in TB, give 2 decimals.  
+! 2017-02-14 JMG. For combatibility with gfortran, got rid of some tabs.
+! 2015-03-12 JMG. Removed some stuff associated with tapes. 
+! Previous updates 
 C    811125  MAH    BASELINE SUMMARY ADDED AT THE END.
 C    831117  WEH    FIXED SOURCE PLOT FOR UTCUR(J) NOT UTCUR
 C    840813  MWH    Added printer LU lock, header for listing,and
@@ -348,7 +355,6 @@ C
         SITOBS(I)=0
         SITOBB(I)=0
         SITCAL(I)=0
-        dgb(i)=0.d0
         dgbM5(i)=0.d0
 
 ! calculate number of tracks for first code
@@ -747,14 +753,7 @@ C
               temp5=samprate(kj,icode)*float(num_mk5_trk_code)          
             endif            
 
-            dgB(kj)  =dgB(kj)  +itime_rec*temp*(9.0d0/64.0d3)
             dgBM5(kj)=dgBM5(kj)+itime_rec*temp*(1./8.d3)
-
-!            dgB(kj) = dgB(kj)  + itime_rec*samprate(icode)*
-!     >                          float(num_trk_code)*(9./64.0d3)
-!            dgBM5(kj)=dgBM5(kj)+ itime_rec*samprate(icode)*
-!     >                          float(num_mk5_trk_code)*1./8.d3
-
 
 ! End of Gbyte
             if (idurxt(kj).gt.0) then ! more time
@@ -1295,7 +1294,7 @@ C       write(ludsp,9405) davgr,dminnob,dmaxnob,lstcod(njdmax),
           iastcnt=iastcnt+iscan_per_stat(j)
           ianh=ianh+iscan_per_stat(j)*rExpDur
           iadobs=iadobs+dobs(j)
-          adgB=adgB+dgB(j)
+    
           adgBM5=adgBM5+dgBM5(j)
           dmax_store_gBM5=max(dmax_store_gbM5,dgBM5(j))    
         enddo ! calculate fractions
@@ -1324,8 +1323,6 @@ C       write(ludsp,9405) davgr,dminnob,dmaxnob,lstcod(njdmax),
         WRITE(LUDSP,"(' # Mk5 tracks:  ',41(1X,I4))")
      >    (num_mk5_tracks(IST(I)),I=1,NST)
 
-!        write(ludsp,"(' Total TBytes:  ',41(1x,f4.1))")
-!     >    (dgB(ist(i))/1.d3,i=1,nst ),  adgB/dble(nst)/1.d3
         adgbm5=adgbm5/dble(nst)
         if(dmax_store_gbM5 .ge. 9.95d3) then     !> 10 TB
           write(ludsp,"(' Total TB(M5):  ',41(1x,f4.1))")

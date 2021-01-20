@@ -55,7 +55,8 @@ C     through the loop (iloop).
 
       icol_wid=len(cantna(1))+1
       iwid_pre=len(crxname(1))+2
-
+       
+      write(*,*) "Read rx.cat: "//trim(rx_cat) 
       call open_cat(rx_cat,ierr)
       if (ierr.ne.0) then
         close(lutmp)
@@ -76,21 +77,22 @@ C     LOIF name for each of the stations.
       if(irx .eq. 0) goto 100
       krx_found(irx)=.true.
       iw=0  !flag indicating we haven't put up the frequency code yet.
-      write(*,*) "Searching for rx: ", ltoken(1)
+      write(*,'("Searching through ", a," found: ",$)') trim(ltoken(1))
 
 ! found a match. Now go through all the stations.
       do while(.true.)
         call skip_to_next_non_comment(keof)
-        if(keof) goto 100
+        if(keof) goto 100 
         call splitNtokens(cbuf,ltoken,Maxtoken,NumToken)
         if(ltoken(1)(1:1) .ne. "-") then
           if(iw .ne. 0 .and. kverbose) write(luscn,'()')
+          write(*,*) " " 
           goto 110  !done with this group. Find the next one.
         endif
 
         istat=iwhere_in_string_list(cantna,nstatn,ltoken(2))
-!        write(*,*)" Searching for: ", ltoken(2)
         if(istat .ne. 0) then
+          write(*,'(" ",a,$)') trim(ltoken(2)) 
           if(istn_rx_xref(istat) .eq. 0) then
             istn_rx_xref(istat)=irx
             cloifname(istat)=ltoken(3)
@@ -107,7 +109,7 @@ C     LOIF name for each of the stations.
             endif
           else
             write(luscn,
-     >   "(/'FRX: Warning! ',a,' found in both ',a,' and ',a,
+     >   "(/,'FRX: Warning! ',a,' found in both ',a,' and ',a,
      >       ' Using first.')")
      >       cantna(istat), crxname(istn_rx_xref(istat)),crxname(irx)
           endif

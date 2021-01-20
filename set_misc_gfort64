@@ -1,12 +1,10 @@
-# Set compilers and libraries for linking sked 
+ # Set compilers and libraries for linking sked 
 # History
 #  2008Mar21  JMGipson first version
 #  2009Mar03  JMGipson. Put in options so that it would be compatible with HP-UX.
 # 
 # Set the compilers and linkers:
-
-setenv FC "gfortran -fno-range-check -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
-setenv FC "gfortran -fno-range-check -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
+setenv FC "gfortran -fno-range-check -ffpe-trap=zero,invalid,overflow -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
 setenv LINK gfortran
 #setenv FC "/opt/intel/fc/bin/ifort -I skdrincl -c -fpp -nus -static -g -D READ_LINE"
 #setenv LINK "/opt/intel/fc/bin/ifort -D READ_LINE"
@@ -37,7 +35,7 @@ setenv READLINE_LIB " "
 #
 # If you want to link to the mysql, include the following (or something similar)
 #
-setenv MYSQL_LIB /lib64/libmysqlclient.so.18
+setenv MYSQL_LIB /lib64/libmysqlclient.so
 setenv MYSQL_INT mysql_int.o
 #
 # If you don't want to link uncomment the following

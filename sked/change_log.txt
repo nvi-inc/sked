@@ -1,4 +1,6 @@
  This file contains a brief description of the changes made to sked
+2021-01-20 JMG simul.f: Don't  try to invert if num_est=0.  sky_cov_pix. Fixed test on elevation. 
+2021-01-15 JMG sumcm.f Removed calculation of storage for tapes.
 2021-01-14 JMG Added VIEN to correlator list in prset.f
 2020Nov04 Modified master_cmd and return_master_line to be more forgiving if they cannot open a file. 
           Previously sked would die. Not it issues an error messsage and continues. 

@@ -143,6 +143,7 @@ C 020904 nrv Only first 8 characters of source name were being unpacked.
 ! 2014Jul09 JMGipson.  Removed idur/2  from epoch. This makes it easier for comparison with other things and has minimal effect on formal error.
 ! 2016Oct31 LeBail.    Removed multiplication by sin(eps) on nutation partial to make consistent with calc. 
 ! 2020Apr15 JMGipson.  Fixed error in SIGN of atmsophere rate partial
+! 2021-01-20 JMGipson. Don' try to invert normal equations if num_est=0
 
 
 
@@ -271,11 +272,11 @@ C     iband is the band index for X-band
       call snrac(nst,istn,isor,icod,-1,mjd,ut,ierr)
 
       if(dnorm_tri(1,0) .eq. 0) then
-         do i1=1,num_est
-           iptr=indx4(i1,i1)
+          do i1=1,num_est
+           iptr=indx4(i1,i1)  
            dnorm_tri(iptr,0)=small  !this keeps non-singular by adding small diagonal term
          end do
-      endif
+      endif   
       if(nsubc .ne. 0) then 
         dnorm_tri(1:num_tri_est,nsubc)=dnorm_tri(1:num_tri_est,nsubc-1)          
       endif
@@ -518,7 +519,7 @@ CHS++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       enddo ! i=1,nstatn-1
 
 ! Invert the matrix for use in optimization.
-      if(nsubc .eq. 0) then
+      if(nsubc .eq. 0 .and. num_est .ge. 1) then 
         dnorm_inv(1:num_tri_est)=dnorm_tri(1:num_tri_est,0)  !normal equations so far
 ! Invert the normal matrix.
         job=11           !compute the inverse AND the rcond

@@ -1,5 +1,7 @@
 This file contains a summary of changes made and why.
-
+2021-01-19 snap.f: Use SETUPBB if the rack is BB. Previoulsy recorder had to be MK6.
+2021-01-19 lstsumo.f: In calculating GB divide by 1000 not 1024 
+2021-01-15 snap.f: In calculating GB divide by 1000 not 1024
 2020Nov20 snap.f: If  no observations return with warning. Previously could crash
 2020Nov17 cvpos.f. Replaced repeated code with call to subroutine iwhere_in_range4.f
 2020Nov17 lists.f, label.f: Got rid of hollerith that indicated tape direction. Got rid of some S2 tests. 

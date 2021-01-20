@@ -9,6 +9,9 @@
 ! input
       integer iobs_in
 ! output
+
+! 2021-01-20 JMGipson. Changed test on elevations. Used to test on both iobs and iobs_in 
+!          
    
 
 ! local
@@ -21,18 +24,20 @@
       integer ierr
       real*8 temp
 
+!      write(*,'("In ",i3, 20f8.2)') iobs_in, eleva(iobs_in,1:nstatn)
+     
       kfound_pix=.false.
       inum_pix_obs(iobs_in,1:max_stn)=0
-
+    
       do i=1,nobs
         iobs=iskrec(i)
         if(iobs .gt. iobs_in) goto 100          !all done
+!        write(*,'("Ob ",i3, 20f8.2)') iobs, eleva(iobs,1:nstatn)
         if(kobc(iobs)) then
           avg_pix_obs(iobs)=0
           nsta=0
-          do istn=1,nstatn
-            if(eleva(iobs_in,istn) .ne. -99.d0 .and.
-     >         eleva(iobs,istn) .ne. -99.d0) then             
+          do istn=1,nstatn           
+            if(eleva(iobs,istn) .ne. -99.d0) then             
                nsta=nsta+1
                call sphere_pix(azimu(iobs,istn),eleva(iobs,istn),
      >            num_pix_bands, ipix_bands,dang_pix_band,

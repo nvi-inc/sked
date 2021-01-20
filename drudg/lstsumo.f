@@ -71,6 +71,7 @@ C 021011 nrv Another digit for printing gap time.
 !             Previously relied on recorder starting and stopping info, which is absent in the "none" case.
 ! 2014Jan17 JMGipson. Modified call to setup_name.  Removed pass info. 
 ! 2020Jun08 JMG. Included new broadband.ftni
+! 2021-01-19 JMG  Changed 1024-->1000 to reflect decimal storage. 
 
 ! Functions
       integer julda
@@ -436,7 +437,7 @@ C  Duration
 C  Footage     
       if(kdisk) then
         if(kskd) then
-          write(luprt,'(f8.1,$)') counter/1024  !convert megabytes to Gigabytes
+          write(luprt,'(f8.1,$)') counter/100  !convert megabytes to Gigabytes
         endif    
       endif
 
