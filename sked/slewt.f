@@ -1,11 +1,13 @@
       SUBROUTINE SLEWT(NSNOW,MJD,UT,NSNEW,ISTN,cwrap_cur,cwrap_new,
-     > TSLEW, lookah,trise,tsris,st0cur,frac,knov,islew_info)
+     > TSLEW, lookah,trise,tsris,st0cur,frac,knov,islew_info,
+     > aznow,aznew)
 C
 C   SLEWT calculates the slew time and the cable wrap
 C
-
+      implicit none
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
+     
 C
 ! functions
 C     INPUT VARIABLES:
@@ -22,7 +24,7 @@ C     INPUT VARIABLES:
      
 ! Output variables
        real tslew        !slew time
-       real trise        !Time until source rises. <0 means source is up. >0 includes slew time.  
+       real trise        !Time until source rises. <0 means source is up. >0 includes slew time.
        character*2 cwrap_new      !New cable wrap.
        real*8 frac 
        integer islew_info !0  -- no problem
@@ -32,9 +34,11 @@ C     INPUT VARIABLES:
                            !-4  -- source is not up 
                            !-5  -- source is not continuous
                            ! 6 
+      
       integer ierr 
 ! Functions used.
       real cablw          !compute required az move.
+      real ggao_slew      !ggao slew time
 
 C   COMMON BLOCKS USED
       include '../skdrincl/sourc.ftni'
@@ -54,13 +58,17 @@ C   LOCAL VARIABLES
       integer nloops
       integer nrs        !which rise-set interval. Some sources can rise a few times (e.g., go behind a mountain.)  
       character*2 cwrap1,cwrap2,cwrap2_pre
- 
-      double precision  gst          !Current GST 
+      double precision gst                       !current gst
       real rme
       double precision edge_tol     !How close can we be to the edge    
       double precision tol_180      !How close can we be to 180 degrees move?
       double precision move_test    !Test cablewrap within this distance
+      character*8 lkind 
+      real az_off, el_off, az_rate,el_rate
+      real slew0, temp
+      real el1,el2
 
+      
       logical kfirst
       character*2 cwrap_first
       LOGICAL KUP                    ! Returned from CVPOS, TRUE if source within limits
@@ -169,7 +177,7 @@ C     time, find out when it rises, then calculate its position at that time.
            if(trise .lt. 0) trise=trise+twopi
 ! convert from radians to seconds.           
             trise=trise/frac 
-            CALL CVPOS(NSNEW,ISTN,MJD,UT+trise, 
+          CALL CVPOS(NSNEW,ISTN,MJD,UT+trise,
      >    AZNEW,ELNEW,HANEW,DECNEW,X30NEW,Y30NEW,X85NEW,Y85NEW,KUP)
 C       Now we have the time to rising and position at rise (xxNEW).
         endif
@@ -284,6 +292,29 @@ C       calculated using az,el at UT+trise).
         islew_info=-5
         trise=-1.0    
       END IF  !
+      aznow=az1
+      aznew=az2
+! Special  fix becauses of GGAO mask
+      if(cstnna(istn) .eq. "GGAO12M") then
+         az1=az1*rad2deg
+         az2=az2*rad2deg
+         az_rate=stnrat(1,istn)*rad2deg
+         el_rate=stnrat(2,istn)*rad2deg
+         az_off=istcon(1,istn)
+         el_off=istcon(2,istn)
+         el1=elnow*rad2deg
+         el2=elnew*rad2deg
+
+         tslew=ggao_slew(az1,el1,az2,el2,
+     &      az_off,az_rate,el_off,el_rate,slew0,lkind)
+!          if(abs(tslew-slew0) .ge. 4) then 
+!             write(*,*) "Difference at GGAO ",tslew-slew0
+!             write(*,'("At ",4f8.2)') az1,el1,az2,el2
+!          endif
+       endif
+         
+      
+      
       
 
 990   RETURN

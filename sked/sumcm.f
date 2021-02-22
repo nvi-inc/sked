@@ -142,6 +142,7 @@ C      - true if source is up, from CVPOS
       integer curIndex, time, start, actMinScn, actMaxScn
       integer binsize, bins, evenBins
       real*8 iobs_avg
+      real az_now,az_new 
       
       real*8 temp,temp5
             
@@ -158,6 +159,7 @@ C  INITIALIZED
 !      
 C
 ! Updates, most recent first.
+! 2021-02-19 JMG Slewt now returns az_now, az_new
 ! 2021-01-14 JMG Removed calculation of storage space left over from tape. (included parity bit.
 ! 2020-06-08 JMG  Include broadband.ftni 
 ! 2019-05-23 JMG  Was not printing out stuff for SNR. NBA=number of bands was being set to 0. 
@@ -775,7 +777,7 @@ C
             ctemp=" " 
             CALL SLEWT(NSPRE(KJ),MJDCUR(KJ),UTCUR(KJ),NSORcur(KJ),KJ,
      >         cwrap_pre(KJ),ctemp,TSLEW,look,trise,tsris,st0cur,frac,
-     >         knov,islew_info)
+     >         knov,islew_info,az_now,az_new)
             if (tslew.gt.0.0) TSLW(KJ) = TSLW(KJ)+TSLEW
 
 C           IDTPRE(KJ) = (MJDCUR(J1)-MJD1)*1440+(UTCUR(J1)+IDURcur(J1))/60.D0       

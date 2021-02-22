@@ -36,6 +36,7 @@ C   COMMON BLOCKS USED
       double precision  AZ,EL, HAR,DEC,X30,Y30,X85,Y85
       integer i,j
       double precision trise
+      real az_now,az_new
 
 ! 2005Jun13 JMGipson.  Modified to compute time when all stations on source.
       DO  I=1,NumSrc ! source loop for mutual vis
@@ -48,7 +49,8 @@ C   COMMON BLOCKS USED
           IF  (NSORcur(istat).GT.0) THEN ! we're observing a source, calculate slewing
             CALL SLEWT(NSORcur(istat),MJD(istat),ut(istat),
      .      ISrc,istat,cwrap_cur(istat),cwrap_new,
-     .      TSLEW(isrc,istat),0,trise,tsris,st0cur,frac,knov,islew_info)
+     .      TSLEW(isrc,istat),0,trise,tsris,st0cur,frac,knov,islew_info,
+     &      az_now,az_new)
           ELSE  ! not initialized
             TSLEW(isrc,istat) = 0.
           ENDIF

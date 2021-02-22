@@ -18,7 +18,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
       subroutine lstsumo(kskd,itearl_local,itlate_local,maxline,
-     >   iline,npage,num_scans,ntapes,             !These are modified by this routine
+     >   iline,npage,num_scans,            !These are modified by this routine
      >   nsline,
      >   itime_start,itime_end,itime_tape_start,itime_tape_stop,
      >   iDur,counter,cpass,cnewtap,cdir,cscan,cbuf_source)
@@ -85,7 +85,7 @@ C Input
       integer itearl_local              !early start
       integer maxline                   !# of lines to output.
 
-      integer iline,npage,num_scans,ntapes !modified in this routine!!!!!!!!!!
+      integer iline,npage,num_scans     !modified in this routine!!!!!!!!!!
       integer nsline                    !snap line that scan starts.
       integer itime_start(5)            !start
       integer itime_end(5)              !end
@@ -437,7 +437,7 @@ C  Duration
 C  Footage     
       if(kdisk) then
         if(kskd) then
-          write(luprt,'(f8.1,$)') counter/100  !convert megabytes to Gigabytes
+          write(luprt,'(f8.1,$)') counter/1000  !convert megabytes to Gigabytes
         endif    
       endif
 
@@ -445,8 +445,6 @@ C  Footage
 
       iline=iline+1
       num_scans = num_scans + 1 ! count of observations
-      if (cnewtap(1:3).eq.'XXX'.or.
-     .    cnewtap(1:3).eq.'Rec') ntapes=ntapes+1
-
+  
       return
       end

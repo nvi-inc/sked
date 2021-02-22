@@ -89,6 +89,7 @@ C 000523 nrv Add separator lines between VEX sections.
 ! 2014Jun03 JMG. kvlba-->kvlba_corr. Added kbonn_corr,and placed $SCHEDULING PARAMs at end of VEX file
 ! 2020Jun02 JMG. Don't write obsolete head stuff 
 ! 2020Oct01 JMG. Fixed some format statements that did not work 
+! 2021-02-12 JMG Removed kbonn_corr which is no longer used. 
 
        cs2fil=" "
        KERR = 1
@@ -97,8 +98,7 @@ C 000523 nrv Add separator lines between VEX sections.
        call capitalize(ccorname)
    
        kvlba_corr = ccorname .eq. "VLBA" .or. ccorname .eq. "SOCORRO" 
-       kbonn_corr = ccorname .eq. "BONN"
-         
+          
        if (cmdcod.eq.'VE') cmdcod='VER'
        if (cmdcod.eq.'VC') cmdcod='VEC'
        if (cmdcod.eq.'VW') cmdcod='VWC'

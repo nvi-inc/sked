@@ -14,7 +14,10 @@ C
       include '../skdrincl/skobs.ftni'
 C
 C  MODIFICATIONS:
-C
+! 2021-02-19 JMG Now slew returns aznow, aznew, 
+! 2019-05-15 JMG If doing 'ch' don't return on slew error messages. Just mush on. 
+! 2017-11-14 JMG  Fixed problem in writing out cable-wrap problems. Indicated wrong station. 
+
 C  DATE    WHO    CHANGES
 C  810720  NRV    CHECK FOR SOURCE UP AFTER NEW START TIME CALCULATION
 C  810817  NRV    MODS FOR FREQ. CODE
@@ -67,8 +70,7 @@ C 970406 nrv Add ITUPR to call
 ! 2012Oct11 JMG. Don't check slew stuff if previous source is the same as the current source. 
 ! 2014Apr08 JMG. Got rid of  some used variables in the process of debugging. 
 ! 2015Oct22 JMG. Slight change in writing data. Added some debug options ('kwrite') that I commented out but kept in code because they may be useful. 
-! 2017Nov14 JMG  Fixed problem in writing out cable-wrap problems. Indicated wrong station. 
-! 2019May15 JMG. If doing 'ch' don't return on slew error messages. Just mush on. 
+
 
 ! functions
       logical kcont
@@ -136,6 +138,7 @@ C     character*128 tape_motion_new(max_stn)
       integer isource   !source
       integer islew_info !near edge of cable wrap
       logical kfirst_obs       !true if first observation. Then we don't have to do all the checking. 
+      real az_now,az_new       !azimuth current and in the future 
    
       real  dur_temp   
       logical kwrite
@@ -175,7 +178,7 @@ C
       
           CALL SLEWT(NSPRE(J),MJDPRE(J),UTPRE(J)+idurpre(j)+idlpre(j),
      >     NSORcur(J),J, cwrap_pre(J),cwrap_new(J),TSLEW,lookah,
-     >     trise,tsris,st0cur,frac, knov, islew_info)
+     >     trise,tsris,st0cur,frac, knov, islew_info,az_now,az_new) 
 
         if(kwrite) then
            writE(ludsp,*) i, cstnna(j)," ", lq//cwrap_pre(j)//lq, 

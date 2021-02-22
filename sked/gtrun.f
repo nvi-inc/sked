@@ -18,6 +18,8 @@ C 970406 nrv Add itupr to call.
 C 970715 nrv Calculate itrun for the bot/eot case as the running time
 C            for the tape to move from end of last scan on the pass
 C            to bot/eot
+
+! 2021-02-19 JMG slewt now returns az_now, az_new 
 ! 2008Jun18 JMGipson.  Modified calculation of ituse for CONTINUOUS
 
 C Called by: SUMCM, CHCMD, LICMD
@@ -36,6 +38,7 @@ C Local:
       real speed,tslew,trise
       double precision utend
       integer islew_info        !info about slewing
+      real az_now,az_new 
 
 C  1. Initialize
 
@@ -55,7 +58,7 @@ C 2. Calculate ITRUN and IDURXT
           else ! moving
             CALL SLEWT(NSPRE(J),mjdstart(J),utstart(J),NSORcur(J),J,
      >      LCBPRE(J),BLNK,TSLEW,look,trise,tsris,st0cur,frac,
-     >      knov,islew_info)
+     >      knov,islew_info,az_now,az_new) 
 C         UTCUR is the mutal good data start time.
 C         UTSTART is the time this station has data start on the new source
 C         This may be earlier than UTCUR for continuous or adaptive motion.

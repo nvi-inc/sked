@@ -19,7 +19,7 @@
 *
       subroutine proc_disk_tracks(lu_outfile,istn,icode,
      >         kignore_mark5b_bad_mask)
-      implicit none  !2020Jun15 JMGipson automatically inserted.
+      implicit none  
       include 'hardware.ftni'
       include '../skdrincl/freqs.ftni'
       include '../skdrincl/statn.ftni'

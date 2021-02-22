@@ -102,8 +102,10 @@ C               - Holders for decoded values
       integer islew_info         !info about slew
       real  dur_temp
       integer itdif              !timedifference
+      real az_now,az_new 
 C
 C  History
+! 2021-02-19 JMG  slew now returns az_now,az_new 
 C   811125  MAH    CHECK FOR CONTINUITY OF OBS
 C                  NEW MSG FOR TSLEW=-2.0
 C   811130  MAH    CALCULATE SLEW TIMES WHEN ST TIME IS SPECIFIED
@@ -317,7 +319,7 @@ C    Initialize extra durations to zero for scheduling.
         if(nsorcur(j) .gt. 0) then       
           CALL SLEWT(NSORcur(j),mjdt(j),utt(j),
      >      NSOR,j,LCBLcur(j),LCABLE(j),TSLEW(j),lookah,trise(j),
-     >      tsris,st0cur,frac,knov,islew_info)
+     >      tsris,st0cur,frac,knov,islew_info,az_now,az_new) 
 !             write(*,*) "JMG!!",  cstnna(j), islew_info, tslew(j) 
           if(islew_info .eq. 0) then
             UTT(j)=UTT(j)+Tslew(j)

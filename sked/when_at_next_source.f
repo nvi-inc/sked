@@ -3,6 +3,7 @@
      >   cwrap,cwrap_new,tslew,imaxsl,mjd_out,ut_out,
      >   aznow,aznew,isrc_time, buf_time) 
 
+! 2021-02-19 JMG slewt2 replaced by slew
 ! 2020Jun08 JMG. include broadband.ftni. New parameter ibb_off 
 
 
@@ -48,7 +49,7 @@
 
        if(cwrap(1:1) .eq. char(0)) cwrap="-"
        IF  (nsor.GT.0 .and. nsor .ne. nsornew) then  
-          CALL SLEWT2(nsor,mjd,ut+IDUR+Idle,
+          CALL SLEWT(nsor,mjd,ut+IDUR+Idle,
      >     nsornew,istat,cwrap,cwrap_new,tslew,
      >     lookah,trise,tsris,st0cur,frac,knov,islew_info,
      >     aznow,aznew)

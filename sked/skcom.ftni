@@ -1,5 +1,6 @@
 ! Sked common block
 ! Completely rearranged in more logical order.
+! 2021-02-12 JMG Removed kbonn_corr which is no longer used
 ! 2007Oct2  John Gipson.
 ! 2010.01.25 JMG.  Changed index order of azimu, eleva from (max_stn,max_obs) to (max_obs,max_stn)
 ! 2010Mar26 JMG. Changed stutcm ->utstcm, enutcm->utencm for consistency with jdstcm and jdencm
@@ -109,8 +110,7 @@
 ! Logical stuff
       logical kvexin            !input file was vex
       logical kvlba_corr        !correlating at VLBA  Same as CCORNAME='VLBA' but this common block is more widely used. 
-      logical kbonn_corr        !Bonn. Put in because DIFX does not like some stuff
-      common  /skcom_log/kvexin,kvlba_corr,kbonn_corr 
+      common  /skcom_log/kvexin,kvlba_corr 
 ! Extended listing stuff.
       logical kxlist            !Extended listing on
       logical KxAZEL            ! AZ el

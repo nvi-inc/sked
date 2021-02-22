@@ -100,6 +100,7 @@ OBJ_FOR=   \
     frsel.o \
     frx.o \
     frec.o \
+    ggao_slew.o \
     getist.o  \
     get_cat_version.o \
     get_new_fluxes.o \
@@ -224,7 +225,7 @@ OBJ_FOR=   \
     sky_cov.o \
     sky_cov_pix.o \
     slewt.o \
-    slewt2.o \
+    slew_time.o \
     snrac.o \
     snrcm.o \
     snrds.o \

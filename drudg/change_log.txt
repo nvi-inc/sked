@@ -1,4 +1,7 @@
 This file contains a summary of changes made and why.
+2021-02-07 lstsum.f: Changed calculation of total Gbytes 1024-->1000. lstsum.f lstsumo.f Remove num_tapes/ntapes argument. 
+2021-02-04 drprrd.f: Space to $PARAM section. Previously assumed was second line of sked file. 
+2021-02-02 drprrd.f: Stop reading when we gertr to end of $PARAM
 2021-01-19 snap.f: Use SETUPBB if the rack is BB. Previoulsy recorder had to be MK6.
 2021-01-19 lstsumo.f: In calculating GB divide by 1000 not 1024 
 2021-01-15 snap.f: In calculating GB divide by 1000 not 1024

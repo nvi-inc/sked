@@ -86,8 +86,12 @@ C         footage count, direction, code, and pass.
       integer istat            !station index
       integer isource          !source index
       integer islew_info       !info about slew.
+      real az_now, az_new 
 C
 C History
+! 2021-02-19 JMG slewt now returns az_now,az_new
+! 2020-06-08 JMG. Reference to new broadband.ftni. Include bb_off(istn) in calculation of time
+
 C     820522  MAH  TAgalong added
 C     840816  MWH  Fixed incorrect conditional statement
 C     840928  MWH  Added cable wrap indicator on TAgalong
@@ -154,7 +158,7 @@ C 001011 nrv Check first source up or not.
 ! 2015Nov20 JMG. Simplified tag-along logic, particularly if tagging  along to a subnet. 
 ! 2016Jul14 JMG. TAGALONG: Modified so that takes into account time to write data if Mark6 station.
 ! 2016Aug16 JMG. Now correctly does wrap in tag-along mode.  
-! 2020Jun08 JMG. Reference to new broadband.ftni. Include bb_off(istn) in calculation of time
+
 
 C
 C    1. Parse command and parameters.
@@ -411,7 +415,7 @@ C         Calculate slewing just to get the cable wrap
             cwrap_cur(jt)=" "       
             CALL SLEWT(NSPRE(JT),MJDPRe(jt),UTpre(jt),NSORcur(J1),JT,
      >         cwrap_pre(JT),cwrap_cur(jt),tslew,lookah,trise,tsris,
-     >         st0cur,  frac,knov,islew_info)
+     >         st0cur,  frac,knov,islew_info,az_now,az_new) 
 !             write(*,*) "cwrap_new ", cwrap_cur(jt) 
 !             write(*,*) idurcur(jt), idlcur(jt) 
            
