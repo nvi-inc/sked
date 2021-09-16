@@ -28,6 +28,9 @@ C
       include '../skdrincl/constants.ftni'
 C
 C History:
+! 2021-04-02 JMG Renamed islcon-->slew_off, stnrat-->slew_rate. Made slew_off real. 
+! 2021-10-02 JMG Removed all references to S2. 
+
 C 960517 nrv New.
 C 960810 nrv Add tape motion to VUNPDAS call. Store LSTREC.
 C 960817 nrv Add tape speed and number of tapes to VUNPDAS.
@@ -39,7 +42,6 @@ C 010615 nrv Initialize lstrec2 to blanks.
 ! 2006Nov30 JMGipson. Modified to check recorder type.
 ! 2016Nov29 JMG. Rack changed to character*20 from character*8 
 ! 2019Sep03 JMG. Correct length for station name.  Added implicit none 
-! 2020Oct02  JMG. Removed all references to S2 
 C
 C INPUT:
       integer ivexnum ! vex file number 
@@ -144,10 +146,10 @@ C       2.1 Antenna information
         cSTCOD(I) = cID
         cPOCOD(I) = cid
         call axtyp(caxis,iaxis(i),1)
-        STNRAT(1,I) = SLRATE(1)
-        STNRAT(2,I) = SLRATE(2)
-        ISTCON(1,I) = ISLCON(1)
-        ISTCON(2,I) = ISLCON(2)
+        slew_rate(1,I) = SLRATE(1)
+        slew_rate(2,I) = SLRATE(2)
+        slew_off(1,I) = ISLCON(1)
+        slew_off(2,I) = ISLCON(2)
         STNLIM(1,1,I) = ANLIM1(1)
         STNLIM(2,1,I) = ANLIM1(2)
         STNLIM(1,2,I) = ANLIM2(1)

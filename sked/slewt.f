@@ -130,6 +130,7 @@ C
       tol_180 =2.d0*deg2rad     !2 degree.
       move_test=185.d0*deg2rad
       kdebug=.false.
+      tslew=0.d0    !initilize to no slew 
 
       CALL CVPOS(NSNOW,ISTN,MJD,UT,
      >  AZNOW,ELNOW,HANOW,DECNOW,X30NOW,Y30NOW,X85NOW,Y85NOW,KUP)
@@ -245,32 +246,32 @@ C                   Function to compute az move including cable wrap
       DELY85 = ABS(Y85NEW-Y85NOW)
 C
       IF (IAXIS(ISTN).EQ.1.OR.IAXIS(ISTN).EQ.5)
-     .  TSLEWC = AMAX1(ISTCON(1,ISTN)+DELHA/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELDC/STNRAT(2,ISTN))
+     .  TSLEWC = AMAX1(Slew_off(1,ISTN)+DELHA/Slew_rate(1,ISTN),
+     .  Slew_off(2,ISTN)+DELDC/Slew_rate(2,ISTN))
       IF (IAXIS(ISTN).EQ.2)
-     .  TSLEWC = AMAX1(ISTCON(1,ISTN)+DELX30/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELY30/STNRAT(2,ISTN))
+     .  TSLEWC = AMAX1(Slew_off(1,ISTN)+DELX30/Slew_rate(1,ISTN),
+     .  Slew_off(2,ISTN)+DELY30/Slew_rate(2,ISTN))
       IF (IAXIS(ISTN).EQ.3.or.IAXIS(ISTN).eq.6)
-     .  TSLEWC = AMAX1(ISTCON(1,ISTN)+DELAZ/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELEL/STNRAT(2,ISTN))
+     .  TSLEWC = AMAX1(Slew_off(1,ISTN)+DELAZ/Slew_rate(1,ISTN),
+     .  Slew_off(2,ISTN)+DELEL/Slew_rate(2,ISTN))
       IF (IAXIS(ISTN).EQ.7) then
-        elrate = stnrat(2,istn)
+        elrate = Slew_rate(2,istn)
 C       The Algonquin antenna is faster going down.
 C       if (elnew.lt.elnow) elrate=elrate*1.333
 C       First compute the az/el slewing rate
-        TSLEW1 = AMAX1(istcon(1,istn)+DELAZ/STNRAT(1,ISTN),
-     .                 istcon(1,istn)+DELEL/elrate)
+        TSLEW1 = AMAX1(Slew_off(1,istn)+DELAZ/Slew_rate(1,ISTN),
+     .                 Slew_off(1,istn)+DELEL/elrate)
 C       Compute the ha/dec slewing rate for the master equatorial
 C       NOTE: Rates are hard-coded here because they are not available
 C             in the normal antenna info.  Rates are 24 deg/min.
         rme = 24.d0*deg2rad/60.d0
-        TSLEW2 = AMAX1(istcon(1,istn)+DELHA/rme,
-     .                 istcon(1,istn)+DELDC/rme)
+        TSLEW2 = AMAX1(Slew_off(1,istn)+DELHA/rme,
+     .                 Slew_off(1,istn)+DELDC/rme)
         tslewc=amax1(tslew1,tslew2)
       endif
       IF (IAXIS(ISTN).EQ.4)
-     .  TSLEWc = AMAX1(ISTCON(1,ISTN)+DELX85/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELY85/STNRAT(2,ISTN))
+     .  TSLEWc = AMAX1(Slew_off(1,ISTN)+DELX85/Slew_rate(1,ISTN),
+     .  Slew_off(2,ISTN)+DELY85/Slew_rate(2,ISTN))
 C
       IF ((ABS(TSLEWC-TSLEWP).LT.10).OR.(NLOOPS.GE.5)) GOTO 110
       GOTO 100
@@ -280,8 +281,8 @@ C     We get here if the slew has converged OR we iterated 5 times.
         TSLEW = TSLEWC
 ! AEM20081128.  The followng lines set slew time to 0 for short slews.
 ! Led to erorrs
-!        RSTCON(1) = FLOAT(ISTCON(1,ISTN))
-!        RSTCON(2) = FLOAT(ISTCON(2,ISTN))
+!        RSTCON(1) = FLOAT(Slew_off(1,ISTN))
+!        RSTCON(2) = FLOAT(Slew_off(2,ISTN))
 !        IF(TSLEW.LE.(AMAX1(RSTCON(1),RSTCON(2))+5.))  TSLEW=0.0
         cwrap_new = cwrap2
 C       Final slewing time is the larger of 
@@ -298,10 +299,10 @@ C       calculated using az,el at UT+trise).
       if(cstnna(istn) .eq. "GGAO12M") then
          az1=az1*rad2deg
          az2=az2*rad2deg
-         az_rate=stnrat(1,istn)*rad2deg
-         el_rate=stnrat(2,istn)*rad2deg
-         az_off=istcon(1,istn)
-         el_off=istcon(2,istn)
+         az_rate=Slew_rate(1,istn)*rad2deg
+         el_rate=Slew_rate(2,istn)*rad2deg
+         az_off=Slew_off(1,istn)
+         el_off=Slew_off(2,istn)
          el1=elnow*rad2deg
          el2=elnew*rad2deg
 

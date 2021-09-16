@@ -32,6 +32,8 @@ C
       include '../skdrincl/skparm.ftni'
 C
 C  History:
+! 2021-05-17 JMG If no track format trudge on and track frame format as "N/A"
+! 2019-09-03 JMG. 1) Added implicit none.  Truncate track-frame format to 8 characters
 C 960520 nrv New.
 C 961122 nrv Change fget_mode_lowl to fget_all_lowl
 C 970124 nrv Move initialization to start.
@@ -40,7 +42,7 @@ C 020327 nrv Get data_modulation.
 C 021111 jfq Don't allow track 0 or headstack 0
 ! 2004Dec8. Changed lm from holerrith to ASCII
 ! 2016Jan19 JMG.  Doubled dimension of several variables that had max_track to 2*max_track becuase now sign& magnitude can be on same track 
-! 2019Sep03 JMG. 1) Added implicit none.  Truncate track-frame format to 8 characters
+
 !
 C
 C  INPUT:
@@ -86,26 +88,31 @@ C
 
 C  1. The recording format
 C
-      
+
       ierr = 1
+ 
+      is=fvex_len(stdef)
       iret = fget_all_lowl(ptr_ch(stdef),ptr_ch(modef),
      .ptr_ch('track_frame_format'//char(0)),
      .ptr_ch('TRACKS'//char(0)),ivexnum)
       if (iret.ne.0) then
-        write(*,*)"VUNPTRK00 did not find track_frame_format ", iret 
-        return
-      endif
-      iret = fvex_field(1,ptr_ch(cout),len(cout))
-      NCH = fvex_len(cout)
-      IF  (NCH.GT.16) THEN  !
-        is=fvex_len(stdef)
-        write(lu,'("VUNPTRK01 -  for station ", a,
-     >   " track format name too long: ",a, " Using first 16 chars")') 
-     >    stdef(1:is), cout(1:nch)
-        cm=cout(1:8)       
+        write(lu,'(a)') 
+     > "VUNPTRK00: Warning no track_frame_format for station "//
+     > stdef(1:is)//" setting to N/A" 
+        cm="N/A" 
       else
-         cm=cout(1:nch)
-      END IF  !
+        iret = fvex_field(1,ptr_ch(cout),len(cout))
+        NCH = fvex_len(cout)
+        IF  (NCH.GT.16) THEN  !
+          is=fvex_len(stdef)
+          write(lu,'("VUNPTRK01 -  for station ", a,
+     >     " track format name too long: ",a, " Using first 16 chars")') 
+     >      stdef(1:is), cout(1:nch)
+          cm=cout(1:nch)       
+        else
+          cm=cout(1:nch)
+        END IF  !
+      endif 
 
 C  1.5 Data modulation
 C
@@ -220,6 +227,7 @@ C  2.5 Track list
 C       Check for consistent fanout
         nn=0
         do j=1,4
+!          write(*,*) "j", j, it(j) 
           if (it(j).ne.-99) nn=nn+1 ! count the fanned tracks
         enddo
         if (in.eq.1) then 
@@ -228,6 +236,7 @@ C       Check for consistent fanout
           if (nn.ne.ifanfac) then
             ierr = -7
             write(lu,'("VUNPTRK07 - Inconsistent fanout defs.")')
+            write(lu,*) " nn = ", nn, " ifanfac = ", ifanfac 
           endif
         endif ! save first/check subsequent defs
         

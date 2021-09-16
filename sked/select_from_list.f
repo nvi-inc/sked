@@ -5,14 +5,20 @@ C     SEST lets the user interactively select from the list
 C     of catalog stations for scheduling.
 C
 C  COMMON BLOCKS USED
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
+
+! History
+!   2021-05-07 JMG Added implicit none. initialize ikey
+!   XXX     
+
 C
 C  CALLed by: STCAT
 C  CALLED SUBROUTINES: DSPST,SENCR,SETCR
 C
 !  Input
-      External cname 			!External function that returns name.
+      External cname                        !external function that returns name.
       integer icol_wid
       integer num_in_list                   !Number of entries.
       logical kselect(num_in_list)          !true, then selected.
@@ -40,12 +46,11 @@ C     knaeq - logical routine for comparison
       integer ix,iy,izero,itype
       logical krefresh             !refresh screen
 
-
+      ikey=0 
       ix=0
       iy=0
       izero=0
 
-! Completely rewritten by JMGipson
 
 C  1. Display the page.
  

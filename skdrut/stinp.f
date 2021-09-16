@@ -148,6 +148,9 @@ C            (e.g. 7560) using speed.
 C
 C     1. Find out what type of entry this is.  Decode as appropriate.
 C
+! 2021-04-02 JMG Renamed islcon-->slew_off, stnrat-->slew_rate. Made slew_off real. 
+! 2020-11-11 JMG. Catch bug if Station ID has wrong format in horizon mask. 
+! 2020-10-02  JMG. Removed all references to S2
 ! 2007Mar30  JMG. Checked to make sure didn't duplicate codes.
 ! 2007Apr05  JMG. But OK to have duplicate " " for horizon mask.
 ! 2009Mar03  JMG. Fixed bug in OR statement with K5.
@@ -157,8 +160,7 @@ C
 ! 2016Jul28  JMG. Changed rack length to 20 chars.
 !                 Initialize cfirtrec(i)="1" even if have problems reading "T " line.
 ! 2017Mar13  JMG. If rack or recorder are not recongnized, set them to 'unknown' and continue.
-! 2020Oct02  JMG. Removed all references to S2
-! 2020Nov11  JMG. Catch bug if Station ID has wrong format in horizon mask. 
+
 
       cbufin=" "
 ! AEM 20050314 init vars
@@ -269,10 +271,10 @@ C     Put the position ID into a permanent place in LPOCOD
 C
         cSTCOD(I) = c1
         call axtyp(laxis,iaxis(i),1)
-        STNRAT(1,I) = SLRATE(1)*deg2rad/60.0d0
-        STNRAT(2,I) = SLRATE(2)*deg2rad/60.0d0
-        ISTCON(1,I) = SLCON(1)
-        ISTCON(2,I) = SLCON(2)
+        slew_rate(1,I) = SLRATE(1)*deg2rad/60.0d0
+        slew_rate(2,I) = SLRATE(2)*deg2rad/60.0d0
+        slew_off(1,I) = SLCON(1)
+        slew_off(2,I) = SLCON(2)
         STNLIM(1,1,I) = ANLIM1(1)*deg2rad
         STNLIM(2,1,I) = ANLIM1(2)*deg2rad
         STNLIM(1,2,I) = ANLIM2(1)*deg2rad

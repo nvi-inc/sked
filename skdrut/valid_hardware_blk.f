@@ -50,8 +50,9 @@
       crack_type(23)=    'RDBE'
       crack_type(24)=    'VLBAC'
       crack_type(25)=    'CDAS'
-      crack_type(26)=    'BB'
-      crack_type(27)=    'unknown'
+      crack_type(26)=    'DVP'
+      crack_type(27)=    'BB'
+      crack_type(28)=    'unknown'
 
 ! Valid recorder types
       crec_type(1)=     'none'

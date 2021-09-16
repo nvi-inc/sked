@@ -234,8 +234,8 @@ C
 C     LAX1 = LAXIS(1,IAXIS(ISTN))
 C     LAX2 = LAXIS(2,IAXIS(ISTN))
       call axtyp(laxis,iaxis(istn),2) ! convert code to name
-      Rt1 = STNRAT(1,ISTN)*60.0*rad2deg
-      Rt2 = STNRAT(2,ISTN)*60.0*rad2deg
+      Rt1 = slew_rate(1,ISTN)*60.0*rad2deg
+      Rt2 = slew_rate(2,ISTN)*60.0*rad2deg
       AL11 = STNLIM(1,1,ISTN)*rad2deg
       AL21 = STNLIM(2,1,ISTN)*rad2deg
       AL12 = STNLIM(1,2,ISTN)*rad2deg

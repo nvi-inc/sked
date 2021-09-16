@@ -84,8 +84,8 @@ C     write antenna line
      > cstcod(istn),cstnna(istn),laxistype(iaxis(istn))
       write(lu_outfile,"(f7.4,1x,$)") axisof(istn)
       do i=1,2
-        write(lu_outfile,"(1x,f5.1,1x,i4,2(1x,f6.1),$)")
-     >    STNRAT(i,ISTN)*60.d0*rad2deg,istcon(1,istn),
+        write(lu_outfile,"(1x,f5.1,1x,f5.1,2(1x,f6.1),$)")
+     >    slew_rate(i,ISTN)*60.d0*rad2deg,slew_off(1,istn),
      >    STNLIM(1,i,ISTN)*rad2deg,STNLIM(2,i,ISTN)*rad2deg
       end do
       write(lu_outfile,"(F5.1,2(1x,a))")

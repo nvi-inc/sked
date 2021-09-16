@@ -33,6 +33,7 @@ C   COMMON BLOCKS USED
       include '../skdrincl/statn.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/freqs.ftni'
+      include '../skdrincl/broadband.ftni'
       include 'minor.ftni'
       include 'major.ftni'
 
@@ -66,12 +67,12 @@ C  LOCAL VARIABLES
       integer ical,lfrq,isc,mjd,imon,iday,idurx,nst
       character*2 cfrq
       equivalence (lfrq,cfrq)
-      integer ix,icod,iband,isor,ierr,isband
+      integer ix,icod,ix_band,isor,ierr,is_band
       integer iptr
       double precision dtemp
-      double precision ST0,GST,UT,wt,sigma,asnr,ssigma,sasnr
+      double precision ST0,GST,UT,wt,sigma,x_snr,ssigma,s_snr
  
-      double precision sigmasnr,sigmaion,sigmaphase
+      double precision sigma_snr,sigmaion,sigmaphase
       double precision HA(MAX_STN)
       double precision sin_el(MAX_STN),  cos_el(MAX_STN)   
       double precision H,RAAP,DEAP,SHS,CHS,SD,CD,SE,atm_part
@@ -144,8 +145,7 @@ C 020904 nrv Only first 8 characters of source name were being unpacked.
 ! 2016Oct31 LeBail.    Removed multiplication by sin(eps) on nutation partial to make consistent with calc. 
 ! 2020Apr15 JMGipson.  Fixed error in SIGN of atmsophere rate partial
 ! 2021-01-20 JMGipson. Don' try to invert normal equations if num_est=0
-
-
+! 2021-05-29 JMGipson. Renamed some variables. Add in calculation for group delay uncertainty for VGOS. Hardware frequency sequence.
 
 
 C     1. For our first trick, we decode all of the entries in  the buffer.
@@ -260,9 +260,9 @@ C
       end do
 
       icod=igtfr(lfrq,ix)
-C     iband is the band index for X-band
-      iband=1
-      if(cband(2) .eq. "X ") iband=2
+C     ix_band is the band index for X-band
+      ix_band=1
+      if(cband(2) .eq. "X ") ix_band=2
       isor=igetsrcnum(csrcnam)
       if(isor.le.0) then
         write(ludsp,9200) csrcnam
@@ -331,25 +331,37 @@ C     iband is the band index for X-band
 ! CHS kwsnr   weights by SNR
 ! CHS kwbas   weights by baseline
         if(kSnrWts) then
-          asnr=iactbl(iband,ib)
-          if (nband.eq.2) then ! X/S calculations
-            isband=2
-            if (iband.eq.2) isband=1
-            sasnr=iactbl(isband,ib)
-            if (asnr.gt.0.0.and.sasnr.gt.0.0) then            !valid X/S SNR
-              sigmaphase=1.d6/(pi*freqrf(iband,1,icod)*asnr)  !ps
-              sigma=1.d6/(twopi*bwrms(iband,1,icod)*asnr)     !ps
-C************ Compute S-band sigma and ionosphere correction.
-              ssigma=1.d6/(twopi*bwrms(isband,1,icod)*sasnr)  !ps
-              sigmaion = ffact(1,icod)*dsqrt(sigma**2 + ssigma**2)
-              sigmasnr = dsqrt(sigmaion**2 + sigma**2)       !NOT noise weighted for solve
-C************ s-band sigma and iono
-              sigma=dsqrt( sigmasnr**2+radd_noise**2+
+          x_snr=iactbl(ix_band,ib)          
+          if(bb_bw(i) .eq. 512.0 .and. bb_bw(j) .eq. 512.0) then    
+! Special kludge for broadband schedules.
+!            x_snr_per_channel=x_snr/4.    !Each 512 has 16 32MHz channels. Get the SNR per channel.
+! See memo by Roger Capalo Covariance Analysis ... 2015 August 14.            
+!           sigma_snr=2.65*1.e6/(twopi*2612.d0*x_snr_per_channel)   !2612 = bwrms for current (~2021) VGOS setup over 4 bands in MHz.
+                                                                    !2.65 is increase in Sigma because the correlator estimates dtec.
+            x_snr=2*iactbl(ix_band,ib)                              !Factor of 2  comes from 4bands.                                                                  
+            sigma_snr=2.65*1e6/(twopi*2612.d0*x_snr)                !See equation for X-band sigma. 
+            sigma=dsqrt( sigma_snr**2+radd_noise**2+
      >                    (rel_noise/sin_el(i))**2  +
-     >                    (rel_noise/sin_el(j))**2  ) !now rss with noise
+     >                    (rel_noise/sin_el(j))**2  ) !now rss with noise     
+            wt=1./sigma                                                                             
+          else if (nband.eq.2) then ! X/S calculations           
+            is_band=2
+            if (ix_band.eq.2) is_band=1
+            s_snr=iactbl(is_band,ib)
+            if (x_snr.gt.0.0.and.s_snr.gt.0.0) then            !valid X/S SNR
+              sigmaphase=1.d6/(pi*freqrf(ix_band,1,icod)*x_snr)  !ps
+              sigma=1.d6/(twopi*bwrms(ix_band,1,icod)*x_snr)     !ps
+C************ Compute S-band sigma and ionosphere correction.
+              ssigma=1.d6/(twopi*bwrms(is_band,1,icod)*s_snr)  !ps
+              sigmaion = ffact(1,icod)*dsqrt(sigma**2 + ssigma**2)
+              sigma_snr = dsqrt(sigmaion**2 + sigma**2)       !NOT noise weighted for solve
+C************ s-band sigma and iono  
+              sigma=dsqrt( sigma_snr**2+radd_noise**2+
+     >                    (rel_noise/sin_el(i))**2  +
+     >                    (rel_noise/sin_el(j))**2  ) !now rss with noise     
               wt=1./sigma
             else
-              write(ludsp,9901) asnr,sasnr,csorna(isor),
+              write(ludsp,9901) x_snr,s_snr,csorna(isor),
      .           ida,ihr,imin,cstcod(i),cstcod(j)
 9901          format('SIMUL06: Computed X-band snr = ',f5.1,
      .          ' S-band snr = ',f5.1,' for ',a8,
@@ -358,14 +370,14 @@ C************ s-band sigma and iono
                 wt=1.d-5
             endif ! valid/not X/S SNR
           else ! single-band calculations
-            if (asnr.gt.0.0) then !valid SNR
-              sigmaphase=1.d6/(pi*freqrf(iband,1,icod)*asnr) !ps
-              sigma=1.d6/(twopi*bwrms(iband,1,icod)*asnr)    !ps
-              sigmasnr=sigma*1.1                             !can't compute iono with 1 baseline,  but put in kludge so you can do something!
-              sigma=dsqrt(sigmasnr**2+radd_noise**2)         !now rss with noise
+            if (x_snr.gt.0.0) then !valid SNR
+              sigmaphase=1.d6/(pi*freqrf(ix_band,1,icod)*x_snr) !ps
+              sigma=1.d6/(twopi*bwrms(ix_band,1,icod)*x_snr)    !ps
+              sigma_snr=sigma*1.1                             !can't compute iono with 1 baseline,  but put in kludge so you can do something!
+              sigma=dsqrt(sigma_snr**2+radd_noise**2)         !now rss with noise
               wt=1./sigma
             else
-              write(ludsp,9902) asnr,csorna(isor),
+              write(ludsp,9902) x_snr,csorna(isor),
      .        ida,ihr,imin,cstcod(i),cstcod(j)
 9902          format('SIMUL06: Computed snr = ',f5.1,
      .          ' for ',a, ' at ',i3,'d',i2.2,'h',i2.2,'m',
@@ -474,7 +486,7 @@ C   Write out the observation record for the SOLVE output file.
 
           write(lutmp,9191) 
      >      csorna(isor)(1:8),iyr,imon,iday,ihr,Imin,isc,
-     >      cstnna(i),cstnna(j),sigmasnr,
+     >      cstnna(i),cstnna(j),sigma_snr,
      >      azim(i)*rad2deg,elev(i)*rad2deg,
      >      azim(j)*rad2deg,elev(j)*rad2deg,
      >      (partial(i1)/c,i1=1,5),                                    !EOP partials 

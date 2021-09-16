@@ -42,6 +42,7 @@ C
 ! 2007Nov02 JMG. Added skycoverage
 ! 2010Jan05 JMG. Formatting changes to get lines to line up.
 ! 2017Feb14 JMG. For combatibility with gfortran, got rid of some tabs. 
+! 2021Jul09 JMG. when writing out "Observation listing..." added Trim to keep line short
 
 
 
@@ -68,7 +69,7 @@ C
       clen=trimlen(cskfil)
       IF  (LU.NE.LUSCN) THEN  !print header
         write(LU,'("Observation listing from file ",a,
-     >  "  for experiment ",a)') CSKFIL(1:CLEN),cEXPER
+     >  "  for experiment ",a)') CSKFIL(1:CLEN),trim(cEXPER) 
       END IF  !print header
 
       if (kxmaxl) then !full information

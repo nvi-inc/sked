@@ -33,10 +33,10 @@ C  STNLIM - limit stops: (1,1) lower limit, axis 1
 C           (degrees)    (2,1) upper limit, axis 1
 C                        (1,2) lower limit, axis 2
 C                        (2,2) upper limit, axis 2
-C  STNRAT - slew rates: (1) axis 1, (2) axis 2 (degrees per minute)
+C  slew_rate - slew rates: (1) axis 1, (2) axis 2 (degrees per minute)
+!  slew_off - slew constant in seconds 
 C  IAXIS  - axis type: 1=hadec, 2=xy, 3=azel
 C  STNELV - station elevation limit, assigned in SKED
-C  ISTCON - slew overhead time, seconds
 C  NHORZ - number of az, el pairs in horizon mask
 C  AZHORZ, ELHORZ - as, el of horizon mask
 C  NCORD - number of pairs in coordinate mask
@@ -63,7 +63,8 @@ C             false if it's step functions
 ! real
       real diaman(max_stn)                      !Diameter.
       real stnlim(2,2,max_stn)                  !Antenna limits (min,max)
-      real stnrat(2,max_stn)                    !Slew rates
+      real slew_rate(2,max_stn)                    !Slew rates
+      real slew_off(2,max_stn)                    !slew constant 
       real AZHORZ(MAX_HOR,MAX_STN)              !AZ mask
       real ELHORZ(MAX_HOR,MAX_STN)              !El Mask
       real CO1MASK(MAX_COR,MAX_STN)             !co-ordinate mask1
@@ -76,7 +77,7 @@ C             false if it's step functions
 
 
 ! Integer/logical
-      integer nstatn,iaxis,maxpas,istcon,nhorz,ncord,maxtap,nsefdpar
+      integer nstatn,iaxis,maxpas,nhorz,ncord,maxtap,nsefdpar
       integer nrecst,nheadstack,ibitden_save
       integer itearl,itlate,itgap,tape_length
       logical klineseg
@@ -88,7 +89,7 @@ C             false if it's step functions
 
       common/statn_real/
      >       diaman,
-     >       STNLIM,STNRAT,
+     >       STNLIM,slew_rate,slew_off,
      >       AZHORZ,ELHORZ, CO1MASK,CO2MASK,STNELV,
      >       SEFDST,    sefdpar,     sefdstel
 
@@ -96,7 +97,6 @@ C             false if it's step functions
      .       NSTATN,
      .       IAXIS(MAX_STN),
      .       MAXPAS(MAX_STN),
-     .       ISTCON(2,MAX_STN),
      .       NHORZ(MAX_STN),
      .       NCORD(MAX_STN),maxtap(max_stn),
      .       tape_length(max_stn),

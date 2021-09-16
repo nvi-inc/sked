@@ -1,8 +1,10 @@
       subroutine opcmd(linstr)
+      implicit none
 C
 C  PARAM is the top level routine for parameter setting
 C
 C   History
+!   2021-05-07 JMG. Implicit none 
 C   NRV 910910 Created
 C   NRV 910912 Add "GO" option for non-interactive use.
 C   nrv 930602 Add "LI" option for documenting.
@@ -35,7 +37,10 @@ C
       character*6 list(ilist_len),listshort(ilist_len)
       data list/ "GO","LIST","SET"/
       data listshort/"GO","LI","SE"/
-
+      
+! initialize
+      ikey=0 
+  
 C  0. check for enough info first
 
       if (nstatn.le.0) then

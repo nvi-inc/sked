@@ -23,6 +23,8 @@ C               WRLLINES     write "L" lines in $CODES
 C               FHDPOS       read hdpos.cat, write $HEAD section
 
 C  History
+! 2020-06-02 JMG Don't write out head position. 
+!
 C 951127 nrv New version. Calls one routine for each catalog file
 C            that is opened and read. 
 C 960207 nrv Add reading/writing head positions.
@@ -41,7 +43,8 @@ C 970408 nrv Add lrecfmtname to frec call, add to WRFCLINES call
 ! 2005Nov28 JMG. All the routines now use ascii. Get rid of hollerith
 ! 2009Apr02 JMGipson. Changed name: icat_mode_freq-->icat_mode_freq_ptr
 !                                   icat_mode_rec -->icat_mode_rec_ptr 
-! 2020Jun02 JMG.  Don't write out head position
+
+
       integer renam ! function
 C  LOCAL:
       integer ierr,ic

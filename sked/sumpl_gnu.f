@@ -279,6 +279,7 @@ C6 close the files, call GNUPLOT to draw the plots
           write(*,*) ctmpcommand
         endif
 
+        if(.false.) then
         do i=ibeg,iend
           j=ist(i)
           nch=trimlen(ctmfil)
@@ -286,8 +287,10 @@ C6 close the files, call GNUPLOT to draw the plots
           open(luplt(j),file=cplnam,status='unknown')
           close(luplt(j),status='delete')
         enddo
-        open(lutm2,file=ctmfi2,status='unknown')
-        close(lutm2,status='delete')
+        endif
+        write(*,*) "File is "//trim(ctmfi2)
+!        open(lutm2,file=ctmfi2,status='unknown')
+!        close(lutm2,status='delete')
 
       enddo
 

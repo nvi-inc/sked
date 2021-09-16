@@ -5,6 +5,7 @@
 !  2005Jun13 JMGipson.  When computing time difference, include duration of scans and slew time.
 !  2007Sep24 JMGipson.  Added MJDFree to above call. Made change MJDCur-->MJDFree in code as appropriate.
 !  2018Jan02 JMGipson.  Put in twin mod stuff. 
+!  2021-04-02 JMG   Fixed IEEE denormal issue caused by checking elevation for  source that had not risen yet. (So no elevationd defined.)
       use twin_mod 
       implicit none 
 
@@ -228,9 +229,9 @@ C
 C   Compute SNR and duration for stations and baselines
           if (kvscan)   CALL SNROK(istnvec,NumStn,is,icod,-1,iokst,
      >                              mjdcur(j),utcur(j))
-          DO  J=IFST,ILST ! one station entry
-                   
+          DO  J=IFST,ILST ! one station entry                   
             istn = istnvec(J)
+            el=-1                       !Set source elevation to negative. Default not up
             if (.not.kasnr.or.(kasnr.and.iokst(j).ge.0)
      >      .or..not.kvscan.or.kOptBySky.or.(num_est.ne.0)) then
 C                            Include station if manual SNR or auto and OK
@@ -247,9 +248,9 @@ C                            Include station if manual SNR or auto and OK
                 ITR(IS,istn)=-1   !indicate we've already written it
               ELSE !calculate position
                 IF (TSLEW(is,istn).LT.0.0) THEN ! not up
-                  if (kdiswh) write(ludsp,cblnk)
+                  if (kdiswh) write(ludsp,cblnk)   
                   IF (ITS(IS,istn).GT.0) ITS(IS,istn)=-1 !it's already set
-                ELSE ! this one up
+                ELSE ! this one up  
 ! Compute the elevation here so that we can use it later.
                   CALL CVPOS(IS,istn,MJDFree(istn),
      >                   UtFree(istn)+tslew(is,istn),
@@ -272,9 +273,9 @@ C                            Include station if manual SNR or auto and OK
                         ENDIF
                       ENDIF !HA
                       IF (.NOT.KMIN.OR.(KMIN.AND.IAXIS(istn).NE.1)) THEN !AZ
-                        WRITE(LUDSP,'(1X,I3,$)') int(AZ*rad2deg+.5)
+                        WRITE(LUDSP,'(1X,I3,$)') nint(AZ*rad2deg)
                       ENDIF !AZ
-                      WRITE(LUDSP,'(I3,$)') int(EL*rad2deg+.5)
+                      WRITE(LUDSP,'(I3,$)') nint(EL*rad2deg)
                     endif
                     IF (IS.EQ.NSORcur(istn)) THEN !slew time
                       kvs(is,istn)=.false. !don't observe same source twice in a row
@@ -301,11 +302,8 @@ C                            Include station if manual SNR or auto and OK
             if (kdiswh) WRITE(LUDSP,'("|",$)')
 C    At this point determine the rise/set flags and whether to re-set
 C    the visibility flag to false.
-C           If source was recently observed, don't pick it again so soon.
-C****       NOTE: This may want to be changed so that several observations
-C****       can be made when the source is rising or setting.
-            IEL=EL*rad2deg+.5
-            if (tdiff(is).lt.float(iminbetween).and.iel.gt.rloel) then
+
+            if (tdiff(is).lt.float(iminbetween)) then
                kvs(is,istn)=.false.
             endif
 

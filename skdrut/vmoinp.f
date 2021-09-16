@@ -25,6 +25,11 @@ C     Call once to get all values in freqs.ftni filled in, then call
 C     SETBA to figure out which frequency bands are there.
 C
 C History
+! 2021-05-17  Removed residual error message about HEADSTACK PASSES
+! 2020-10-03  Removed references to headstacks, passes, tapes
+! 2019-09-03  Implicit none
+
+
 C 960518 nrv New.
 C 960522 nrv Revised.
 C 960610 nrv Move initialization of freqs.ftni arrays here
@@ -69,8 +74,7 @@ C 021111 jfq Extend S2 mode to support LBA rack
 ! 2018Oct09  Preserve mode and band if VEX created from sked previously.  Previously was setting to numerical value, first mode=
 !            Also keep better track of number of  freq-channels. If everything except for side-band is the same, assume same fre
 !            which means use same BBC.
-! 2019Sep03  Implicit none
-! 2020Oct03  Removed references to headstacks, passes, tapes
+
 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/freqs.ftni'
@@ -322,16 +326,7 @@ C         Get $TRACKS statements (i.e. fanout).
 C         Get $HEAD_POS and $PASS_ORDER statements.
 ! Now set to default since no disk recording...
           nhdpos=1
-
-          if (ierr.ne.0) then
-            write(lu,'("VMOINP07 - Error getting $HEAD_POS and",
-     .        "$PASS_ORDER information for mode",a, " station ",a,
-     .         /, " iret=",i5," ierr=",i5)')
-     .      modedefnames(icode)(1:il),stndefnames(istn)(1:im),iret,ierr
-            call errormsg(iret,ierr,'HEAD_POS',lu)
-            ierr1=5
-          endif
-
+   
 C         Get $ROLL statements.
           call vunproll(modedefnames(icode),stndefnames(istn),ivexnum,
      .      iret,ierr,lu,croll,irtrk,iinc,ireinit,nrdefs,nrsteps)

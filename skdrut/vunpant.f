@@ -18,7 +18,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
       SUBROUTINE vunpant(stdef,ivexnum,iret,ierr,lu,
-     > cNAANT,cAXIS,AXISOF,SLRATE,ANLIM1,ANLIM2,DIAMAN,ISLCON)
+     > cNAANT,cAXIS,AXISOF,SLRATE,ANLIM1,ANLIM2,DIAMAN,SLCON)
       implicit none  !2020Jun15 JMGipson automatically inserted.
 C
 C     VUNPANT gets the antenna information for station
@@ -33,6 +33,7 @@ C
       include '../skdrincl/constants.ftni'
 C
 C  History:
+! 2021-04-02 Changed slew constant from integer to real
 C 960516 nrv New.
 C 970116 nrv Change "ant_motion" to "antenna_motion" for Vex 1.5
 C 970123 nrv Move initialization to front.
@@ -60,7 +61,7 @@ C                    statement to which the VEX error refers,
 C                    <0 indicates invalid value for a field
       character*8 cNAANT   ! name of the antenna
       character*4 cAXIS    ! axis type
-      integer islcon(2)    ! slewing constant
+      integer slcon(2)    ! slewing constant   (seconds)
       double precision AXISOF ! axis offset, meters
       real SLRATE(2),ANLIM1(2),ANLIM2(2),diaman
 C            - antenna slew rates for axis 1 and 2, degrees/minute
@@ -87,8 +88,8 @@ C  Initialize at start in case we have to leave early.
       axisof = 0.d0
       slrate(1)=0.0
       slrate(2)=0.0
-      islcon(1)=0
-      islcon(2)=0
+      slcon(1)=0
+      slcon(2)=0
       anlim1(1)=+999.9*deg2rad
       anlim1(2)=-999.9*deg2rad
       anlim2(1)=+999.9*deg2rad
@@ -225,7 +226,7 @@ C       if (caxis(1:3) .eq. cax) i1=2
           write(lu,
      >     '("VUNPANT06 - Invalid first axis constant ", i2)') i
         else
-          ISLCON(i1) = R
+          SLCON(i1) = R
         endif
       enddo ! two slewing rates
 

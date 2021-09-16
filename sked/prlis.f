@@ -3,6 +3,7 @@ C
 C PRLIS lists the values of the parameters used as defaults in
 C              the scheduling program.
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
 ! functions
@@ -28,6 +29,7 @@ C COMMON BLOCKS USED
 ! 2015Mar17 JMG. Added Mark6_off
 ! 2016Dec08 KOL. Added Fill_off
 ! 2017Oct06 KLB. Add kconf_equip
+! 2021-05-04 JMG got rid of 'modular' (unitilaized variable) and added implicit none 
 ! 
 C
 C CALLING SUBROUTINES: PRCMD (the command decoder for parameter
@@ -204,9 +206,7 @@ C
      > '(" Maxscan     ",i4,"sec (max scan length)  ")') maxscn
        write(ludsp,
      > '(" Modscan     ",i4,"sec (mod scan time)    ",$)') modscn
-       write(ludsp,
-     > '(" Modular     ",i6,"sec (mod start time)    ")') modular
-
+ 
        write(ludsp,
      > '(" Calibration ",I3,"sec (time before obs)   ",$)') icalde
 

@@ -58,6 +58,8 @@
       logical kdone_bbc(max_bbc)  !flag indicating that we have this BBC     
       logical kfirst
       integer nlast  
+      
+      rfvc_max=0.d0            !initialize
             
       kwrite_return = .true.   
 !If true, then need to write a <CR> before outputting error or warning info.     
@@ -110,6 +112,8 @@ C             For 8-BBC stations use the loop index number to get 1-7
               call proc_dbbc_bbc(icode,ic,ib,ichan) 
             endif 
 
+!            writE(*,*) rfvc_max, ib 
+!            write(*,*) fvc
             if(rfvc_max .lt. fvc(ib)) then
              cbuf2=cbuf         !this makes a copy of this which we will output later. 
              rfvc_max=fvc(ib)

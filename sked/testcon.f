@@ -50,6 +50,7 @@ C LOCAL:
 
       integer*2 job                !det or inverse?
       double precision rcond
+      double precision delta_t
     
       NumTrial=NumTrial+1
    
@@ -76,13 +77,14 @@ C LOCAL:
 ! if sky coverage option is turned on, exit now.
       covar_score=0.d0
       if(kOptBySky .or. nobs .eq. 0) goto 100 
+!     write(*,*) uttst(1), utcur(1),idurtst(1)  
+!      delta_t = uttst(1)-utcur(1)+idurst(1)    !Not quite correct
             
 ! Optimizing by covariance.
 ! Compute contribution of this subnet to normal equations.
       dnorm_tmp(1:num_tri_est)=dnorm_tri(1:num_tri_est,iSubNet)  !normal equations so far
       job=11                                                     !compute inverse
-!      write(*,*) dnorm_inv(1:2)," | ", dnorm_tmp(1:2) 
-
+!     write(*,*) dnorm_inv(1:2)," | ", dnorm_tmp(1:2) 
       call invert_and_con_tri(dnorm_tmp,rcond,num_est,job)
     
       
@@ -92,18 +94,21 @@ C LOCAL:
       do iopt=1,num_opt
         iptr=indx4(ixref_opt2est(iopt),ixref_opt2est(iopt))     
 ! Find the change of the diagonal elements that are optimized..
-        diag_change=(dnorm_inv(iptr)-dnorm_tmp(iptr))/dnorm_inv(iptr)
+!        diag_change=(dnorm_inv(iptr)-dnorm_tmp(iptr))/dnorm_inv(iptr)
+         diag_change = 1.-sqrt(dnorm_tmp(iptr)/dnorm_inv(iptr))
 !        write(*,*) ">>>>>>>>>",NumTrial, iopt, diag_change 
-!        write(*,*) "----", sqrt(dnorm_inv(iptr)), sqrt(dnorm_tmp(iptr))
+!        write(ludsp,"('---- ',a,' ',2f8.4)") csorna(nsortst(1)),
+!     >        sqrt(dnorm_inv(iptr))-sqrt(dnorm_tmp(iptr)),
+!     >        diag_change*1e3
         covar_score=covar_score+diag_change
       enddo ! i=1,npara
-
+ 
 100   continue 
       call store(NumTrial,sky_score,covar_score,iSubNet)
 ! Debugging.
-!      if(.true.) then 
+!     if(.true.) then 
       if(kdissub) then
-           write(*,'(i4,2(f9.4,1x)," | ", a)')
+           write(ludsp,'(i4,2(f9.4,1x)," | ", a)')
      >       NumTrial,sky_score,covar_score,  ctrial_scan(1)(1:80)
       endif
 

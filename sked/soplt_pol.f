@@ -160,12 +160,15 @@ C   3.  Call plot routine
 C
       xdisp = 1
       if (ludsp.eq.lufil) xdisp = 3
+      write(*,*) "file:"//ctmfi2
+      stop
       call pc8(xdisp,ctmfi2)
-
+      if(.false.) then
       open(lutmp,file=ctmfil,status='unknown',iostat=ierr)
       close(lutmp,status='delete')
       open(lutm2,file=ctmfi2,status='unknown',iostat=ierr)
       close(lutm2,status='delete')
+      endif
 
       return
       end

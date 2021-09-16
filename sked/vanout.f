@@ -6,6 +6,7 @@ C   HISTORY:
 C 990606 nrv New. Copied from vsiout.
 C 990916 nrv Use VEX writing utilities.
 ! 2010.06.16 JMG Leave spaces between names when writing to screen.
+! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
 C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
@@ -69,19 +70,19 @@ C axis_offset
         call fcreate_axis_offset(ptr_ch(cstr),
      .        ptr_ch('m'//char(0)))
 C antenna_motion first axis
-        x = stnrat(1,is)*rad2deg*60.0 ! deg/min
+        x = slew_rate(1,is)*rad2deg*60.0 ! deg/min
         write(cstr,'(f5.1)') x
         call null_term(cstr)
-        write(cstr2,'(i5)') istcon(1,is)
+        write(cstr2,'(f5.1)') slew_off(1,is)
         call null_term(cstr2)
         call fcreate_antenna_motion(ptr_ch(cax1),ptr_ch(cstr),
      .          ptr_ch('deg/min'//char(0)),
      .          ptr_ch(cstr2),ptr_ch('sec'//char(0)))
 C antenna_motion second axis
-        x = stnrat(2,is)*rad2deg*60.0 ! deg/min
+        x = slew_rate(2,is)*rad2deg*60.0 ! deg/min
         write(cstr,'(f5.1)') x
         call null_term(cstr)
-        write(cstr2,'(i5)') istcon(2,is)
+        write(cstr2,'(f5.1)') slew_off(2,is)
         call null_term(cstr2)
         call fcreate_antenna_motion(ptr_ch(cax2),ptr_ch(cstr),
      .            ptr_ch('deg/min'//char(0)),

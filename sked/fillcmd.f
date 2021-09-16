@@ -5,6 +5,7 @@
 ! 2017Mar22. Set knewsk=.true. indicating schedule has been changed. This insures we capture changes in writing. 
 ! 2018Feb13. KLB Take into account downtime
 ! 2019Mar16 JMG. Use kastro_src instead of checking rmin_astro, rmax_astro  
+! 2021-04-27 JMG replace (integer durscan) by (integer idurscan) and introduced (real*4 durscan)
 C
 C  FILLCMD checks a schedule for iddle time that can be used
 C    to observe longer the previous scan, and
@@ -53,8 +54,9 @@ C  LOCAL VARIABLES
       double precision RitimeDIFF                  ! time difference in double precision
       integer ikey(max_stn)
       logical found_idle                           ! loop to find appropriate idle time to add
-      integer durscan                              ! new duration of the scan
-      integer durscan_orig                         ! original scan duration 
+      integer idurscan                             ! new duration of the scan
+      integer idurscan_orig                        ! original scan duration 
+      real*4 durscan 
 
       integer iset,imaxsl,isrc_time                ! local variables for when_at_next_source
       real buf_time                                ! local variable for when_at_next_source
@@ -418,8 +420,8 @@ C
 ! Only do the loop if idletime >0. 
                   if(idleTIME.gt.0) then
 ! Set the new scan duration...
-                    durscan_orig=idurcur(istat)
-! ATTENTION! If station is on downtime during the scan, durscan should not exceed
+                    idurscan_orig=idurcur(istat)
+! ATTENTION! If station is on downtime during the scan, idurscan should not exceed
 ! the time of beginning downtime
                 ! check if station is in downtime during the window time selected
                     idur2down=0
@@ -446,25 +448,25 @@ C
      >                               mjdcur(istat),utcur(istat))
                     if (idurlast.lt.MAXSCN) then
                       if (idur2down.gt.0) then
-                        durscan=min(idurlast,(min(idur2down,
+                        idurscan=min(idurlast,(min(idur2down,
      >                            idurcur(istat)+idletime)))
                       else
-                        durscan=min(idurlast,idurcur(istat)+idletime)
+                        idurscan=min(idurlast,idurcur(istat)+idletime)
                       endif
                     else
                       if (idur2down.gt.0) then
-                        durscan=min(min(MAXSCN,idur2down),
+                        idurscan=min(min(MAXSCN,idur2down),
      >                              idurcur(istat)+idletime)
                       else
-                        durscan=min(MAXSCN,idurcur(istat)+idletime)   
+                        idurscan=min(MAXSCN,idurcur(istat)+idletime)   
                       endif
                     endif
                     found_idle=.false. 
-                    do while(durscan .gt. durscan_orig .and. 
+                    do while(idurscan .gt. idurscan_orig .and. 
      >                                 .not. found_idle)  
                     call when_at_next_source(istat,nsorcur(istat),
      >                    nsortst(istat),mjdcur(istat),utcur(istat),
-     >                    durscan,idlcur(istat),
+     >                    idurscan,idlcur(istat),
      >                    icalcur(istat),iset,
      >                    cwrap_cur(istat),cwrap_tst(istat),tslew2,
      >                    imaxsl,
@@ -481,16 +483,17 @@ C
      >                                          (uttst(istat)-uttmp2)
  
 !               We consider the "real" time difference
-! Added in test for continuity of scan.  
+! Added in test for continuity of scan.   
+                    durscan=idurscan
                     if (Ritimediff.ge.0 .and. kup   .and.
      >                 kcont(MJDcur(istat),UTcur(istat),durscan,
      >                 nsorcur(istat),istat,cwrap_cur(istat),ierr)) THEN
-                        idurcur(istat)=durscan
+                        idurcur(istat)=idurscan
                         found_idle=.true.
                         mjdtmp=mjdtmp2
                         uttmp=uttmp2
                      else
-                        durscan=durscan-1   
+                        idurscan=idurscan-1   
                      endif  
                    end do                  
                   endif

@@ -46,6 +46,7 @@ C 020227 nrv New command COMMENT. Don't capitalize the comment.
 !                 arguments capitalized and added SUMOUT to this list. 
 ! 2012Oct10  JMG. Don't capitalize "CAT" command line 
 ! 2013Jan23 JMG. Don't capitalize "VCC" command 
+! 2021-05-05 JMG Don't capitalize 'exper' command
 
 C   LOCAL VARIABLES
       integer*2 lintmp(51)
@@ -123,9 +124,9 @@ C                   Shift remainder of the command left in LINSTQ
       select case(cmdlist(ifunc))
 ! All of the commands below do not have their argument capitalized 
       case("ER", "EC","WC","WR", "VEC","VER","VWR","VWC",    !write various schedule files.
-     >   "VCC","FLUX","SOURCE",                                  !open catalog files
+     >   "VCC","FLUX","SOURCE",                            !open catalog files
      >   "PRINTL","PRINTP","SOLVE", "SUMOUT", "UNIT",      !Misc other kinds of files.
-     >   "COMMENT","PARAMETER", "CATALOG")                 !Miscellaneous
+     >   "COMMENT","PARAMETER", "CATALOG","EXPER")                 !Miscellaneous
          continue
       case default        
 ! This is the default:  commands have their args capitalized. 

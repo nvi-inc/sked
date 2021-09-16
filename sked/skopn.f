@@ -71,6 +71,7 @@ C      logical kflux ! true if there's a $FLUX section
 C
 C  History
 C  WHEN   WHO CHANGES
+!  2021-05-07  JMG Exper is now upto 128 characters
 C  830425 NRV ADDED ELEVATION COMMAND
 C  830524 WEH CHANGE LOOP LIMIT FOR PRECESSION FROM NSOUCR TO NCELES
 C  830818 NRV MOVED SOURCE-SATELLITE NAME CONCAT. EARLIER SO THAT
@@ -215,7 +216,7 @@ C       read stations, codes, sources
 9009      format(' from VREAD iret=',i5,' ierr=',i5)
         endif
 C       Write out experiment information now.
-        write(luscn,'(/"Experiment name: ",a8)') cexper
+        write(luscn,'(/"Experiment name: ",a)') trim(cexper)
         i=trimlen(cexperdes)
         if (i.gt.0) write(luscn,'("Experiment description: ",a)')
      .  cexperdes(1:i)

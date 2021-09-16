@@ -10,7 +10,8 @@ C
 !2015Dec01  JMGipson. Added SHAO 
 !2017Oct07  KOL. Added conf_equip
 !2018Oct05  KOL. Added UTAS
-!2021-01-13 JMG Added Vien 
+!2021-01-13 JMG Added Vien to correlator
+!2021-05-05 JMG Added "Beg" as synonym for start
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
@@ -59,7 +60,7 @@ C               - Key word, longest is 22 characters
       equivalence (lfrqde,cfrqde)
 
       integer MaxPr
-      parameter (MaxPr=64)
+      parameter (MaxPr=65)
       character*22 listPr(MaxPr),cParam
       character*2  listPrShort(MaxPr)
 
@@ -79,7 +80,8 @@ C               - Key word, longest is 22 characters
       data lyt_list/"TRUE","YES","ON","FALSE","NO","OFF"/
 
       data listPr/
-     > "ALL_BL_GOOD","BARREL",   "CALIBRATION","CHANGE",     "CONFIRM",
+     > "ALL_BL_GOOD","BARREL",   "BEG", "CALIBRATION","CHANGE",
+     > "CONFIRM",
      > "CONF_EQUIP",
      > "CORRELATOR","CORSYNCH", "DEBUG",      "DESCRIPTION","DURATION",
      > "EARLY",     "END",      "EXPERIMENT", "FILLIN",    "FILLBEST",
@@ -98,7 +100,8 @@ C               - Key word, longest is 22 characters
      > "SCHEDULING_SOFTWARE", "SOFTWARE_VERSION","SCHEDULE_CREATE_DATE"/
 
       data listPrShort/
-     >"AG","BR","CA","CH","CO",
+     >"AG","BR","BG","CA","CH",
+     >"CO",
      >"CE",
      >"TC","CR","DG","DE","DU",
      >"TE","EN","EX","FI","FB",
@@ -518,7 +521,7 @@ C         description goes from here to the end of the line
         ENDIF ! code
 
 C  Time parameters section
-      else if (ckey.eq.'ST'.or.ckey.eq.'EN') then ! start/end
+      else if (ckey.eq.'ST'.or. ckey .eq. "BG" .or.ckey.eq.'EN') then ! start/end
         CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
         if (ic1.eq.0) then
           write(luscn,'(a)') "PRSET20 - You must enter something for "//
@@ -534,7 +537,7 @@ C  Time parameters section
      >      'PRSET21 - Nominal start/end must be of form YYDDDHHMMSS.'
           IERR = -1
         ENDIF
-        if (ckey.eq.'ST') then ! start
+        if (ckey.eq.'ST'.or. ckey .eq. "BG") then ! start
 !          call gtdat(lkeywd)
           iyr_start = iyr
           ida_start = ida

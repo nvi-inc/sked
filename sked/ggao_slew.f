@@ -1,7 +1,11 @@
       real function ggao_slew(az1,el1,az2,el2,
      &  az_off,az_vel,el_off,el_vel,slew0,lkind)
-      implicit none
+      implicit none            
 ! compute slew time accouting for radar mask at GGAO
+
+! History
+! 2021-02-22 Original version
+! 2021-04-22 Modified to handle cass of az_off=0 
       
 ! passed. 
       real az1,el1          !starting point   
@@ -58,8 +62,16 @@
       
       el_mid = el_pk            
       
-      az_acc=az_vel/az_off
-      el_acc=el_vel/el_off
+      if(az_off .gt. 0) then
+         az_acc=az_vel/az_off
+      else
+         az_acc=100.d0               !very fast acceleration
+      endif
+      if(el_off .gt. 0) then
+         el_acc=el_vel/el_off
+      else
+         el_acc=100.d0
+      endif 
            
 ! Make sure we are always moving in one direction.
       if(az1 .le. az2) then

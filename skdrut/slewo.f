@@ -67,8 +67,8 @@ C     CALLING SUBROUTINES: OBSCM,CHCMD, and others
 C     CALLED SUBROUTINES: CVPOS,CABLW
 C
 C   LOCAL VARIABLES
-       LOGICAL kcont
-      REAL*4 RSTCON(2),tslewp,tslewc,delaz,delel,deldc,delha,
+      LOGICAL kcont
+      REAL*4 tslewp,tslewc,delaz,delel,deldc,delha,
      .delx30,dely30,delx85,dely85,aznow,aznew,elnow,elnew,hanow,
      .hanew,decnow,decnew,x30now,x30new,y30now,y30new,x85now,x85new,
      .y85now,y85new,az1,az2,trise,elrate,tslew1,tslew2
@@ -102,6 +102,7 @@ C     931012  nrv    Add in the constants when calculating slew times for
 C                    type 7 (ALGO)
 !   2008Jun20 JMG. Changed arg list for kcont
 !   2020Oct28 JMg. Changed to using kcont (with character arguments) 
+! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
 C
 C
 C     1. First we find the position of the telescope at the end of
@@ -168,43 +169,40 @@ C                   Function to compute az move including cable wrap
       DELY85 = ABS(Y85NEW-Y85NOW)
 C
       IF (IAXIS(ISTN).EQ.1.OR.IAXIS(ISTN).EQ.5)
-     .  TSLEWC = AMAX1(ISTCON(1,ISTN)+DELHA/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELDC/STNRAT(2,ISTN))
+     .  TSLEWC = AMAX1(slew_off(1,ISTN)+DELHA/slew_rate(1,ISTN),
+     .  slew_off(2,ISTN)+DELDC/slew_rate(2,ISTN))
       IF (IAXIS(ISTN).EQ.2)
-     .  TSLEWC = AMAX1(ISTCON(1,ISTN)+DELX30/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELY30/STNRAT(2,ISTN))
+     .  TSLEWC = AMAX1(slew_off(1,ISTN)+DELX30/slew_rate(1,ISTN),
+     .  slew_off(2,ISTN)+DELY30/slew_rate(2,ISTN))
       IF (IAXIS(ISTN).EQ.3.or.IAXIS(ISTN).eq.6)
-     .  TSLEWC = AMAX1(ISTCON(1,ISTN)+DELAZ/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELEL/STNRAT(2,ISTN))
+     .  TSLEWC = AMAX1(slew_off(1,ISTN)+DELAZ/slew_rate(1,ISTN),
+     .  slew_off(2,ISTN)+DELEL/slew_rate(2,ISTN))
       IF (IAXIS(ISTN).EQ.7) then
-        elrate = stnrat(2,istn)
+        elrate = slew_rate(2,istn)
 C       The Algonquin antenna is faster going down.
 C       if (elnew.lt.elnow) elrate=elrate*1.333
 C       First compute the az/el slewing rate
-        TSLEW1 = AMAX1(istcon(1,istn)+DELAZ/STNRAT(1,ISTN),
-     .                 istcon(1,istn)+DELEL/elrate)
+        TSLEW1 = AMAX1(slew_off(1,istn)+DELAZ/slew_rate(1,ISTN),
+     .                 slew_off(1,istn)+DELEL/elrate)
 C       Compute the ha/dec slewing rate for the master equatorial
 C       NOTE: Rates are hard-coded here because they are not available
 C             in the normal antenna info.  Rates are 24 deg/min.
         rme = 24.d0*PI/(180.d0*60.d0)
-        TSLEW2 = AMAX1(istcon(1,istn)+DELHA/rme,
-     .                 istcon(1,istn)+DELDC/rme)
+        TSLEW2 = AMAX1(slew_off(1,istn)+DELHA/rme,
+     .                 slew_off(1,istn)+DELDC/rme)
         tslewc=amax1(tslew1,tslew2)
       endif
       IF (IAXIS(ISTN).EQ.4)
-     .  TSLEWc = AMAX1(ISTCON(1,ISTN)+DELX85/STNRAT(1,ISTN),
-     .  ISTCON(2,ISTN)+DELY85/STNRAT(2,ISTN))
+     .  TSLEWc = AMAX1(slew_off(1,ISTN)+DELX85/slew_rate(1,ISTN),
+     .  slew_off(2,ISTN)+DELY85/slew_rate(2,ISTN))
 C
       IF ((ABS(TSLEWC-TSLEWP).LT.10).OR.(NLOOPS.GE.5)) GOTO 110
       GOTO 100
 C     We get here if the slew has converged OR we iterated 5 times.
 110   IF  (kcont(mjd,UT+TSLEWC,TSLEWP-TSLEWC,NSNEW,ISTN,cwrap_cur,ierr))
      .  THEN  !continuity OK
-        TSLEW = TSLEWC
-        RSTCON(1) = FLOAT(ISTCON(1,ISTN))
-        RSTCON(2) = FLOAT(ISTCON(2,ISTN))
-        IF(TSLEW.LE.(AMAX1(RSTCON(1),RSTCON(2))+5.))
-     .      TSLEW=0.0
+        TSLEW = TSLEWC    
+        IF(TSLEW.LE.(AMAX1(slew_off(1,istn),slew_off(2,istn)))) tslew=0.
         cwrap_new = cwarp2
 C       Final slewing time is the larger of
 C       "time to rise" (trise) and "slew to risen position" (tslew

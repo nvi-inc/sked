@@ -185,7 +185,8 @@ C 27Aug2003 JMG  If a source is near cable wrap limits, reject it.
 !                     calculation.  Assume the antenna can do it!
 ! 2014May02 JMG. Removed ipas,idir, ift from call to set_scan_param. No longer used. 
 
-      kdisplay=nsubc .eq. 0 .or. kdebug 
+!      kdisplay=nsubc .eq. 0 .or. kdebug 
+      kdisplay = kdebug
 
 C
 C   1. Check for enough info to start.  Call NEWPR to parse

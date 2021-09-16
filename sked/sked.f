@@ -157,6 +157,7 @@ C 2004Mar05  JMG Modified to be able to set up minor modes.
 ! 2020Jun06 JMG. Removed reference to HP and authors 
 ! 2020Jun10 jmg. Changed argument of 'solve' from linestq to cmdline. 
 ! 2020Oct13 JMG. Changed argument of results from linestq to cmdline
+! 2021-05-07 JMG Changed arg list to 'random' command
 
 !
 C   0. Opening message
@@ -263,7 +264,7 @@ C  6. The main prompt
 !      write(*,*) "fsked 700:   kcat_freq ", kcat_freq
       cmdline=" "
       linestq(1) = 0
-      call read_cmdline(luscn,luusr,cmdline)
+      call read_cmdline(luscn,luusr,cmdline)     
 
       if(cmdline .eq. "!!") then    ! repeat last command
         cmdline=cmdline_old
@@ -281,7 +282,7 @@ C  6. The main prompt
 ! if there is no argument, set the rest of the line to blanks.
 !     Set the end of the command to blank.
       cmdline(icmdlen+1:ibufq_len*2) = ' '
-      if(ifunc .le.0) goto 700
+      if(ifunc .le.0) goto 700 
 C
 C********************************************************************
 C  7. We have a legal, recognized, unambiguous command.  Now decode
@@ -406,8 +407,8 @@ C     no parameters for this command.
         call delete_temp_files
         stop
 !     case("REMOVE")   !See ADD above  
-      case("RANDOM")
-         call random_cmd(cmdline,nsourc)
+      case("RANDOM")   !Schedule random observation 
+         call random_cmd(cmdline)
       case("RESULT") 
         CALL RESULT(cmdline)
 !     case("REWRITE")  !See ADD above 

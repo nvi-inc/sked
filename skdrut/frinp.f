@@ -128,6 +128,7 @@ C 2003Jul25 JMG  ITRAS changed to function
 ! 2018Oct   JMG  Modified so samprate applies only to stations specified in preceding "F" line.
 ! 2018Dec22 JMG. Fixed bug using undefinfed variable 'nstav' and added implicit none. 
 ! 2020Jun22 JMG Fixed bug introduced 2018OCT. 
+! 2021-05-07 JGipson Minor clenaup  up output on error.
 
 C
 C     1. Find out what type of entry this is.  Decode as appropriate.
@@ -202,7 +203,9 @@ C
 C     2. Now decide what to do with this information.
 C     First, handle code type entries, "C" with frequencies.
 C
-      IF  (lchar .eq. "C") THEN  !code entry
+      IF  (lchar .eq. "C") THEN  !code entry  
+! Debug 
+!        write(*,'(2i4,1x,a2,1x,a2,2f12.2)') icx,ivc, lc,lsg,f1,vb
         do j=1,nstsav ! apply to each station on the preceding "F" line
           is=istsav(j)
           if (is.gt.0) then ! valid station
@@ -298,13 +301,13 @@ C                                    ! this channel on this BBC
      .        write(lu,'(a,a2,a,a2,a,i3,a,a)')
      >        "FRINP04 - Subgroup ", lsg," inconsistent with ",
      >        lsubvc(ic,istn,icode), " for channel ",ic,
-     >        " station",cstnna(istn)
+     >        " station ",cstnna(istn)
 
               if (lc.ne.lcode(icode)) 
      .        write(lu,'(a,a2,a,a2,a,i3,a,a)')
      >        "FRINP05 - Code ",lc," inconsistent with ",
      >         lcode(icode), " for channel ",ic,
-     >        " station",cstnna(istn)
+     >        " station ",cstnna(istn)
               kfound=.true.
               FREQLO(ic,ISTN,ICODE) = F ! LO freq
               cIFINP(ic,istn,ICODE) = cIN ! IF input channel
@@ -325,13 +328,13 @@ C                                    ! this channel on this BBC
      .        write(lu,'(a,a2,a,a2,a,i3,a,a)')
      >        "FRINP04 - Subgroup ", lsg," inconsistent with ",
      >        lsubvc(ic,istn,icode), " for channel ",ic,
-     >        "station",cstnna(istn)
+     >        "station ",cstnna(istn)
 
               if (lc.ne.lcode(icode)) 
      .        write(lu,'(a,a2,a,a2,a,i3,a,a)')
      >        "FRINP05 - Code ",lc," inconsistent with ",
      >         lcode(icode), " for channel ",ic,
-     >        "station",cstnna(istn)
+     >        "station ",cstnna(istn)
 
               FREQLO(ic,ISTN,ICODE) = F ! LO freq
 C             there's no sideband on this line

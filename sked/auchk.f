@@ -183,11 +183,10 @@ C
         if(kwrite) then
            writE(ludsp,*) i, cstnna(j)," ", lq//cwrap_pre(j)//lq, 
      >                 lq//cwrap_new(j)//lq, lq//cwrap_cur(j)//lq
-        endif 
-      
-          if(tslew .lt. 0) then
+        endif     
+         if(tslew .lt. 0) then
              writE(*,*) "auchk: Inform J. Gipson about this!"
-          else if(islew_info .ne. 0) THEN !error messages
+         else if(islew_info .ne. 0) THEN !error messages
              kerr=6      
 ! All of the messages have similar formats. Generate the format.
             if(islew_info .lt. 0) then 

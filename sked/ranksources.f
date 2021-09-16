@@ -9,7 +9,10 @@ C   COMMON BLOCKS USED
       include '../skdrincl/statn.ftni'
       include '../skdrincl/freqs.ftni'
       include '../skdrincl/skobs.ftni'
-        
+
+! History (most recent at top)
+! 2021-04-30  Fixed bug in listing sources  
+! 2021-04-30  Also cleaned up printing      
 
 ! passed
       integer irank_mode
@@ -116,9 +119,10 @@ C   COMMON BLOCKS USED
       lu=0
 ! Do sources that are good.
       do isrc=1,nsourc
+        if(mod(isrc,10) .eq. 1) write(luscn,'(i4," | ",$)') isrc
 !       if(luscn.ne.0) write(luscn,'(i4,$)') isrc
-        if(luscn .ne. 0) write(luscn,'(1x,a8,$)') csorna(i)
-        if(mod(isrc,20) .eq. 0) write(luscn, *) " "
+        if(luscn .ne. 0) write(luscn,'(1x,a8,$)') csorna(isrc)
+        if(mod(isrc,10) .eq. 0) write(luscn, *) " "
         if(uptime(isrc) .eq. 0) then
           srcrank(isrc)=-1.
         else

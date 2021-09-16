@@ -1,4 +1,22 @@
  This file contains a brief description of the changes made to sked
+2021-09-16 ../skdrut/ttape.f. Fixed bug. When setting tapes would change to wrong value
+2021-07-09 lshed.f.  Added 'Trim(XXX)' so that line would not include lots of blanks
+2021-05-29 simul.f.  Now  calculate sigma group for Broadband. Renamed some variables
+2021-05-17 slewt.f.  Initilize tstew to 0.  Sometimes would return NAN
+2021-05-06 random.cmd. Significant enhancements to functionality. Can now set time stop. 
+2021-05-07 opcmd.f: Added implicit none. select_from_list. Implicit none. Initilized ikey=0.
+2021-05-08 exper_cmd.f increased exper variable to 128 chars. 
+2021-05-05 prset.f: Introduced "beg" as synonym for "start" 
+2021-05-05 seop.f: Changed some variables from INT*2 to Integer so that would interface with curses.
+2021-05-05 gtcmd.f: Don't capitalize exper. 
+2021-05-04 ../skdrincl/skobs.ftni. Changed size of exper from 8 to 128 chars. 
+2021-05-04 prlis.f got rid of unitilaized variable 'modular' 
+2021-04-27 fill_cmd.f.  Fixed bug. durscan was integer, but passed to kcont.f which expected real*4
+2021-04-22 ggao_slew.f Handle case of offset is 0. 
+2021-04-02 whatsup.f: Fixed ieee-denorm error.  
+2021-02-22 Slewt.f:  Modifed to take into account GGAO mask.
+2021-02-22 stnrat-->slew_rat,istcon-->slew_off (and made real). 
+2021-02-22 Routines effected:vanout.f,chstn.f, stlis.f,slewt.f IN ..skdrut/:  slewo.f stinp.f, vstinp.f vunpant.f. 
 2021-01-20 JMG simul.f: Don't  try to invert if num_est=0.  sky_cov_pix. Fixed test on elevation. 
 2021-01-15 JMG sumcm.f Removed calculation of storage for tapes.
 2021-01-14 JMG Added VIEN to correlator list in prset.f

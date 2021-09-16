@@ -5,7 +5,8 @@ C
 C   History
 
 !  Now recent at top
-! 2020Oct13 JMG.  Initialized ierr4 to 0. 
+! 2021-05-07 JMGipson.  Fixed some interger*2 -->integer so  that could interface to curses
+! 2020-10-13 JMG.  Initialized ierr4 to 0. 
 C   NRV 910905 Replacement for Heinz's many-question version of PARAM
 C   NRV 911026 Changed first line with major/minor options
 C   nrv 920706 added 2nd line of parameters, for noise floor
@@ -37,12 +38,12 @@ C  INPUT: cfunc - 2-characters, PA for param page, SO for source page
 C  LOCAL:
       integer nrows,nsrows,icol,irow,inx,ival,i,j,k,index,itype
 ! AEM 20041217 int->int*2
-      integer*2 ic
+      integer ic
       character*1 cc
 ! AEM 20041217 int->int*4 passed to C-module
       integer*4 izero,ierr4,ix,iy,ixcol,i4,i4x
 ! AEM 20041217 int->int*2 passed to C-module
-      integer*2 ikey
+      integer  ikey
 ! AEM 20050113 add new variables for precise positioning in "Optimize"
 !              and "Estimate" sections and trimlen
       integer icol_p
@@ -60,10 +61,15 @@ C     inx - index within a column for setting typed values
      >            '  U    ','  E    ','  N     '/
       data cerpna/'   XP   ','   YP  ','  DUT  ','  PSI   ','  EPS   '/
   
-
+  ! initialize
       ierr4=0
       ierr=0
       izero=0
+
+      ikey=0 
+      ix=0
+      iy=0  
+      
       call start_mn(ierr4)
       if (ierr4.ne.1) then
         write(luscn,9901)
@@ -87,9 +93,7 @@ C     inx - index within a column for setting typed values
          cstpna(8)='   N   '
       endif
 
-
 C  1. Display the page.
-
       if (cfunc.eq.'PA') then
         CALL DSPOP(cstpna,cerpna)
         nrows = nstatn*2 + 2                !the 2 extra rows are EOP. 

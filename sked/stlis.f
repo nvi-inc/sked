@@ -32,6 +32,8 @@ C
        logical ksome_mark6
 C
 C HISTORY
+! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
+! 2020-06-08  JMG. New broadband.ftni 
 C   880314 NRV DE-COMPC'D
 C   881228 GAG ADDED NRV's HORIZON AND COORDINATE MASK DISPLAY'S
 C   900118 NRV Added listing SEFDs, etc. after baselines
@@ -55,7 +57,7 @@ C 2003Dec10 JMGipson get rid of holleriths
 ! 2006Nov30  Use cstrec(istn,irec)
 ! 2008Jun05  Rewritten and simplifed.
 ! 2016Dec12  JMG. Minor formatting changes. 
-! 2020Jun08 JMG. New broadband.ftni 
+
 C
 C
 C     1. Simply list the stations selected by the user, getting the
@@ -74,12 +76,12 @@ C
         if(cstrec(i,1) .eq. "Mark6") ksome_mark6=.true. 
         call axtyp(laxis,iaxis(i),2)
         WRITE(LUDSP,9130) I,cstcod(i),cpocod(I),cSTNNA(I),LAXIS,
-     >   STNRAT(1,I)*rad2deg*60,STNRAT(2,I)*rad2deg*60,
-     >   istcon(1,i),istcon(2,i),
+     >   slew_rate(1,I)*rad2deg*60,slew_rate(2,I)*rad2deg*60,
+     >   slew_off(1,i),slew_off(2,i),
      >   STNLIM(1,1,I)*rad2deg,STNLIM(2,1,I)*rad2deg,
      >   STNLIM(1,2,I)*rad2deg,STNLIM(2,2,I)*rad2deg
 
-9130   FORMAT(I3,1X,4(a,1x),2(F5.1,1x),2I5,4F9.1)
+9130   FORMAT(I3,1X,4(a,1x),4(F5.1,1x),4F9.1)
         WRITE(LUDSP,9140) STNPOS(1,I)*rad2deg, STNPOS(2,I)*rad2deg,
      >     coccup(i)
 9140    FORMAT('     Position ',F10.2,' WEST    ',F10.2,' NORTH',
