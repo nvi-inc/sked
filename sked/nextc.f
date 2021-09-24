@@ -1,10 +1,12 @@
-      SUBROUTINE NEXTC(Linstq)
-C
+      SUBROUTINE NEXTC(Linstq)           
 C    NEXTC computes and displays sources available for observation
 C    ( WHATSUP command)
 C
 C   COMMON BLOCKS USED
+      use max_stat_scan      !set maximum number of scans per source. 
+      use obs_scan_counters
       implicit none 
+      
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
       include 'skcom.ftni'
@@ -52,12 +54,9 @@ C      - holder for footage count at end of current obs
 
       integer iSrcVec(max_sor)          !Source array
       integer isrc
-
-      integer*4 NumObsSrc(MAx_Sor)
-      integer*4 NumOBsStat(MAx_stn)
-      integer*4 NumObs
-
+    
       LOGICAL KMIN
+      double precision temp1, temp2
 
 C      - time of rise,set during lookahead
       Double precision UtFree(Max_Stn)       !Time last obs was done. (seconds part)
@@ -236,7 +235,7 @@ C   Calculate all rising/setting times now.
 
       TimeFinish = -1d0
 
-      write(ludsp, '("Auto Mode:       ",L1)') ,kauto
+      write(ludsp, '("Auto Mode:       ",L1)') kauto
 
       if (kauto) then !optimization
 ! 2. Ending time of optimization mode. Default is given by command line.
@@ -332,9 +331,6 @@ C   Calculate all rising/setting times now.
         endif 
      
       if(.true.) then
-       call MakeObsPer(isrcvec,NsrcUse,iStnAll,NumAll,
-     &     NumObsSrc,NumObsStat,NumObs) 
-
        koff=.false.
       
        itemp=0
@@ -343,7 +339,7 @@ C   Calculate all rising/setting times now.
        do i=1,NsrcUse         
          isrc=isrcvec(i)
          if(kastro .and. kastro_src(i)) then 
-             if(dble(NumObsSrc(isrc))/dble(NumObs) .ge. 
+             if(dble(NumObsSource(isrc))/dble(NumObs) .ge. 
      &                         rmax_astro(isrc)) then
                kvs(isrc,1:Max_Stn)=.false.
                if(.not.koff) then
@@ -360,6 +356,17 @@ C   Calculate all rising/setting times now.
        if(koff) write(*,*) " "
 !       pause
        endif
+! Turn of stations that are above number of allowed scans.
+!       write(*,'("NumObstat  ",30i6)')  NumObsStat(1:nstatn)
+!       write(*,'("NumScantat ",30i6)')  NumScanStat(1:nstatn)
+       do istn=1,nstatn
+          if(Max_ss_list(istn) .eq. 0) cycle     !ignore stations with 0.          
+          temp1=dble(NumScanStat(istn))/dble(max_ss_list(istn))
+          temp2 = (TimeLast-TimeExpBeg)/(TimeExpEnd-TimeExpBeg)
+  
+          if(temp1 .gt. temp2)  kvs(1:NsrcUse,istn)=.false.
+!           endif 
+       end do         
        endif
 
         call clear_close_sources(isrcvec,nsrcuse,istnsub,numsub)

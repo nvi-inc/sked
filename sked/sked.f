@@ -8,6 +8,7 @@ C   requested function.
 C
       use group_mod    ! module containing GROUP definitions and routines
       use twin_mod     ! module containing TWIN_TELESCOPES definitions and routines
+      use max_stat_scan  !module for maximum number of  scans per station
       implicit none
 
       include '../skdrincl/skparm.ftni'
@@ -373,6 +374,9 @@ C     no parameters for this command.
         call major_cmd(cmdline)
       case("MASTER") 
         call master_cmd(cmdline)
+        
+      case("MAX_STAT_SCAN")
+        call max_stat_scan_cmd(cmdline)
       case("MAX")
         call mxlis
       case("MEDIA", "TAPE")

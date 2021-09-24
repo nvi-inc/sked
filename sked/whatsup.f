@@ -1,12 +1,17 @@
       subroutine whatsup(istnvec,NumStn,iSrcVec,NumSrc,MJDFree,UtFree,
      >  ielall,kmin)
 ! extracted from old nextc.
+!  2021-09-24 Gipson Renamed NOBSSO to  NumObsSource
+!  2021-04-02 JMG   Fixed IEEE denormal issue caused by checking elevation for  source that had not risen yet.
+!                   (So no elevation defined.)
+
 !  2003Nov13 JMGipson.  Added ispindelay call to tspin
 !  2005Jun13 JMGipson.  When computing time difference, include duration of scans and slew time.
 !  2007Sep24 JMGipson.  Added MJDFree to above call. Made change MJDCur-->MJDFree in code as appropriate.
 !  2018Jan02 JMGipson.  Put in twin mod stuff. 
-!  2021-04-02 JMG   Fixed IEEE denormal issue caused by checking elevation for  source that had not risen yet. (So no elevationd defined.)
+
       use twin_mod 
+      use obs_scan_counters
       implicit none 
 
       include '../skdrincl/skparm.ftni'
@@ -213,11 +218,11 @@ C
           if (kdiswh) then
             WRITE(LUDSP,9721) IS,cSORNA(IS),ISSCAN(IS)
 9721        FORMAT(I3,1X,A8,1X,I4,' ',$)
-            IF (NOBSSO(IS).EQ.0) THEN !it's up but no obs
+            IF (NumObsSource(IS).EQ.0) THEN !it's up but no obs
               WRITE(LUDSP,9722)
 9722          format(11x,'|',$)
             ELSE
-              WRITE(LUDSP,9723) IHR,IMIN,isec,NOBSSO(IS)
+              WRITE(LUDSP,9723) IHR,IMIN,isec,NumObsSource(IS)
 9723          FORMAT(I2.2,':',I2.2,':',i2.2,I3,'|',$)
             ENDIF !it's up but no obs
           endif
@@ -332,10 +337,10 @@ C
           IF (.not.ksrcup(is)) then !not up anywhere
             if (kdiswh) then
               WRITE(LUDSP,9721) IS,cSORNA(IS),ISSCAN(IS)
-              IF (NOBSSO(IS).EQ.0) THEN !it's up but no obs
+              IF (NumObsSource(IS).EQ.0) THEN !it's up but no obs
                 WRITE(LUDSP,9722)
               ELSE
-                WRITE(LUDSP,9723) IHR,IMIN,isec,NOBSSO(IS)
+                WRITE(LUDSP,9723) IHR,IMIN,isec,NumObsSource(IS)
               ENDIF !it's up but no obs
               DO J=IFST,ILST
                 istn=istnvec(J)

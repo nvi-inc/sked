@@ -431,7 +431,7 @@ C   COMMON BLOCKS USED
             if (NumToken.lt.2) then
               write(luscn,*) "Specify group number"
             else
-              read(ltoken(2),*), groupNB
+              read(ltoken(2),*) groupNB
               if (groupNB.le.0) then
                  write(luscn,*) "Specify group# correctly"
               else
@@ -439,7 +439,7 @@ C   COMMON BLOCKS USED
                     write(luscn,*) "No source in this group: ",groupNB
                  else
                     if (NumToken.ge.3) then
-                       ind_newcm=index(cmdline,trim(ltoken(3)))                  
+                       ind_newcm=index(cmdline,trim(ltoken(3)))       
                     endif
                     do igr=1,group_count(group_list,0)
                        if (group_list(igr)%group_number.eq.groupNB) then

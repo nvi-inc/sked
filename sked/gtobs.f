@@ -11,7 +11,8 @@ C     "pass through" the CUR variables so that the subnet
 C     information is always up to date.                                     
 C     The file is left positirecordd just AFTER the record which applies    
 C     to the CURRENT observation.                                           
-C                                                                           
+C      
+      use obs_scan_counters                                                                     
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/skobs.ftni'
 C
@@ -72,8 +73,9 @@ C     1. First make sure that sources and stations have been selected.
 C
       KGOT = .FALSE.
       IF (NOBS.EQ.0) then
-        DO I=1,NSOURC
-          NOBSSO(I)=0
+!  Check
+       write(*,*) "GTOBS:  False initalize!"      
+        DO I=1,NSOURC    
           UTPRSO(I)=0
           MJPRSO(I)=0
         ENDDO 
@@ -96,8 +98,7 @@ C
         J = 1
         IRECGO=1
         IRCUR=MAX_OBS
-        DO I=1,NSOURC
-          NOBSSO(I)=0
+        DO I=1,NSOURC   
           UTPRSO(I)=0
           MJPRSO(I)=0
         ENDDO 
@@ -123,11 +124,9 @@ C
             ICODcur(I)= 0
           END DO
           KRWND = .FALSE.
-          DO I=1,NSOURC
-            NOBSSO(I)=0
-            do is=1,max_baseline
-              nsorobs(i,is)=0
-            enddo
+!          write(*,*) "GTOBS: initilaizing nsorobs" 
+          call init_obs_scan_counters(max_sor,max_stn) 
+          DO I=1,NSOURC    
             UTPRSO(I)=0
             MJPRSO(I)=0
           ENDDO                                               

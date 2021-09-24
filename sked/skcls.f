@@ -4,6 +4,7 @@ C     SKCLS writes out the new schedule file, section by section.
 C
       use group_mod    ! module containing GROUP defintions and routines
       use twin_mod     ! module containing TWIN_TELESCOPES defintions and routines
+      use max_stat_scan  !module for maximum number of  scans per station
      
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/skobs.ftni'
@@ -254,6 +255,7 @@ C  4.85 $OP.  Write if new selection.
           call major_out(lutmp,'s')    ! Write out ALL the major modes to lutmp
           call minor_out(lutmp,.true.,.false.,'s') ! Write out ALL the minor modes to lutmp, no header row.
           call astro_out(lutmp,.false.,.false.,'s')  !don't number the sources. Only list set sources.
+          call max_stat_scan_out(lutmp,.false.,.false.,'s')  !don't number the stations. Only list set stations.
           call twin_out(lutmp,.false.,.false.,'s')  !don't number the stations. Only list set stations.
           call group_out(lutmp,.false.,.false.,0,'s')  !don't number the sources. Only list set sources.
           call srcwt_out(lutmp,.false.,.false.,'s')  !don't number the sources. Only list set sources
@@ -369,6 +371,7 @@ C  Write the VEX format file.
             call major_out(lutmp,'v')    ! Write out ALL the major modes to lutmp
             call minor_out(lutmp,.true.,.false.,'v') ! Write out ALL the minor modes to lutmp, no header row.
             call astro_out(lutmp,.false.,.false.,'v')  !don't number the sources. Only list set sources.
+            call max_stat_scan_out(lutmp,.false.,.false.,'v')  !don't number the stations. Only list set stations.
             call twin_out(lutmp,.false.,.false.,'v')  !don't number the stations. Only list set stations.
             call group_out(lutmp,.false.,.false.,0,'v')  !don't number the sources. Only list set sources.
             call srcwt_out(lutmp,.false.,.false.,'v')  !don't number the sources. Only list set sources

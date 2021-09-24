@@ -1,9 +1,7 @@
       SUBROUTINE SKINI
-
-C
 C  SKINI initializes many of the common variables used in SKED
-C
       use group_mod  ! module containing GROUP definitions and routines
+      use obs_scan_counters
 !      use twin_mod   ! module containing TWIN_TELESCOPES definitions and routines
 
       implicit none 
@@ -34,6 +32,7 @@ C
       include 'cat_name_version.ftni' 
 ! Now most recent at top.
 !
+! 2021-09-24 Gipson.  Initialize obs_Scan_counters in separate routine.
 ! 2019Sep03  JMG: 1) Added implicit none:  2) initialize kcat_freq=.false. 
 !
 C
@@ -434,16 +433,13 @@ C     NRV 971006 Don't need prepass as default any more.
       KFLG(2) = .TRUE.
       KFLG(3) = .FALSE.
       KFLG(4) = .FALSE.
-      do i=1,max_sor
-        NOBSSO(i) = 0
-        do j=1,max_baseline
-          nsorobs(i,j)=0
-        enddo
-        UTPRSO(i)=0.D0
-        MJPRSO(i)=0
-        ISSCAN(i)=idurde
-      end do
-!
+      
+      utprso=0
+      mjprso=0
+      isscan=idurde
+      
+      call init_obs_scan_counters(max_sor,max_stn)
+    
 
 C
       RETURN

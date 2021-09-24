@@ -8,6 +8,7 @@ C     The original schedule file is left intact.
 C
       use group_mod          ! module containing GROUP definitions and routines
       use twin_mod           ! module containing TWIN_TELESCOPES definitions and routines
+      use max_stat_scan      ! set # scans for station
 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
@@ -516,6 +517,16 @@ C     FINALLY Close the original schedule file
               call astro_cmd(ctemp)
             endif         
         end do
+      else if (cbuf.eq. '$MAX_STAT_SCAN') then
+         do while(.true.)             
+            read(luskd,'(a)',err=300,end=300) cbuf            
+            if(cbuf(1:1) .eq. "$") goto 210
+            if(cbuf(1:1) .ne. "*") then 
+              ctemp="SET "//cbuf(1:trimlen(cbuf))
+              call max_stat_scan_cmd(ctemp)
+            endif         
+        end do
+                
 ! The read command is only valid during input
       else if (cbuf.eq. '$TWIN_TELESCOPES') then
          ktwin_read_valid=.true.
@@ -527,7 +538,8 @@ C     FINALLY Close the original schedule file
           endif
           ctemp="READ "//cbuf(1:trimlen(cbuf))
           call twin_cmd(ctemp)
-        end do
+        end do        
+        
       else if (cbuf.eq. '$GROUP') then
          kgroup_read_valid=.true.
          do while(.true.)

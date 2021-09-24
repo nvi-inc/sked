@@ -15,7 +15,9 @@ SK =$(SRCDIR)/sked/
 # Be sure to put the modules at the top since they are needed by others.
 OBJ_MOD = \
    group_mod.o \
-   twin_mod.o 
+   obs_scan_counters.o \
+   twin_mod.o \
+   max_stat_scan.o
 
 OBJ_FOR=   \
     sked.o  \
@@ -151,7 +153,6 @@ OBJ_FOR=   \
     make_mode_list.o \
     make_scans.o \
     makesubset.o \
-    makeobsper.o \
     makesrcobstarget.o \
     makestatobstarget.o \
     maxdu.o modcu.o muvis.o mxlis.o  \

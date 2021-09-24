@@ -9,6 +9,7 @@ C
 CHS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C   PAKUP packs up CUR variables into IBUF
 C
+      use obs_scan_counters
       include '../skdrincl/skparm.ftni'
 C
 ! funcitons
@@ -82,6 +83,7 @@ CHS------------------------------------------------------------------
 CHS Insert/delete mode
 CHS The CUR-variables are packed up into ibuf.
 C
+!      write(*,*) "Pakup nsubc ", nsubc 
       if(nsubc.eq.0) then ! insert/delete mode
 C
       J = ISTCUR(1)
@@ -90,8 +92,7 @@ C
       i=max(8,trimlen(csorna(isor)))
       cbuf=csorna(isor)(1:i)
       nch=i
-C  Increment source summary info
-      NOBSSO(ISOR)=NOBSSO(ISOR)+1
+C  Increment source summary info    
       UTPRSO(ISOR)=UT +idurx
       MJPRSO(ISOR)=MJDCUR(J)
       IDUMY = IB2AS(ICALcur(J),IBUF,NCH+1,4)
@@ -121,13 +122,9 @@ C  Increment source summary info
         cbuf(nch:nch+1)=cstcod(istcur(i))//cbl
         nch=nch+2
       END DO
-      do i=1,nstncur-1
-        do j=i+1,nstncur
-          ib=ibnum(istcur(i),istcur(j))
-          nsorobs(isor,ib) = nsorobs(isor,ib)+1
-        enddo
-      enddo
-
+!      write(*,*) "PAK: incrementing counters" 
+      call update_obs_scan_counters(isor,istcur,nstncur)
+  
 C   Tape pass, direction, footage for each station
 C  Generate footages in local buffer, then move in.
       nch=nch+1

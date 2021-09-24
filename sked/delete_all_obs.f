@@ -1,4 +1,5 @@
       subroutine delete_all_obs()
+      use obs_scan_counters
 ! get ready to delete all observations.
       include '../skdrincl/skparm.ftni'
 C
@@ -19,7 +20,7 @@ C   COMMON BLOCKS USED
       nxtrec=1
       ircur=0
       nobs=0
-      nsorobs=0  !Added 2009Oct03 
+!      nsorobs=0  !Added 2009Oct03 
       nsorcur=0  !no previous sources
       idurcur=0
       nsortst=0
@@ -29,9 +30,12 @@ C   COMMON BLOCKS USED
       iftcur=0
 
       kobc=.false.
-
-      nobsso=0
+    
       mjprso=0
+      
+      call init_obs_scan_counters(max_sor,max_stn)
+
+      
 
       knewsk=.true.
       return

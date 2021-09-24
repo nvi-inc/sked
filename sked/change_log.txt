@@ -1,4 +1,8 @@
  This file contains a brief description of the changes made to sked
+2021-09-24 New sked command: max_stat_scan.  Set Max#  scans per staiton. Designed for Svetloe which has 350 scans max.
+2021-09-24 Changes related to this: skopn.f, skcls.f, cmdblock.f mas_stat_scan.f
+2021-09-24 New module obs_scan_counters which takes care of counting scans, observations.  Several files had changes:.
+2021-09-24 obs_scan_counters.f find_best_scan.f, unpak.f, pakup.f, gtobs.f, skini.f,delete_all_obs.f,whatsup.f 
 2021-09-16 ../skdrut/ttape.f. Fixed bug. When setting tapes would change to wrong value
 2021-07-09 lshed.f.  Added 'Trim(XXX)' so that line would not include lots of blanks
 2021-05-29 simul.f.  Now  calculate sigma group for Broadband. Renamed some variables

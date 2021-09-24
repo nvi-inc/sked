@@ -2,6 +2,7 @@
      >  isrcvec,NSrcUse,
      >  iStnAll,NumAll, iStnVec,NstnUse,  NumTst,kfillobs,ibest)
 
+      use Obs_Scan_Counters
       implicit none 
 ! subroutine to find the best scan in some set.
 ! Include files
@@ -75,12 +76,8 @@
       Double Precision SrcDel(Max_Sor)       !deviation from ideal
 
       Double precision StatWant(max_stn)     !Ideal station distribution
-      Double Precision StatDel(Max_stn)      !Deviation of station from desired
-
-      Integer*4 NumObsSrc(Max_Sor)
-      Integer*4 NumObsStat(Max_Stn)
-      Integer*4 NumObs
-
+      Double Precision StatDel(Max_stn)      !Deviation of station from desired 
+     
       Double Precision rAvg,rMin,rMax,rStd
       Double precision TotObsPred(Max_Sor)
 
@@ -106,12 +103,9 @@
 
       integer iplus,iminus              !1,-1
 
-      dSecPerDay=86400.d0
-      NumObsSrc = 0
-      NumObsStat = 0
-      NumObs = 0
+      dSecPerDay=86400.d0   
+    
       TotObsPred = 0.d0
-
   
 ! Computer various things having to do with trying to even up # obs on sources, stations.
 ! Only do after we have done a certain number of obs to prime the pump.
@@ -128,10 +122,7 @@
      >    (kStatEvn .and. iStatEvnMode .ne. 0) .or.
      >    kastro) then
           call tsincer(TimeLast,iSrcVec,NSrcUse,iStnAll,NumAll) ! calculate time since rise
-
-! Compute the number of obs per src, per station, and total.
-          call MakeObsPer(iSrcVec,NsrcUse,iStnAll,NumAll,
-     >      NumObsSrc, NumObsStat,NumObs)
+!
          endif
 
 ! compute weighting vector for astrometric mode.s
@@ -139,9 +130,9 @@
         if(kastro) then
           do i=1,NSrcUse
             isrc=isrcvec(i)       
-            if(kastro_src(i)) then 
-              dtemp=dble(NumObsSrc(isrc))/dble(NumObs)
-              if(dtemp .lt. rmin_astro(isrc)) then
+            if(kastro_src(i)) then             
+              dtemp=dble(NumObsSource(isrc))/dble(NumObs)
+               if(dtemp .lt. rmin_astro(isrc)) then
 !               Astro(isrc)=rmin_astro(isrc)
                 AstDel(Isrc)=rmin_astro(isrc)-dtemp  !positive-->prefer 
               else if(dtemp .gt. rmax_astro(isrc)) then
@@ -159,7 +150,7 @@
           call MakeSrcObsTarget(iSrcVec,NSrcUse,iStnAll,NumAll,
      >      SrcWant,iSrcEvnMode)
 ! SrcEvn is difference between % we want and % we have.
-           SrcDel =SrcWant - dble(NumObsSrc)/dble(NumObs)
+           SrcDel =SrcWant - dble(NumObsSource)/dble(NumObs)
 
 !           TotObsPred=dble(NumObs)*
 !     >          (TimeExpEnd-TimeExpBeg)/(TimeLast-TimeExpBeg)
@@ -176,7 +167,7 @@
           do i=1,NsrcUse,20
             itemp=min(i+19,NsrcUse)
             write(*,'("OBS  ",i4,20i6)')
-     >      i,(NumObsSrc(iSrcVec(isrc)),isrc=i,itemp)
+     >      i,(NumObsSource(iSrcVec(isrc)),isrc=i,itemp)
            end do
 
            do i=1,NsrcUse,20

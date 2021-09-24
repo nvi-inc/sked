@@ -1,5 +1,6 @@
 ! Sked common block
 ! Completely rearranged in more logical order.
+! 2021-09-24 Gipson. Moved some arrays dealing with num obs, num scans into obs_scan_coutners 
 ! 2021-02-12 JMG Removed kbonn_corr which is no longer used
 ! 2007Oct2  John Gipson.
 ! 2010.01.25 JMG.  Changed index order of azimu, eleva from (max_stn,max_obs) to (max_obs,max_stn)
@@ -197,17 +198,16 @@
       integer luusr                     !input
       integer lutmp,lutm2              !temporary Lus
       common /skcom_int/lucat,ludsp,lufil,lulog,luscn,luskd,lusel,
-     >    luusr, lutmp,lutm2
-
+     >    luusr, lutmp,lutm2     
+    
 
 ! Arrays dealing with sources
       integer ISSCAN(MAX_SOR)           !Default scan length (currently all the same)
-      integer NOBSSO(MAX_SOR)           !# of obs on this source
       integer NSUPN(MAX_SOR)            !# of stations up at current time.
 
       integer MJPRSO(MAX_SOR)           !Source last observed: Day part
       double precision UTPRSO(MAX_SOR)   !Source last observed: Seconds part.
-      common /skcom_int/isscan,nobsso,nsupn,mjprso
+      common /skcom_int/isscan,nsupn,mjprso
       common /skcom_dbl/utprso
 
 ! Scan stuff.
@@ -328,15 +328,16 @@
       integer ISNRBL(MAX_BAND,MAX_BASELINE)     !SNR targets
       integer isnrbl_1(max_band,max_baseline)   ! "  " " "
       common /skcom_int/iactbl,imarg,imarg_1,imarg_ast, isnrbl,isnrbl_1
-
+      
+ 
 ! Source-baseline stuff
       integer itimeup(max_sor,max_baseline)             !Time (in minutes)that source is up on this baseline
       integer itsincer(max_sor,max_baseline)            !Time since rising.
-      integer nsorobs(max_sor,max_baseline)             !# of obs of this source on this  baseline
+
       integer ntrisset(max_sor,max_baseline)            !# of times source rises and sets.
       integer itset(max_sor,max_baseline,max_nrs)       !Times it sets
       integer itris(max_sor,max_baseline,max_nrs)       !Times it rises
-      common /skcom_int/itimeup,itsincer,nsorobs,ntrisset,itset,itris
+      common /skcom_int/itimeup,itsincer,ntrisset,itset,itris
 
 ! ****START of character arrays **************
 ! Define various character arrays.

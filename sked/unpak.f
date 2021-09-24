@@ -8,6 +8,7 @@ C
 C    UNPAK unpacks the record found in IBUF and puts the data into
 C              the CUR variables
 C
+      use obs_scan_counters
       implicit none 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
@@ -244,6 +245,7 @@ CHS Insert/delete mode
 CHS The data is put into the CUR-variables.
 C
       keep_index=.false.
+!      write(*,*) "Unpak nsubc: ", nsubc
       if(nsubc.eq.0) then ! insert/delete mode
 ! A real scan
        call set_scan_param(
@@ -254,15 +256,13 @@ C
      >  nsorcur,icalcur, idlcur, icodcur,ireccur,idurcur,lcblcur,
      >  cprecur,cmidcur,cpstcur)
 
-      NOBSSO(ISOR)=NOBSSO(ISOR)+1
+ 
       UTPRSO(ISOR)=UT+idurx
       MJPRSO(ISOR)=MJD
-      do i=1,nstncur-1
-        do j=i+1,nstncur
-          ib=ibnum(istcur(i),istcur(j))
-          nsorobs(isor,ib) = nsorobs(isor,ib)+1
-        enddo
-      enddo
+!      write(*,*) "UNPAK: incrementing counters" 
+      call update_obs_scan_counters(isor,istcur,nstncur)
+      
+    
 CHS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 CHS-------------------------------------------------------------------
 CHS Optimization mode

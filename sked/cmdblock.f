@@ -188,51 +188,67 @@ CMD: 21  -----------
      >"Compare schedule, master ",
      >"[CHECK | GET ]                                          ",
 !CMD:   13 ----------
+!     >"--",
+!     >"MAX_STAT_SCAN     ",
+!     > "Select, list Max_stat_scan   ",
+!     >" LIST | ADD <stat> <max_stat_scan> | SET <stat> <max_stat_scan> ",
+!     > //"|" DELETE <stat>", 
+
+!CMD:  13 ----------
+     >"--",
+     >"MAX_STAT_SCAN     ",
+     > "Select, list Max_stat_scan   ",
+     > "LISTA | ADD <stat> <#scan> | SET  <stat> <#scan> | DEL <stat>",
+!     >"Compare schedule, master ",
+!     >"[CHECK | GET ]                           ",           
+
+   
+!CMD:   14 ----------
      >"ME",
      >"MEDIA             ",
      >"Set, list media types ",
      >"special syntax                                                 ",
-!CMD: 14
+!CMD: 15
      >"MI",
      >"MINOR             ",
      >"List, select minor opts",
      >"[ LIST| Name [ON|OFF] NORM Weight AuxValue1 ...          ",
-!CMD:  15 ----------
+!CMD:  16 ----------
      >"MO",
      >"MODIFY            ",
      >"Modify current scan    ",
      >"Command takes no parameters                                    ",
-!CMD   16
+!CMD   17
      >"MN",
      >"MONITOR           ",
      >"Get sources to monitor ",
      >"<Number of Sources>",
-!CMD:   17 ----------
+!CMD:   18 ----------
      >"MT",
      >"MOTION          ",
      >"Set, list tape motion",
      >"[<station> <type> [<gaptime>] <station> <type> ...]     ",
-!CMD:  18----------
+!CMD:  19----------
      >"MU",
      >"MUTUALVIS         ",
      >"Display mutual vis.    ",
      >"[<source> [<subnet> [TOTAL|XYAZEL|POLAZEL]]]        ",
-!CMD:   19 ----------
+!CMD:   20 ----------
      >"NE",
      >"NEXT              ",
      >"List next scan         ",
      >"[<number>]                                                ",
-!CMD:   20 ----------
+!CMD:   21 ----------
      >"NW",
      >"NOW              ",
      >"Set current time        ",
      >" [ ? | <subnet> <time> ]                                    ",
-!CMD:   21 ----------
+!CMD:   22 ----------
      >"OP",
      >"OPTIMIZATION     ",
      >"Set, list optimization      ",
      >"GO | SET | LIST                            ",
-!CMD:   22 ----------
+!CMD:   23 ----------
      >"PA",
      >"PARAMETERS       ",
      >"Set, list parameters ",
