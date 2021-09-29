@@ -105,8 +105,8 @@ C   COMMON BLOCKS USED
       cmd=list(ifunc)
       if(cmd.eq. "?") then
         write(luscn,'(A)')
-     >   "Max_stat_Scan  [List | Obs | Delete <Station> "//  
-     >  "| Add <Station> <Weight> | Set <Station> <Weight> ]"
+     >   "Max_stat_Scan  [List | Delete <Station> "//  
+     >  "| Add <Station> <Max_scan> | Set <Station> <Max_scan> ]"
         return
       else if(cmd.eq."LIST") then  
         kall=.false.

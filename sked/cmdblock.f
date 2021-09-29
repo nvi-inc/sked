@@ -198,7 +198,7 @@ CMD: 21  -----------
      >"--",
      >"MAX_STAT_SCAN     ",
      > "Select, list Max_stat_scan   ",
-     > "LISTA | ADD <stat> <#scan> | SET  <stat> <#scan> | DEL <stat>",
+     > "LIST | ADD <stat> <#scan> | SET  <stat> <#scan> | DEL <stat>",
 !     >"Compare schedule, master ",
 !     >"[CHECK | GET ]                           ",           
 

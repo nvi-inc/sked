@@ -32,6 +32,7 @@ C
       include '../skdrincl/skparm.ftni'
 C
 C  History:
+! 2021-09-29 JMG Put in kludge for australian stations where some tracks start at 0
 ! 2021-05-17 JMG If no track format trudge on and track frame format as "N/A"
 ! 2019-09-03 JMG. 1) Added implicit none.  Truncate track-frame format to 8 characters
 C 960520 nrv New.
@@ -73,6 +74,7 @@ C  LOCAL:
       integer it(4),j,nn,in,i,nch
       integer fvex_len,fvex_int,fvex_field,fget_all_lowl,ptr_ch
       integer is
+      integer itrk_offset
 C
 C  Initialize
 C
@@ -88,7 +90,7 @@ C
 
 C  1. The recording format
 C
-
+      itrk_offset=0
       ierr = 1
  
       is=fvex_len(stdef)
@@ -100,6 +102,14 @@ C
      > "VUNPTRK00: Warning no track_frame_format for station "//
      > stdef(1:is)//" setting to N/A" 
         cm="N/A" 
+! See if has 'S2_data_source' This indicates an LBA schedule.        
+       iret = fget_all_lowl(ptr_ch(stdef),ptr_ch(modef),
+     >    ptr_ch('S2_data_source'//char(0)),
+     >    ptr_ch('TRACKS'//char(0)),ivexnum)
+       if(iret .ne. 0) return
+       write(lu,'(a)') 
+     >    "Passed 'S2_data_source' consistency check with LBA"  
+       itrk_offset=1
       else
         iret = fvex_field(1,ptr_ch(cout),len(cout))
         NCH = fvex_len(cout)
@@ -209,6 +219,7 @@ C  2.5 Track list
           iret = fvex_field(i,ptr_ch(cout),len(cout)) ! get track
           if (iret.eq.0) then ! a track
             iret = fvex_int(ptr_ch(cout),j) ! convert to binary
+            j=j+itrk_offset 
             if (j.le.0.or.j.gt.max_track) then
               ierr = -6
               write(lu,'("VUNPTRK06 - Invalid track number ",i3,
