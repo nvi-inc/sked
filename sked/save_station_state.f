@@ -1,6 +1,7 @@
       subroutine save_station_state
 ! Save the station state. This is done before selecting new stations.
 ! Used to preserve information about the station.
+      use max_stat_scan 
       implicit none 
 
 C  COMMON BLOCKS USED
@@ -18,9 +19,11 @@ C  COMMON BLOCKS USED
       integer numbl
       integer i
 ! History
-!  2005Jul06  JMGipson.  Better save/restore of subnet.
-!  2008Jun06 JMGipson.  Minor change in output statement.
-!  2020Jun08.  Include broadband.ftni.  restore ibb_off
+!  2021-10-20 JMG. Now include MAX_STAT_SCAN info
+!  2020-06-08.  Include broadband.ftni.  restore ibb_off
+!  2008-08-06 JMGipson.  Minor change in output statement.
+!  2005-07-06  JMGipson.  Better save/restore of subnet.
+  
 
       nstatn_save=nstatn
       nsubst_save=nsubst
@@ -58,6 +61,9 @@ C  COMMON BLOCKS USED
       isink_mbps_save(1:nstatn)=isink_mbps(1:nstatn)
       ibb_off_save(1:nstatn)=ibb_off(1:nstatn)
       bb_bw_save(1:nstatn)=bb_bw(1:nstatn)      
+      
+! Max_stat_scan info       
+      max_ss_list_save(1:nstatn)=max_ss_list(1:nstatn)
 
 ! SNR info
       isnrbl_save(1:max_band,1:numbl) =isnrbl(1:max_band,1:numbl)
@@ -71,12 +77,15 @@ C  COMMON BLOCKS USED
 
 ! ************************************************************
       subroutine restore_station_state
+      use max_stat_scan 
+      
 ! Restore the station state. This is done after selecting new stations.
 ! Stations that we had before get values that they had previously.
 ! History
 ! 2013May06. JMGipson. Try to restore 1-letter codes ONLY if we had observations previously.
 ! 2013May27. JMGipson. Removed fixing 1-letter code. Now handled in wrsts.f 
 ! 2020Jun08.  Include broadband.ftni.  restore ibb_off 
+      implicit none
 
 C  COMMON BLOCKS USED
       include '../skdrincl/skparm.ftni'
@@ -140,9 +149,10 @@ C  COMMON BLOCKS USED
 
 ! Initialize the broadband stuff so that no station is broadband. 
       bb_bw=0.0
-      idata_mbs=0
-      isink_mbs=0   
+      idata_mbps=0
+      isink_mbps=0   
       ibb_off=0
+      max_ss_list=0 
    
       do i=1,nstatn
         iwhere=iwhere_in_string_list(cstnna_save,nstatn_save,cstnna(i))
@@ -164,7 +174,8 @@ C  COMMON BLOCKS USED
           idata_mbps(i)  =idata_mbps_save(iwhere)
           isink_mbps(i)  =isink_mbps_save(iwhere)
           ibb_off(i)     =ibb_off_save(iwhere)
-
+          
+          max_ss_list(i)=max_ss_list_save(iwhere)
  
           if(kfirst) then
             ifirst=i

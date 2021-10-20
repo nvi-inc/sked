@@ -79,6 +79,7 @@ C   LOCAL VARIABLES
       integer  ierr
       logical kerr
       integer ihrs_long
+      real    rhours_long
       logical kbad_snr
       integer*2 linestq(30)
       integer*4 itime_vec(6)   !holds date and time
@@ -178,11 +179,16 @@ C   LOCAL VARIABLES
       read(ltoken(4),'(i3)') ida_mst_start
       read(ltoken(5),"(i2,1x,i2)") ihr_mst_start,imin_mst_start
 ! get the length, and calculate the end time.
-      read(ltoken(6),"(i2)"), ihrs_long
+      read(ltoken(6),*) rhours_long
       iyr_mst_end  =iyr_mst_start
       ida_mst_end  =ida_mst_start
-      ihr_mst_end  =ihr_mst_start+ihrs_long
-      imin_mst_end =imin_mst_start
+      
+      ihr_mst_end  =ihr_mst_start+int(rhours_long)
+      imin_mst_end =imin_mst_start+(rhours_long-int(rhours_long))*60.d0
+      if(imin_mst_end .ge. 60) then
+         imin_mst_end =imin_mst_end -60
+         ihr_mst_end = ihr_mst_end+1
+      endif 
 
       if(ihr_mst_end .ge. 24) then
          ihr_mst_end = ihr_mst_end-24

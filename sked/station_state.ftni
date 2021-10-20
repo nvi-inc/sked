@@ -3,15 +3,7 @@
 !  save_station_state
 !  restore_station_state
 
-! General station information. 
-      real          bb_bw_save(max_stn)
-      real          stnelv_save(MAX_STN)                 !elevation limit
-      common /station_save_real/stnelv_save,bb_bw_save
-
-      integer       nstatn_save 
-      integer       itearl_save(max_stn)                 ! save early start  
-      common /station_save_integer/nstatn_save,itearl_save
-  
+! Names of stations and code. 
       character*128 tape_motion_type_save(max_stn)       ! save tape motion
       character*128 tape_allocation_save(max_stn)        
       character*8   cstnna_save(max_stn)                 !name
@@ -20,6 +12,23 @@
       common /station_save_char/tape_motion_type_save,
      >  tape_allocation_save,cstnna_save, 
      >  cstcod_save
+     
+     
+
+! General station information. 
+      real          bb_bw_save(max_stn)
+      real          stnelv_save(MAX_STN)                 !elevation limit
+      common /station_save_real/stnelv_save,bb_bw_save
+      
+ 
+      integer       nstatn_save 
+      integer       itearl_save(max_stn)                 ! save early start  
+      common /station_save_integer/nstatn_save,itearl_save
+       
+      
+! max_stat_scan info
+      integer max_ss_list_save(max_stn) 
+      common /station_save_integer/max_ss_list_save
 
 ! SNR information.     
       integer       isnrbl_save(max_band,max_baseline)
