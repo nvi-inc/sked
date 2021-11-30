@@ -66,12 +66,19 @@ C
 C     CALLING SUBROUTINES: OBSCM,CHCMD, and others
 C     CALLED SUBROUTINES: CVPOS,CABLW
 C
-C   LOCAL VARIABLES
+! function
       LOGICAL kcont
-      REAL*4 tslewp,tslewc,delaz,delel,deldc,delha,
-     .delx30,dely30,delx85,dely85,aznow,aznew,elnow,elnew,hanow,
-     .hanew,decnow,decnew,x30now,x30new,y30now,y30new,x85now,x85new,
-     .y85now,y85new,az1,az2,trise,elrate,tslew1,tslew2
+      real slew_time
+! Local variables       
+      REAL tslewp,tslewc
+      real delaz,delel
+      real aznow,aznew,elnow,elnew
+      real hanow,hanew,decnow,decnew,x30now,x30new,y30now,y30new
+      real x85now,x85new,y85now,y85new
+      real x1,x2,y1,y2
+      real tslew1,tslew2       
+  
+      real*4 az1,az2,trise,elrate
       integer nloops,il
       character*2 cwrap1,cwarp2,cwarp2p
       LOGICAL KUP ! Returned from CVPOS, TRUE if source within limits
@@ -90,6 +97,9 @@ C               - current,new values of az,wrap
 C
 C  History
 C      DATE   WHO    CHANGES
+! 2021-11-10  JMG. Substantial change in the logic to make simpler and use new slew model. 
+! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
+C
 C     811125  MAH    CHECK THAT SLEWING DOES CONVERGE FOR AZ-EL ANTENNAS
 C     830423  NRV    ADD X,Y CALCULATIONS
 C     830523  WEH    SATELLITES ADDED, DEC ADDED TO CVPOS CALL, SLEWING
@@ -102,8 +112,7 @@ C     931012  nrv    Add in the constants when calculating slew times for
 C                    type 7 (ALGO)
 !   2008Jun20 JMG. Changed arg list for kcont
 !   2020Oct28 JMg. Changed to using kcont (with character arguments) 
-! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
-C
+
 C
 C     1. First we find the position of the telescope at the end of
 C        the current observation and the position of the new source
@@ -160,43 +169,44 @@ C
       cwarp2=cwrap_new
       DELAZ = CABLW(ISTN,AZ1,cwrap1,AZ2,cwarp2)
 C                   Function to compute az move including cable wrap
-      DELEL = ABS(ELNEW-ELNOW)
-      DELHA = ABS(HANEW-HANOW)
-      DELDC = DABS(0.D0+DECNEW-DECNOW)
-      DELX30 = ABS(X30NEW-X30NOW)
-      DELX85 = ABS(X85NEW-X85NOW)
-      DELY30 = ABS(Y30NEW-Y30NOW)
-      DELY85 = ABS(Y85NEW-Y85NOW)
-C
-      IF (IAXIS(ISTN).EQ.1.OR.IAXIS(ISTN).EQ.5)
-     .  TSLEWC = AMAX1(slew_off(1,ISTN)+DELHA/slew_rate(1,ISTN),
-     .  slew_off(2,ISTN)+DELDC/slew_rate(2,ISTN))
-      IF (IAXIS(ISTN).EQ.2)
-     .  TSLEWC = AMAX1(slew_off(1,ISTN)+DELX30/slew_rate(1,ISTN),
-     .  slew_off(2,ISTN)+DELY30/slew_rate(2,ISTN))
-      IF (IAXIS(ISTN).EQ.3.or.IAXIS(ISTN).eq.6)
-     .  TSLEWC = AMAX1(slew_off(1,ISTN)+DELAZ/slew_rate(1,ISTN),
-     .  slew_off(2,ISTN)+DELEL/slew_rate(2,ISTN))
-      IF (IAXIS(ISTN).EQ.7) then
-        elrate = slew_rate(2,istn)
-C       The Algonquin antenna is faster going down.
-C       if (elnew.lt.elnow) elrate=elrate*1.333
-C       First compute the az/el slewing rate
-        TSLEW1 = AMAX1(slew_off(1,istn)+DELAZ/slew_rate(1,ISTN),
-     .                 slew_off(1,istn)+DELEL/elrate)
-C       Compute the ha/dec slewing rate for the master equatorial
-C       NOTE: Rates are hard-coded here because they are not available
-C             in the normal antenna info.  Rates are 24 deg/min.
-        rme = 24.d0*PI/(180.d0*60.d0)
-        TSLEW2 = AMAX1(slew_off(1,istn)+DELHA/rme,
-     .                 slew_off(1,istn)+DELDC/rme)
-        tslewc=amax1(tslew1,tslew2)
-      endif
-      IF (IAXIS(ISTN).EQ.4)
-     .  TSLEWc = AMAX1(slew_off(1,ISTN)+DELX85/slew_rate(1,ISTN),
-     .  slew_off(2,ISTN)+DELY85/slew_rate(2,ISTN))
+       select case (iaxis(istn))
+        case(1,5)     
+          x1=HaNew
+          X2=HaNow
+          Y1=DecNew
+          Y2=DecNow
+        case(2)     
+          X1=X30new
+          X2=X30Now
+          Y1=DecNew
+          Y2=Decnow
+        case(3,6)
+          X1=Az1
+          X2=Az2
+          Y1=ElNew
+          Y2=ElNow
+        case(4)
+          X1=x85New
+          X2=X85Now
+          Y1=Y85New
+          Y2=Y85Now
+        case default  
+! This is algonquin.  Should never hit
+          write(*,*) "Slewt:  unknown axis offset ", iaxis(istn)
+          stop
+        end select
+      tslew1=slew_time(x1,X2,
+     &             slew_off(1,istn),slew_vel(1,istn),slew_acc(1,istn))
+      tslew2=slew_time(Y1,y2,
+     &             slew_off(2,istn),slew_vel(2,istn),slew_acc(2,istn))
+    
+      tslewc=max(tslew1,tslew2) 
+ 
+ 
 C
       IF ((ABS(TSLEWC-TSLEWP).LT.10).OR.(NLOOPS.GE.5)) GOTO 110
+      
+      
       GOTO 100
 C     We get here if the slew has converged OR we iterated 5 times.
 110   IF  (kcont(mjd,UT+TSLEWC,TSLEWP-TSLEWC,NSNEW,ISTN,cwrap_cur,ierr))

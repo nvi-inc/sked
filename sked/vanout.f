@@ -7,6 +7,8 @@ C 990606 nrv New. Copied from vsiout.
 C 990916 nrv Use VEX writing utilities.
 ! 2010.06.16 JMG Leave spaces between names when writing to screen.
 ! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
+! 2021-11-10  Renamed slew_rate-->slew_vel
+! 2021-11-10 Modify slew_off when writing out to include acceleration erm.
 C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
@@ -19,11 +21,14 @@ C
 C  LOCAL
       real x
       character*9 cant
-      character*128 cax1,cax2,cax
+      character*8 cax
+      character*8 cax_vec(2)      
+      integer i12    !count over axis. 
       character*128 cstr,cstr2,cstr3,cstr4 ! converting to strings
       integer is
       integer ptr_ch
       character*4 laxis
+      real t_acc 
 
 C  1. ANTENNA
 
@@ -51,42 +56,41 @@ C axis_type
         call axtyp(laxis,iaxis(is),2)
         call c2lower(laxis,cax)
         if (cax(1:4).eq.'hadc') then
-          cax1 = cax(1:2)
-          cax2 = 'dec'
+          cax_vec(1) = cax(1:2)
+          cax_vec(2) = 'dec'
         else if (cax(1:1).eq.'x') then
-          cax1 = cax(1:1)
-          cax2 = cax(2:4)
+          cax_vec(1) = cax(1:1)
+          cax_vec(2) = cax(2:4)
         else
-          cax1 = cax(1:2)
-          cax2 = cax(3:4)
+          cax_vec(1) = cax(1:2)
+          cax_vec(2) = cax(3:4)
         endif
-        call null_term(cax1)
-        call null_term(cax2)
-        call fcreate_axis_type(ptr_ch(cax1),ptr_ch(cax2))
+        call null_term(cax_vec(1))
+        call null_term(cax_vec(2))
+        call fcreate_axis_type(ptr_ch(cax_vec(1)),ptr_ch(cax_vec(2)))
 C axis_offset
         x=axisof(is)
         write(cstr,'(f10.5)') x
         call null_term(cstr)
         call fcreate_axis_offset(ptr_ch(cstr),
      .        ptr_ch('m'//char(0)))
-C antenna_motion first axis
-        x = slew_rate(1,is)*rad2deg*60.0 ! deg/min
-        write(cstr,'(f5.1)') x
-        call null_term(cstr)
-        write(cstr2,'(f5.1)') slew_off(1,is)
-        call null_term(cstr2)
-        call fcreate_antenna_motion(ptr_ch(cax1),ptr_ch(cstr),
+! Antenna motion over both axis.     
+        do i12=1,2
+           x = slew_vel(i12,is)*rad2deg*60.0 ! deg/min
+          write(cstr,'(f5.1)') x
+          call null_term(cstr)
+          t_acc=0.d0 
+          if(slew_off(i12,is) .ne. 0 .and. slew_acc(i12,is) .ne. 0) then 
+             t_acc=slew_vel(i12,is)/slew_acc(i12,is)
+          endif 
+           
+          write(cstr2,'(f5.1)') slew_off(i12,is)+t_acc
+          call null_term(cstr2)
+          call fcreate_antenna_motion(ptr_ch(cax_vec(i12)),ptr_ch(cstr),
      .          ptr_ch('deg/min'//char(0)),
      .          ptr_ch(cstr2),ptr_ch('sec'//char(0)))
-C antenna_motion second axis
-        x = slew_rate(2,is)*rad2deg*60.0 ! deg/min
-        write(cstr,'(f5.1)') x
-        call null_term(cstr)
-        write(cstr2,'(f5.1)') slew_off(2,is)
-        call null_term(cstr2)
-        call fcreate_antenna_motion(ptr_ch(cax2),ptr_ch(cstr),
-     .            ptr_ch('deg/min'//char(0)),
-     .            ptr_ch(cstr2),ptr_ch('sec'//char(0)))
+        end do 
+
 C pointing_sector 
 C   first axis
         x = stnlim(1,1,is)*rad2deg
@@ -103,9 +107,9 @@ C   second axis
         write(cstr4,'(f6.1)') x
         call null_term(cstr4)
         call fcreate_pointing_sector(ptr_ch('n'//char(0)),
-     .         ptr_ch(cax1),ptr_ch(cstr),ptr_ch('deg'//char(0)),
+     .         ptr_ch(cax_vec(1)),ptr_ch(cstr),ptr_ch('deg'//char(0)),
      .         ptr_ch(cstr2),ptr_ch('deg'//char(0)),
-     .         ptr_ch(cax2),ptr_ch(cstr3),ptr_ch('deg'//char(0)),
+     .         ptr_ch(cax_vec(2)),ptr_ch(cstr3),ptr_ch('deg'//char(0)),
      .         ptr_ch(cstr4),ptr_ch('deg'//char(0)))
 
       enddo

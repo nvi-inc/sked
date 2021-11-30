@@ -3,11 +3,13 @@ C
 C  This routine writes out the VEX $SITE section.
 C
 C   HISTORY:
+! 2021-11-20 JMG. Respect the differenece between step-functions and line-segments. 
+! 2014-09-16 JMG. Only write out occupation code if we have one!
 C 990606 nrv New. Copied from vsoout.
 C 990922 nrv Use VEX utilities.
 C 991006 nrv Add call with null to end az/el lists.
 ! 2009Sep15  JMGipson. Removed debugging statement
-! 2014Sep16. JMG. Only write out occupation code if we have one!
+
 C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
@@ -21,6 +23,7 @@ C  LOCAL
       integer ptr_ch
       character*20 cst,cx,cy,cz
       integer iazel
+      integer ilast 
 
 C  1. SITE block
 
@@ -56,7 +59,8 @@ C site_position
      .                             ptr_ch(cy),ptr_ch('m'//char(0)),
      .                             ptr_ch(cz),ptr_ch('m'//char(0)))
 C horizon_map_az
-        if (nhorz(is).gt.0) then
+        write(*,*) cstnna(is), nhorz(is),klineseg(is)
+        if (nhorz(is).gt.0) then          
           do iazel=1,2
 !            write(*,*) " "
             if(iazel .eq. 1) then
@@ -64,7 +68,9 @@ C horizon_map_az
             else
 !             write(*,'("EL ",$)')  
             endif
-            do j=1,nhorz(is)
+            ilast=nhorz(is)
+            if(iazel .eq. 2 .and. .not. klineseg(is)) ilast=ilast-1         
+            do j=1,ilast
               if(iazel .eq. 1) then
                  write(cx,'(f5.1)') azhorz(j,is)*rad2deg
 !                 if(is .eq. 8) write(*,'(a,1x,$)') cx(1:6)

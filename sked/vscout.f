@@ -3,6 +3,8 @@ C
 C  This routine writes out scan blocks in the VEX $SCHED section.
 C
 C   HISTORY:
+
+! 2021-11-19 JMG got rid of all references to 'feet' which are no longer used. 
 C 990923 nrv New. 
 C 990927 nrv Writing version 1.5 for now.
 C 991020 nrv Use station index within scan for dur and footage.
@@ -59,7 +61,7 @@ C     integer*2 scan_name(8),scan_namep(8)
       equivalence (icb,lcb),(cst,lst)
       integer iptr
 
-      integer IFT(MAX_STN),IDUR(MAX_STN)
+      integer IDUR(MAX_STN)
       integer idstop(max_stn)
    
       integer ihd(max_pass),nh
@@ -72,12 +74,12 @@ C     integer*2 scan_name(8),scan_namep(8)
      .        imin4(max_stn),isc4(max_stn)
       integer ideltat(max_stn),ideltatmax,ideltatmaxj,ioffset(max_stn)
       double precision ut1(max_stn),ut,utpre(max_stn)
-      real tslew,dum,speed
+      real tslew,dum
       integer itu_early(max_stn)
       logical knewtp,knewt
       integer*2 lcbpre(max_stn),lcb_new
-      integer iftpre(max_stn),isorp(max_stn)
-      integer mjdpre(max_stn),iftnew(max_stn),mjd1(max_stn)
+      integer isorp(max_stn)
+      integer mjdpre(max_stn),mjd1(max_stn)
      
 C  1. SCHED
 
@@ -149,19 +151,19 @@ C
       DO WHILE (IC1.NE.0.AND.I.LE.NST) ! decode footage counters
   
         nch = ic2-ic1+1
-        read(cbuf(ic1+2:ic2),*) ift(i)
+!        read(cbuf(ic1+2:ic2),*) ift(i)
 
         CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
         I = I+1
       END DO  !decode footage counters
       IF  (I.EQ.1) THEN  !no counters
         DO  NI = 1,NST   
-          IFT(NI) = 0
+!          IFT(NI) = 0
         END DO  !
       END IF  !no counters
       IF  (I.GT.1.AND.I.LT.(NST+1)) THEN  !too few counters
         DO  NI = I,NST   
-          IFT(NI) = IFT(I-1)
+!          IFT(NI) = IFT(I-1)
         END DO  !
       END IF  !too few counters
 C Skip over procedure flags
@@ -259,7 +261,7 @@ C***********************************************
           isc_ref=isc
           do j=1,nst
             is=ist(j)
-            iftnew(is)=ift(j)
+!            iftnew(is)=ift(j)
             idstop(is) = idur(j)
             ioffset(is)=0
           enddo
@@ -280,7 +282,7 @@ C***********************************************
               imin1(is)=imin
               isc1(is)=isc
               ideltat(j) = 0
-              iftnew(is)=ift(j)
+!              iftnew(is)=ift(j)
               itu_early(is)=1
             else ! calculate new ref time 
 C   data_begin is at the ref time in sked's observations, except
@@ -302,7 +304,7 @@ C             time1 is previous data_stop + slew + cal = new data_valid
               ut1(is)=hms2seconds(ihr1(is),imin1(is),isc1(is))
               ideltat(j) = isecdif(mjd,ut,mjd1(is),ut1(is))
 C             iftnew is footage at time1
-              iftnew(is) = iftpre(is) + (tslew+ical)*speed(icod,is)
+!              iftnew(is) = iftpre(is) + (tslew+ical)*speed(icod,is)
             endif ! calculate new ref time
 C         Save values for the next scan calculation
             mjdpre(is) = mjd
@@ -378,7 +380,7 @@ C   cal time
           write(cdatab,'(i4)') ioffset(istn)
           call null_term(cdatab)
 C   footage at the start of recording.
-        write(cfeet,'(i5)') iftnew(istn)
+        write(cfeet,'(i5)') 0
         call null_term(cfeet)
 C   rec_begin is the time recording starts. This is data_begin minus early
 C   start for start-stop. THIS WILL BE IN VEX 1.6.

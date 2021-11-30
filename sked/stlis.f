@@ -3,6 +3,7 @@ C
 C
 C  STLIS lists the selected stations
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
 C
@@ -30,6 +31,7 @@ C
        integer ibl_key(2,max_stn*(max_stn-1)/2)
        integer iptr
        logical ksome_mark6
+       integer ilast 
 C
 C HISTORY
 ! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
@@ -69,35 +71,51 @@ C
         RETURN
       endif
 C
-      WRITE(LUDSP,'(a)') 
-     >  '     STATION     AXIS  SLEW RATES   SLEW CONST  LIMIT STOPS'
+      WRITE(LUDSP,'(a)') ' Station               '
+     >//' |      Slew-1      |   Limits-1  '
+     >//' |      Slew-2      |   Limits-2  |' 
       ksome_mark6=.false. 
       DO I=1,NSTATN
         if(cstrec(i,1) .eq. "Mark6") ksome_mark6=.true. 
         call axtyp(laxis,iaxis(i),2)
-        WRITE(LUDSP,9130) I,cstcod(i),cpocod(I),cSTNNA(I),LAXIS,
-     >   slew_rate(1,I)*rad2deg*60,slew_rate(2,I)*rad2deg*60,
-     >   slew_off(1,i),slew_off(2,i),
-     >   STNLIM(1,1,I)*rad2deg,STNLIM(2,1,I)*rad2deg,
+        WRITE(LUDSP,'(i3,1x,4(a,1x),2(" | ",3f5.1,1x, " | ",2f6.1))')        
+     >   I,cstcod(i),cpocod(I),cSTNNA(I),LAXIS,
+     >   slew_off(1,i), slew_vel(1,i)*rad2deg, slew_acc(1,i)*rad2deg,   
+     >   STNLIM(1,1,I)*rad2deg,STNLIM(2,1,I)*rad2deg,   
+     >   slew_off(2,i), slew_vel(2,i)*rad2deg, slew_acc(2,i)*rad2deg,   
      >   STNLIM(1,2,I)*rad2deg,STNLIM(2,2,I)*rad2deg
 
 9130   FORMAT(I3,1X,4(a,1x),4(F5.1,1x),4F9.1)
         WRITE(LUDSP,9140) STNPOS(1,I)*rad2deg, STNPOS(2,I)*rad2deg,
      >     coccup(i)
 9140    FORMAT('     Position ',F10.2,' WEST    ',F10.2,' NORTH',
-     .  '   Occupation code: ',a)
+     .  '   Occupation code: ',a)     
+   
         IF (NHORZ(I).GT.0) THEN !write horizon mask
-          WRITE(LUDSP, "('     Horizon ',$)") 
-          DO J=1,NHORZ(I)
-            WRITE(LUDSP,9151) AZHORZ(J,I)*rad2deg,ELHORZ(J,I)*rad2deg
-
+          if(klineseg(i)) then
+! mask is given as line-segments. Same number of az and el points.          
+            WRITE(LUDSP, "('     Hor-line ',$)") 
+            ilast =nhorz(i)            
+          else
+! mask is given as step functions. One more az point.           
+            write(ludsp, "('     Hor-step ',$)") 
+            ilast=nhorz(i)-1
+          endif 
+          DO J=1,ilast
+            WRITE(LUDSP,9151) AZHORZ(J,I)*rad2deg,ELHORZ(J,I)*rad2deg 
 9151        FORMAT(F5.0,f5.1,$)
             IF (MOD(J,7).EQ.0) THEN
               WRITE(LUDSP,'()')
-              WRITE(LUDSP,'("             ",$)')
+              WRITE(LUDSP,'("              ",$)')
             END IF
           ENDDO
-          write(ludsp,'()')
+! for step functions have 1 last az.           
+          if(.not.klineseg(i)) then 
+              WRITE(LUDSP,'(f5.0)') AZHORZ(J,I)*rad2deg
+          else
+             write(ludsp,'(a)') 
+          endif
+          
         ENDIF
         IF (NCORD(I).GT.0) THEN !write coordinate mask
           WRITE(LUDSP,9154)

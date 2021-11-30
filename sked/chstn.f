@@ -18,7 +18,7 @@ C LOCAL:
 C
       IF  (NSTATN.GT.0) THEN 
         DO  I=1,NSTATN
-          IF  (Slew_RATe(2,I).EQ.0.0) THEN  !
+          IF  (Slew_vel(2,I).EQ.0.0) THEN  !
             write(luscn,"(a,a8)")
      >     "CHSTN04 - Antenna information not complete for ",cantna(i)
             goto 900

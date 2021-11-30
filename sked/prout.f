@@ -24,7 +24,7 @@ C  COMMON BLOCKS USED:
 ! functions
       integer trimlen,ibnum
       character*1 lyn
-      real speed
+    
 C INPUT
       character*1 ciin ! v=vex output, s=standard,d=terminal
 C
@@ -377,9 +377,9 @@ C TAPE_TYPE line
             cbuf(nch:nch+1)="K5"
             nch=nch+3
           else if (cterid(i)(1:2) .eq. "K4") then
-            k4sp = speed(1,i) ! speed for code 1 in m/s
-            ival = idint(0.1 + maxtap(i)/(60.d0*k4sp)) ! min=m/(60*m/s)
-            write(cbuf(nch:),'(i4)') ival
+!            k4sp = speed(1,i) ! speed for code 1 in m/s
+!            ival = idint(0.1 + maxtap(i)/(60.d0*k4sp)) ! min=m/(60*m/s)
+            write(cbuf(nch:),'(i4)') 0
             nch=nch+5
           else  
             if (maxtap(i).gt.5000.and.maxtap(i).lt.10000) then

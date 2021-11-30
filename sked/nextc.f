@@ -110,6 +110,7 @@ C added by JMGipson
       character*80 ldum 
 
 !  Date     Who   What
+!  2021-11-30 JMG Added more debugging informaiton. 
 !  2007Sep22 JMG  Broken into smaller pieces. Got rid of obsolescent code.
 !  2008Jun06 JMG  Got rid of some variables that were no longer used
 !  2009Sep22 JMG. Changed format statement for Endtime later than 1 day.
@@ -329,10 +330,14 @@ C   Calculate all rising/setting times now.
             goto 1200
           endif
         endif 
+        
+        if(kdebug) then
+          write(*,*)  "After whatsup" 
+          call write_vs(isrcvec,NsrcUse,istnSub,numsub)
+        endif
+        
      
-      if(.true.) then
-       koff=.false.
-      
+       koff=.false.     
        itemp=0
        if(NumObs .ne. 0) then
 ! turn off astrometric sources if above targets ans astromode is on.
@@ -356,18 +361,33 @@ C   Calculate all rising/setting times now.
        if(koff) write(*,*) " "
 !       pause
        endif
+       
+       if(kdebug) then
+          write(*,*)  "After astrometric"
+          call write_vs(isrcvec,NsrcUse,istnSub,numsub)
+        endif       
 ! Turn of stations that are above number of allowed scans.
-!       write(*,'("NumObstat  ",30i6)')  NumObsStat(1:nstatn)
-!       write(*,'("NumScantat ",30i6)')  NumScanStat(1:nstatn)
+       if(kdebug) then 
+         write(*,'("NumObstat  ",30i6)')  NumObsStat(1:nstatn)
+         write(*,'("NumScantat ",30i6)')  NumScanStat(1:nstatn)
+       endif 
        do istn=1,nstatn
           if(Max_ss_list(istn) .eq. 0) cycle     !ignore stations with 0.          
           temp1=dble(NumScanStat(istn))/dble(max_ss_list(istn))
           temp2 = (TimeLast-TimeExpBeg)/(TimeExpEnd-TimeExpBeg)
   
-          if(temp1 .gt. temp2)  kvs(1:NsrcUse,istn)=.false.
+          if(temp1 .gt. temp2) then
+            if(kdebug) write(*,*) "Zeroing station ", 
+     >       cstnna(istn), temp1, temp2  
+            kvs(1:NsrcUse,istn)=.false.
+          endif  
 !           endif 
        end do         
-       endif
+       
+       if(kdebug) then
+          write(*,*)  "After max_stat_source"
+          call write_vs(isrcvec,NsrcUse,istnSub,numsub)
+        endif
 
         call clear_close_sources(isrcvec,nsrcuse,istnsub,numsub)
 !  write up a map showing the visibility

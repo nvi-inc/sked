@@ -49,12 +49,18 @@ C     CALLED SUBROUTINES: CVPOS,CABLW
 C
 C   LOCAL VARIABLES
 
+! functions
       LOGICAL kcont
-      REAL RSTCON(2),tslewp,tslewc,delaz,delel,deldc,delha
-      real delx30,dely30,delx85,dely85,aznow,aznew,elnow,elnew
+      real    slew_time
+! Local       
+      
+      REAL tslewp,tslewc
+      real delaz,delel
+      real aznow,aznew,elnow,elnew
       real hanow,hanew,decnow,decnew,x30now,x30new,y30now,y30new
-      real x85now,x85new,y85now,y85new,az1,az2,elrate
-      real tslew1,tslew2
+      real x85now,x85new,y85now,y85new
+      real x1,x2,y1,y2
+      real tslew1,tslew2                       !slewing times for two axis 
       integer nloops
       integer nrs        !which rise-set interval. Some sources can rise a few times (e.g., go behind a mountain.)  
       character*2 cwrap1,cwrap2,cwrap2_pre
@@ -64,9 +70,12 @@ C   LOCAL VARIABLES
       double precision tol_180      !How close can we be to 180 degrees move?
       double precision move_test    !Test cablewrap within this distance
       character*8 lkind 
-      real az_off, el_off, az_rate,el_rate
-      real slew0, temp
+      real az_off, az_vel,az_acc    !For use by GGAO. Radians converted  to degrees
+      real el_off, el_vel,el_acc      
+      real temp
       real el1,el2
+      real az1,az2
+      real slew0_ggao               !slewing at GGAO in absence of mask
 
       
       logical kfirst
@@ -86,6 +95,8 @@ C               - current,new values of az,wrap
 
 C
 C  History
+
+! 2021-11-10 JMGipson  Modified slewing algorithms. 
 C      DATE   WHO    CHANGES
 C     811125  MAH    CHECK THAT SLEWING DOES CONVERGE FOR AZ-EL ANTENNAS
 C     830423  NRV    ADD X,Y CALCULATIONS
@@ -235,43 +246,40 @@ C                   Function to compute az move including cable wrap
      &               az1-stnlim(1,1,istn) .lt. pi) then
            islew_info=7
          endif
-      endif
-
-      DELEL = ABS(ELNEW-ELNOW)
-      DELHA = ABS(HANEW-HANOW)
-      DELDC = DABS(0.D0+DECNEW-DECNOW)
-      DELX30 = ABS(X30NEW-X30NOW)
-      DELX85 = ABS(X85NEW-X85NOW)
-      DELY30 = ABS(Y30NEW-Y30NOW)
-      DELY85 = ABS(Y85NEW-Y85NOW)
-C
-      IF (IAXIS(ISTN).EQ.1.OR.IAXIS(ISTN).EQ.5)
-     .  TSLEWC = AMAX1(Slew_off(1,ISTN)+DELHA/Slew_rate(1,ISTN),
-     .  Slew_off(2,ISTN)+DELDC/Slew_rate(2,ISTN))
-      IF (IAXIS(ISTN).EQ.2)
-     .  TSLEWC = AMAX1(Slew_off(1,ISTN)+DELX30/Slew_rate(1,ISTN),
-     .  Slew_off(2,ISTN)+DELY30/Slew_rate(2,ISTN))
-      IF (IAXIS(ISTN).EQ.3.or.IAXIS(ISTN).eq.6)
-     .  TSLEWC = AMAX1(Slew_off(1,ISTN)+DELAZ/Slew_rate(1,ISTN),
-     .  Slew_off(2,ISTN)+DELEL/Slew_rate(2,ISTN))
-      IF (IAXIS(ISTN).EQ.7) then
-        elrate = Slew_rate(2,istn)
-C       The Algonquin antenna is faster going down.
-C       if (elnew.lt.elnow) elrate=elrate*1.333
-C       First compute the az/el slewing rate
-        TSLEW1 = AMAX1(Slew_off(1,istn)+DELAZ/Slew_rate(1,ISTN),
-     .                 Slew_off(1,istn)+DELEL/elrate)
-C       Compute the ha/dec slewing rate for the master equatorial
-C       NOTE: Rates are hard-coded here because they are not available
-C             in the normal antenna info.  Rates are 24 deg/min.
-        rme = 24.d0*deg2rad/60.d0
-        TSLEW2 = AMAX1(Slew_off(1,istn)+DELHA/rme,
-     .                 Slew_off(1,istn)+DELDC/rme)
-        tslewc=amax1(tslew1,tslew2)
-      endif
-      IF (IAXIS(ISTN).EQ.4)
-     .  TSLEWc = AMAX1(Slew_off(1,ISTN)+DELX85/Slew_rate(1,ISTN),
-     .  Slew_off(2,ISTN)+DELY85/Slew_rate(2,ISTN))
+      endif 
+      
+      select case (iaxis(istn))
+        case(1,5)     
+          x1=HaNew
+          X2=HaNow
+          Y1=DecNew
+          Y2=DecNow
+        case(2)     
+          X1=X30new
+          X2=X30Now
+          Y1=DecNew
+          Y2=Decnow
+        case(3,6)
+          X1=Az1
+          X2=Az2
+          Y1=ElNew
+          Y2=ElNow
+        case(4)
+          X1=x85New
+          X2=X85Now
+          Y1=Y85New
+          Y2=Y85Now
+        case default  
+! This is algonquin.  Should never hit
+          write(*,*) "Slewt:  unknown axis offset ", iaxis(istn)
+          stop
+        end select
+      tslew1=slew_time(x1,X2,
+     &             slew_off(1,istn),slew_vel(1,istn),slew_acc(1,istn))
+      tslew2=slew_time(Y1,y2,
+     &             slew_off(2,istn),slew_vel(2,istn),slew_acc(2,istn))
+    
+      tslewc=max(tslew1,tslew2) 
 C
       IF ((ABS(TSLEWC-TSLEWP).LT.10).OR.(NLOOPS.GE.5)) GOTO 110
       GOTO 100
@@ -279,11 +287,7 @@ C     We get here if the slew has converged OR we iterated 5 times.
 110   IF  (kcont(MJD,UT+TSLEWC,TSLEWP-TSLEWC,NSNEW,ISTN,cwrap_cur,ierr))
      .  THEN  !continuity OK
         TSLEW = TSLEWC
-! AEM20081128.  The followng lines set slew time to 0 for short slews.
-! Led to erorrs
-!        RSTCON(1) = FLOAT(Slew_off(1,ISTN))
-!        RSTCON(2) = FLOAT(Slew_off(2,ISTN))
-!        IF(TSLEW.LE.(AMAX1(RSTCON(1),RSTCON(2))+5.))  TSLEW=0.0
+
         cwrap_new = cwrap2
 C       Final slewing time is the larger of 
 C       "time to rise" (trise) and "slew to risen position" (tslew
@@ -297,19 +301,23 @@ C       calculated using az,el at UT+trise).
       aznew=az2
 ! Special  fix becauses of GGAO mask
       if(cstnna(istn) .eq. "GGAO12M") then
-         az1=az1*rad2deg
+! convert from radians to degrees because this is what ggao_slew expects.  
+         az1=az1*rad2deg     
          az2=az2*rad2deg
-         az_rate=Slew_rate(1,istn)*rad2deg
-         el_rate=Slew_rate(2,istn)*rad2deg
-         az_off=Slew_off(1,istn)
-         el_off=Slew_off(2,istn)
          el1=elnow*rad2deg
          el2=elnew*rad2deg
+         
+         az_off =Slew_off(1,istn) 
+         az_vel =Slew_vel(1,istn)*rad2deg
+         az_acc =slew_acc(1,istn)*rad2deg
+         el_off =Slew_off(2,istn) 
+         el_vel =Slew_vel(2,istn)*rad2deg
+         el_acc =slew_acc(2,istn)*rad2deg          
 
          tslew=ggao_slew(az1,el1,az2,el2,
-     &      az_off,az_rate,el_off,el_rate,slew0,lkind)
+     &     az_off,az_vel,az_acc,el_off,el_vel,el_acc,slew0_ggao,lkind)
 !          if(abs(tslew-slew0) .ge. 4) then 
-!             write(*,*) "Difference at GGAO ",tslew-slew0
+!             write(*,*) "Difference at GGAO",tslew-slew0
 !             write(*,'("At ",4f8.2)') az1,el1,az2,el2
 !          endif
        endif

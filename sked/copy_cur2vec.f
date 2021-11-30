@@ -7,8 +7,9 @@
       include '../skdrincl/statn.ftni'
       include 'skcom_vec.ftni'
 ! functions
-      real speed
+
 !     JMG 2003May29
+! 2021-11-19 JMG. Got rid of things that need tape speed. 
 ! 2020Nov05 JMGipson. Git rid of 
 ! copy current measurement into old measurement.
       integer istat
@@ -64,14 +65,7 @@
             itucur(istat)=1
          else if (tape_motion_type(istat).eq.'START&STOP'.or.
      >            tape_motion_type(istat).eq.'ADAPTIVE') then
-            if(iold .eq. 0) then
-               itucur(istat)=1
-               write(*,*) "Copy_cur2vec. Shouldn't be here!"
-            else
-               ifeet_dif=iftend_vec(istat,iold)-iftcur(istat)
-               itime_dif=ifeet_dif/speed(icod_vec(istat,iold),istat)
-               if(itime_dif .lt. 10) itucur(istat)=1
-            endif
+ 
          else if(tape_motion_type(istat) .eq. "CONTINUOUS"
      >       .and. iftcur(istat) .ne. 0) then
              itucur(istat)=0
@@ -83,9 +77,7 @@
 ! Compute tape end.
       do i=1,nstncur
          istat=istcur(i)
-         IFTEND_cur(istat) = IFTCUR(istat)+ 
-     >    (IDURcur(istat)+
-     >     itucur(istat)*ITEARL(istat))*SPEED(ICODcur(istat),istat)
+         IFTEND_cur(istat) = IFTCUR(istat) 
       end do
 
       DO I=1,Nstncur

@@ -14,6 +14,7 @@ C
       include '../skdrincl/skobs.ftni'
 C
 C  MODIFICATIONS:
+! 2021-11-19 JMG Got rid of calculation of itol which was never  used. 
 ! 2021-02-19 JMG Now slew returns aznow, aznew, 
 ! 2019-05-15 JMG If doing 'ch' don't return on slew error messages. Just mush on. 
 ! 2017-11-14 JMG  Fixed problem in writing out cable-wrap problems. Indicated wrong station. 
@@ -119,7 +120,7 @@ C      - calculated UT for next observation
 C     - trial values for each station from AUTOT
       integer j,j2,i,ierr,n1,ichk
       integer mjdnew,mjdt,iyrnew,idanew,itsec,itmin,itdiff
-      integer idum,itdif,itol
+      integer idum,itdif
    
       real toltime ! time tolerance for checking
 
@@ -304,7 +305,7 @@ C
             KERR = 1
             itdif=idint(utnew-utcur(j))
           endif ! check timing
-          itol = toltime*speed(icodcur(j),j) ! 10 seconds footage tolerance
+  
          END IF  !check CUR
 C
       END DO  !check and/or adjust CUR variables

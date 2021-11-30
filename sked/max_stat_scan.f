@@ -4,7 +4,7 @@
       contains
 ! *********************************************************************
       subroutine max_stat_scan_out(luout,kall,knumber,lkind)
-! write out the stations in $TWIN_TELESCOPES
+! write out the stations ins in $MAX_STAT_SCAN
       include '../skdrincl/skparm.ftni'
 C
 C   COMMON BLOCKS USED
@@ -29,14 +29,22 @@ C   COMMON BLOCKS USED
         write(luscn,'(a)') '  #  Station Scan'
       endif 
       
+      write(*,*) "list ", max_ss_list(1:nstatn)  
       do istat=1,nstatn
         if(kall .or. max_ss_list(istat) .ne. 0) then
+           istart=1
            if(knumber) then 
-              write(luout,'(i4," ",$)') istat 
+              write(cbuf,'(i4," ")') istat 
+              istart=6
            endif 
-           write(luout,'(a8," ",i3)') cstnna(istat),max_ss_list(istat)
+           write(cbuf(istart:),'(a8," ",i3)') 
+     >       cstnna(istat),max_ss_list(istat)
+          call wrt_param_line(cbuf,luout,lkind) 
+        
         endif
       end do
+!      stop
+      
       return
       end subroutine
 ! ***********************************************************************    

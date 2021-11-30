@@ -127,9 +127,8 @@ C ... and add the track list
             enddo ! ihd headstacks
           enddo ! ipass subpasses
         enddo ! each group
-      enddo ! codes
-    
-      write(*,*) " here  " 
+      enddo ! codes    
+   
       itype=9
       do ic=1,ncodes ! codes
         call getist(ic,itype,ist,ipr,npx)

@@ -35,7 +35,7 @@ C     itrun, idurxt, and itucur are set in common
 
 C Local:
       integer idft,i,j,blnk,look,mjdend
-      real speed,tslew,trise
+      real tslew,trise
       double precision utend
       integer islew_info        !info about slewing
       real az_now,az_new 
@@ -50,12 +50,6 @@ C  1. Initialize
         if(tape_motion_type(j) .eq. 'CONTINUOUS') then
           itucur(j)=0
         else if (nspre(j).gt.0) then !initialized
-          if (tape_motion_type(j).eq.'START&STOP'.or.
-     .       (tape_motion_type(j).eq.'ADAPTIVE'.and.
-     .      abs(iftpre(j)-iftcur(j))/speed(icodpr(j),j).lt.10)) then ! stopped
-C
-C 2. Calculate ITRUN and IDURXT
-          else ! moving
             CALL SLEWT(NSPRE(J),mjdstart(J),utstart(J),NSORcur(J),J,
      >      LCBPRE(J),BLNK,TSLEW,look,trise,tsris,st0cur,frac,
      >      knov,islew_info,az_now,az_new) 
@@ -69,8 +63,6 @@ C         This may be earlier than UTCUR for continuous or adaptive motion.
 C         If the tape is at BOT or EOT then CUR=START
             if (iftcur(j).eq.0.or.iftcur(j).eq.maxtap(j)) then ! at bot/eot
               itucur(j)=1
-              idft=abs(iftcur(j)-iftpre(j)) ! running feet to bot/eot
-              itrun(j)=idft/speed(icodpr(j),j) ! equialent running time
             else ! not at bot/eot
               itucur(j)=0
               idurxt(j) = isecdif(mjdcur(j),utcur(j),
@@ -79,8 +71,7 @@ C         If the tape is at BOT or EOT then CUR=START
               itrun(j) = isecdif(mjdcur(j),utcur(j),
      .                           mjdend,utend)
               if (itrun(j).lt.0) itrun(j)=0
-            endif ! bot/eot
-          endif ! stopped/moving
+            endif ! bot/eot         
         else                            !not initialized
           if((tape_allocation(j) .eq. "AUTO"  .or.
      >        tape_allocation(j) .eq. "SCHEDULED")

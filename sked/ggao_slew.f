@@ -1,17 +1,23 @@
       real function ggao_slew(az1,el1,az2,el2,
-     &  az_off,az_vel,el_off,el_vel,slew0,lkind)
+     &  az_off,az_vel,az_acc, el_off,el_vel,el_acc,slew0,lkind)
       implicit none            
 ! compute slew time accouting for radar mask at GGAO
 
 ! History
 ! 2021-02-22 Original version
 ! 2021-04-22 Modified to handle cass of az_off=0 
+! 2021-11-10 Modified to have az_off, az_vel,az_acc passed from outside
       
 ! passed. 
       real az1,el1          !starting point   
       real az2,el2          !ending point
-      real az_off,az_vel      !az offset (seconds) and rate (deg/min)
-      real el_off,el_vel      !el offset (seconds) and rate (deg/min)
+      real az_off           !az_off (seconds)  Settling time
+      real az_vel           !max az velocity  (deg/sec)  maximum
+      real az_acc           !az acceleration. 
+      real el_off           !el_off (seconds)  Settling time
+      real el_vel           !max velocity  (deg/sec)  maximum
+      real el_acc           !acceleration. 
+         
 !returned      
       real slew0            !slew time w/o masks.  
       character*8 lkind     !Describes path taken       
@@ -26,10 +32,8 @@
 ! local   
 ! Internally make starting point be less than ending point. 
       real az_beg, el_beg          !beginning and ending az.   
-      real az_end, el_end   
- 
-      real az_acc,  el_acc        !acceration      
-        
+      real az_end, el_end    
+               
       real az_pk1, az_pk2         !location of peaks in az
       real el_pk                  !height of peaks   
       
@@ -41,7 +45,7 @@
       
       real az_slew1, el_slew1     !az and el slew time for first segment
       real az_slew2, el_slew2     !az and el slew time for second segment        
-      real az_slew1p, az_slew2p       !Same  as above but don't account for deceleration
+      real az_slew1p, az_slew2p   !Same  as above but don't account for deceleration
       real el_slew1p, el_slew2p           
                           
       real slewt                  !total slew time
@@ -86,8 +90,8 @@
           el_end=el1
       endif       
      
-      az_slewt=slew_time(az1,az2,az_vel,az_acc)
-      el_slewt=slew_time(el1,el2,el_vel,el_acc)      
+      az_slewt=slew_time(az1,az2,az_off,az_vel,az_acc)
+      el_slewt=slew_time(el1,el2,el_off,el_vel,el_acc)      
      
       slew0=max(az_slewt,el_slewt)
       slewt=slew0 
@@ -180,8 +184,8 @@
         endif
 ! Find slew time for first segment.       
         az_mid1=max(az_beg,az_mid1)   !handles rare case when within rectangular mask
-        az_slew1=slew_time(az_beg,az_mid1,az_vel,az_acc)
-        el_slew1=slew_time(el_beg,el_mid,el_vel,el_acc)                     
+        az_slew1=slew_time(az_beg,az_mid1,az_off,az_vel,az_acc)
+        el_slew1=slew_time(el_beg,el_mid, el_off,el_vel,el_acc)                     
         
 ! 2. Find which peak we are descending
         if(az_end .ge. az_pk2) then       
@@ -191,8 +195,8 @@
         endif     
 ! Find slew time for second segment        
         az_mid2=min(az_mid2,az_end)     !handles rare case when within rectangular mask
-        az_slew2=slew_time(az_mid2,az_end,az_vel,az_acc)
-        el_slew2=slew_time(el_mid,el_end,el_vel,el_acc) 
+        az_slew2=slew_time(az_mid2,az_end,az_off,az_vel,az_acc)
+        el_slew2=slew_time(el_mid,el_end, el_off,el_vel,el_acc) 
 
 ! Slew values used for comparison of time. 
 ! Subtract 1/2 offset because we don't worry about stopping/starting 
@@ -204,16 +208,16 @@
         if(az_slew1p .ge. el_slew1p .and. 
      &     az_slew2p .ge. el_slew2p) then
 ! One very long slew in azimuth        
-           slewt=slew_time(az_beg,az_end,az_vel,az_acc)
+           slewt=slew_time(az_beg,az_end,az_off,az_vel,az_acc)
         else if(az_slew1p .ge. el_slew1p .and. 
      &          az_slew2p .le. el_slew2p) then
 ! A long slew in Az followed by the descent in Elevation
 ! Subtract 1/2 of the offset because this coincides with el starting. 
-           slewt=slew_time(az_beg,az_mid2,az_vel,az_acc)+el_slew2
+           slewt=slew_time(az_beg,az_mid2,az_off,az_vel,az_acc)+el_slew2
      &            -az_off/2
         else if(az_slew1p .le. el_slew1p .and. 
      &          az_slew2p .ge. el_slew2p) then
-           slewt=el_slew1+slew_time(az_mid1,az_end,az_vel,az_acc)
+           slewt=el_slew1+slew_time(az_mid1,az_end,az_off,az_vel,az_acc)
      &            -az_off/2
         else 
            slewt=el_slew1+ (az_mid2-az_mid1)/az_vel + el_slew2
@@ -248,8 +252,8 @@
       az_mid1=max(az_beg,az_mid1)  !middle can't be before beginning
       az_mid1=min(az_mid1,az_end)  !middle can't be after ending 
       
-      az_slew1=slew_time(az_beg,az_mid1,az_vel,az_acc)
-      el_slew1=slew_time(el_beg,el_mid,el_vel,el_acc) 
+      az_slew1=slew_time(az_beg,az_mid1,az_off,az_vel,az_acc)
+      el_slew1=slew_time(el_beg,el_mid, el_off,el_vel,el_acc) 
       
 ! This is slew time used for comparison. Don't worry about stopping      
       az_slew1p=abs(az_beg-az_mid1)/az_vel+az_off/2.
@@ -260,14 +264,14 @@
 ! Two possibilities.  
 ! 1. A long slew in elevation 
 ! 2. A slew in elevation followed by one in azimuth 
-         az_slew2=slew_time(az_mid1,az_end,az_vel,az_acc)
+         az_slew2=slew_time(az_mid1,az_end,az_off,az_vel,az_acc)
          slewt=max(el_slewt,el_slew1p+az_slew2)
       else 
          if(el_slew1p .gt. az_slew1p) goto 500     !don't hit top on the way down. Normal slew
 ! Two possibilities.
 ! 1. A long slew in azimuth
 ! 2. A slew in azimuth followed by one in elevation.     
-         el_slew2=slew_time(el_mid,el_end, el_vel,el_acc)
+         el_slew2=slew_time(el_mid,el_end, el_off,el_vel,el_acc)
 ! Use az_slew1p because antenna is still moving. It will stop while el is moving.          
          slewt=max(az_slewt,az_slew1p+el_slew2)   
       endif 

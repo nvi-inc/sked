@@ -1,4 +1,9 @@
  This file contains a brief description of the changes made to sked
+2021-11-30 nextc.f: More debugging information.
+2021-11-30 max_stat_scan.f: Was not writing out stuff to VEX file. 
+2021-11-20 Many changes related to adding in acceleration term in sked model and making naming consistent
+2021-11-20   stlis.f, vsiout.f,ggao_slew.f, chstn.f: In ../skdrut  slewo.f slewt.f, stinp.f stinp.f vunpant.f
+2021-11-19 Removed call to obsolete speed function: gtrun, prout.f 
 2021-10-20 save_station_state.f, restore_station_state.f:  store and restores max_state_scan info 
 2021-10-18 master_cmd: Can now handle frational hours in the duration 
 2021-09-24 New sked command: max_stat_scan.  Set Max#  scans per staiton. Designed for Svetloe which has 350 scans max.

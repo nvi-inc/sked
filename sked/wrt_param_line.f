@@ -1,5 +1,5 @@
       subroutine wrt_param_line(cline,lutmp,ciin)
-! write out a line from the parameters section.
+! Write out a line to sked or vex file. 
       implicit none
 ! History
 !  2012Nov08. JMG. Changed from:
