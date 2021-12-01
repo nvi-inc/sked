@@ -547,19 +547,23 @@ C
           cwarp_Temp=cwarp(j)
           IF (.NOT.kcont(mjdtmp,uttmp,dur_temp,nsor,j,cwarp(j),ierr))
      >     THEN
+            if(iverbose_level .ge. 1) then 
             WRITE(LUDSP,
      >        "('ERROR! (newob):  Cable wrap problem! ',
      >        'Scan not continous for ', A8,' at ',A8)") 
      >         cSORNA(NSOR),cstnna(j)
+            endif 
             kok=.false.
             istn(i)=-iabs(istn(i))
           endif
 
           if(cwarp_temp .ne. cwarp(j)) then   
           if(cwarp_temp .eq. " ") cwarp_temp="-"
-            write(ludsp,
-     >	    "('ERROR! (newob): Cable wrap changed at ',a ' from ',
-     >         a,' to ',a)")      cstnna(j),cwarp_temp,cwarp(j)
+            if(iverbose_level .ge. 1) then 
+             write(ludsp,
+     >	      "('ERROR! (newob): Cable wrap changed at ',a ' from ',
+     >           a,' to ',a)")      cstnna(j),cwarp_temp,cwarp(j)
+            endif 
             kok=.false.
             istn(i)=-iabs(istn(i))
           endif
@@ -593,9 +597,11 @@ C    calculated start time, or max 3 times.
          j=istn(i)
 !  Now turn off station if station is not up for scan. (Becase of downtime.
          if(.not.(kstatup(j,mjdbeg,utbeg,idurst(j)))) then 
+           if(iverbose_level .ge. 1) then 
            write(*,
      >    '("Station ",a, " can not participate because of downtime")')
      >             cstnna(j)                
+           endif 
              kok=.false.
              istn(i)=-iabs(istn(i))
           endif   

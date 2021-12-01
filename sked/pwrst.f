@@ -56,7 +56,7 @@ C  OUTPUT:
 
       if(iwhere .eq. 0) goto 100
       if(.not. kdone(iwhere)) then
-        if(kverbose) write(luscn,'(A,1x,$)') cpos(iwhere)
+        if(iverbose_level.ge.5) write(luscn,'(A,1x,$)') cpos(iwhere)
         write(lutmp,'(a)')"P "//ldum(1:trimlen(ldum))
         num_done=num_done+1
         kdone(iwhere)=.true.
@@ -65,7 +65,7 @@ C  OUTPUT:
 
 190   continue
       close(lucat)
-      if(kverbose) write(luscn,'(a)') ! write the EOL
+      if(iverbose_level.ge.5) write(luscn,'(a)') ! write the EOL
 
 200   continue
       if(num_done .ne. num_sel) then

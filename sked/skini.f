@@ -420,6 +420,7 @@ C     For FS 9.4 standard is 100 sec.
       MODSCN = 10 
       minsubnetsize = 2
       numsubnet = 1
+      iverbose_level=0 
 
 C     *NOTE* ABOVE WE MADE MXFEET=ITSKIP, EFFECTIVELY DISABLING THE
 C     "CAN'T WASTE TAPE" ERRORS.
@@ -438,9 +439,7 @@ C     NRV 971006 Don't need prepass as default any more.
       mjprso=0
       isscan=idurde
       
-      call init_obs_scan_counters(max_sor,max_stn)
-    
-
+      call init_obs_scan_counters(max_sor,max_stn)    
 C
       RETURN
       END

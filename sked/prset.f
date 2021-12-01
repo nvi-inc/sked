@@ -60,7 +60,7 @@ C               - Key word, longest is 22 characters
       equivalence (lfrqde,cfrqde)
 
       integer MaxPr
-      parameter (MaxPr=65)
+      parameter (MaxPr=66)
       character*22 listPr(MaxPr),cParam
       character*2  listPrShort(MaxPr)
 
@@ -97,7 +97,8 @@ C               - Key word, longest is 22 characters
      > "SOURCE",  "START",     "SUBNET",     "SUNDIS",    "SYNCHRONIZE",
      > "TAPETM",  "VERBOSE",   "VIS",        "VSCAN",      "WIDTH",
      > "VIE_SCHED_VERSION","VIE_SCHED_CREATE_DATE",
-     > "SCHEDULING_SOFTWARE", "SOFTWARE_VERSION","SCHEDULE_CREATE_DATE"/
+     > "SCHEDULING_SOFTWARE", "SOFTWARE_VERSION","SCHEDULE_CREATE_DATE",
+     > "VERBOSE_LEVEL"/
 
       data listPrShort/
      >"AG","BR","BG","CA","CH",
@@ -113,8 +114,9 @@ C               - Key word, longest is 22 characters
      >"PI",
      >"xD","xV","SP","SA",
      >"SO","ST","SU","SD","SY",
-     >"TP","VB","VI","VS","WI",
-     >"V1","V2","--","--","--"/
+     >"TP","--","VI","VS","WI",
+     >"V1","V2","--","--","--",
+     >"VB"/
 
       data ListAM/"AUTO","MANUAL"/
       data ListAS/"ALL","SUBNET"/
@@ -232,7 +234,7 @@ C
      &     ckey.eq.'ML'.or.ckey.eq.'M6'.or.ckey.eq.'FO'.or. 
      .     ckey.eq.'WI'.OR.ckey.eq.'CR'.or.ckey.eq.'TE'.or.
      >     ckey.eq.'FS'.or.ckey.eq.'FB'.or.ckey.eq.'FT'.or.
-     .     ckey.eq.'SM'.or.ckey.eq.'XS') Then
+     .     ckey.eq.'SM'.or.ckey.eq.'XS'.or.ckey.eq.'VB') Then
         CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
         if (ic1.eq.0) then
           write(luscn,'("PRSET03 - You must enter a number.")')
@@ -315,6 +317,8 @@ C       ELSE IF (ckey.eq.'MB') THEN
 C         mintdiff = INUM*60
 !        ELSE IF (ckey.eq.'SD') THEN
 !          ISUNDI = INUM
+        else if(ckey .eq.'VB') then
+          Iverbose_level=inum 
         ELSE IF (ckey.eq.'SO') THEN
           ISORTM = INUM
         ELSE IF (ckey.eq.'SP') THEN
@@ -464,7 +468,7 @@ C  4. String parameter section.
               else if(Cparam .eq. "KEEP_LOG") then
                 kkeep_log=kyesno
               else if(Cparam .eq. "VERBOSE") then
-                kverbose=kyesno
+                iverbose_level=5
               else if(Cparam .eq. "CONF_EQUIP") then
                 kconf_equip=kyesno
               else if(Cparam .eq. "ALL_BL_GOOD") then

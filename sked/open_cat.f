@@ -24,7 +24,7 @@
         close(lucat)     
         return
       endif
-      if(kverbose)
+      if(iverbose_level.ge.5)
      >   write(luscn,'("Opening catalog: ",a)') cat_name(1:nch)
       return
       end

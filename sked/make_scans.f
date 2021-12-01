@@ -51,8 +51,10 @@ C local variables
       end do
 
       if(.not.kproceed) then
-         write(luscn,*)
+         if(iverbose_level .ge. 1) then 
+          write(luscn,*)
      >      "Make_scans: Not enough observing stats to proceed"
+          endif 
          return
       endif
 

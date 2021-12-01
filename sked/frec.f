@@ -135,7 +135,7 @@ C  1. Open the catalog and get the mode.
           endif
 
 ! Write out the antenna name and track
-          if(kverbose) write(luscn,'(a," (",a,") ",$)') 
+          if(iverbose_level.ge.5) write(luscn,'(a," (",a,") ",$)') 
      >       cantna(istn), cat_Rec_trk(itrk)
           if(num_track_found(istn) .gt. 1) then 
              write(*,*) "ERROR:  For mode ",trim(crec_mode), 
@@ -147,7 +147,7 @@ C  1. Open the catalog and get the mode.
           endif 
           iw=iw+icol_wid
           if(iw .gt. iwscn) then
-             if(kverbose) write(luscn,'()')
+             if(iverbose_level.ge.5) write(luscn,'()')
              iw=icol_wid
           endif
 
@@ -162,7 +162,7 @@ C  1. Open the catalog and get the mode.
       goto 500
 
 190   continue
-      if(iw .ne. 0 .and. kverbose) write(luscn,'()')
+      if(iw .ne. 0 .and. iverbose_level.ge.5) write(luscn,'()')
       ierr=0
 
       kfirst_err=.true.

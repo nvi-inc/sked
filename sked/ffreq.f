@@ -55,14 +55,14 @@ C  2.  Find each sub-code in the freq.cat file and save the frequency info.
       call splitNtokens(cbuf,ltoken,Maxtoken,NumToken)
       if(ltoken(1) .ne. cfrq_name) goto 100
       if(nrx .eq. 0) then
-         if(kverbose) write(luscn,'(a,": ",$)') cfrq_name
+         if(iverbose_level.ge.5) write(luscn,'(a,": ",$)') cfrq_name
       endif
 ! Parse a line like:
 !    CDPSX-WB WB SW  VLBA_WID
       nrx=nrx+1     !update number of codes.
       c2code=ltoken(2)
       crxname(nrx)=ltoken(4)
-      if(kverbose) write(luscn,'(a," ",$)') crxname(nrx)
+      if(iverbose_level.ge.5) write(luscn,'(a," ",$)') crxname(nrx)
 
 ! At this piont, found a match.
       ifr=0
@@ -115,7 +115,7 @@ C  2.  Find each sub-code in the freq.cat file and save the frequency info.
         write(luscn,'("Ffreq: ERROR! Code not found ",a)') cfrq_name
         ierr=1
       else
-        if(kverbose) write(luscn,'()')
+        if(iverbose_level.ge.5) write(luscn,'()')
       endif
       return
       end

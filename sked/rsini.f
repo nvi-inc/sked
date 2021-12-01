@@ -58,7 +58,7 @@ C                             above two arrays
         return
       endif
 
-      write(luscn,'(a)') "Calculating rise/set times:"
+      write(luscn,'(a,$)') "Calculating rise/set times: "
 
       do i=1,Max_sor
        do j=1,Max_baseline
@@ -80,8 +80,12 @@ C                             above two arrays
 
 C     do i=1,nsourc
       do i=1,nceles
-        write(luscn,"(i4,$)") i
-        if(mod(i,20) .eq. 0) write(luscn,'()') 
+        if(iverbose_level .ge. 1) then 
+          write(luscn,"(i4,$)") i
+          if(mod(i,20) .eq. 0) write(luscn,'()') 
+        else
+          write(luscn,'(a,$)') "." 
+        endif 
         do j=1,nstatn
           istn(j)=j
         enddo
@@ -192,13 +196,13 @@ C  Fill in the mutual rise/set arrays for each baseline.
 !             endif
       enddo
       krsini = .true.
-      write(luscn, *) '....done'
+      write(luscn,'(a)') ' done'
 
 ! for debugging
       if(.false.) then 
       do j=1,nstatn
       do i=1,nceles
-        write(*,'(i3,1x,a,1x,a,1x,6f8.2)'),i,cstnna(j),csorna(i),
+        write(*,'(i3,1x,a,1x,a,1x,6f8.2)') i,cstnna(j),csorna(i),
      &      tsris(i,j,1:ntsrisset(i,j))*1440.d0/twopi, 
      &      tsset(i,j,1:ntsrisset(i,j))*1440.d0/twopi
       end do

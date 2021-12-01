@@ -1,4 +1,9 @@
  This file contains a brief description of the changes made to sked
+2021-12-01 Minimize amount of output during auto-sked mode.  Removed kverbose, added iverbose_level.
+2021-12-01 Files affected: skparm.ftni, awrst.f find_best_scan.f ffreq.f frec.f frx.f hwrst.f 
+           make_scans.f  max_stat_scan.f newob.f nextc.f open_cat.f prlis.f prout.f prset.f pwrst.f 
+           read_antenna_cat.f read_freq_cat.f read_loif_cat.f read_mode_cat.f read_rec_cat.f 
+           read_rx_cat.f read_track_cat.f rsini.f simul.f skini.f  stcat.f unout.f wrfclines.f wrllines.f wrfrs.f
 2021-11-30 nextc.f: More debugging information.
 2021-11-30 max_stat_scan.f: Was not writing out stuff to VEX file. 
 2021-11-20 Many changes related to adding in acceleration term in sked model and making naming consistent

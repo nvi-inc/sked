@@ -123,6 +123,7 @@ C 021011 nrv Write POSTPASS parameter.
 ! 2015Mar17 JMG. Added Mark6_off
 ! 2016Dec08 KOL. Added Fill_off
 ! 2016Dec12 JMG. Got rid of TAPE_TYPE parameter. This is obsolete since everything is now disk. 
+! 2021-12-01 JMG removed KVERBOSE, added VERBOSE_LEVEL
 
       cbuf="$PARAM"
       write(luscn,'(a)') trim(cbuf) 
@@ -211,8 +212,10 @@ C Output the lines which have numbers in them.
 !      write(cline,'(4(a11,5x,a1,1x,a1,1x,a1,1x))')
       write(cline,'(4(a11,5x,a1,1x))')
      >"DEBUG      ",lyn(kdebug),  "KEEP_LOG   ",lyn(kkeep_log),
-     >"VERBOSE    ",lyn(kverbose),"CONF_EQUIP ",lyn(kconf_equip)
+     >"CONF_EQUIP ",lyn(kconf_equip)
 
+      call wrt_param_line(cline,lutmp,ciin)      
+      write(cline,'("VERBOSE_LEVEL  ", i2)') iverbose_level       
       call wrt_param_line(cline,lutmp,ciin)
 
 ! Output line with various ascii parameters.

@@ -191,7 +191,7 @@
      >   cbuf(1:trimlen(cbuf))
 
 200   continue
-      if(kverbose)write(luscn,'()')
+      if(iverbose_level.ge.5)write(luscn,'()')
 
 300   continue
       kcat_track=.true.

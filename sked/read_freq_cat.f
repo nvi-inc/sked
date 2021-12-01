@@ -136,7 +136,7 @@
       write(luscn,*) cbuf(1:trimlen(cbuf))
 
 300   continue
-      if(kverbose) then
+      if(iverbose_level.ge.5) then
       write(luscn,'("Read_freq_cat: num_freqs/max_freqs: ",i4,"/",i4)')
      >    num_cat_freq,max_cat_freq
       endif

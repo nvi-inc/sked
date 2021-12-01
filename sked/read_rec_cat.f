@@ -141,10 +141,10 @@
 130     continue
       end do
 200   continue
-      if(kverbose) write(luscn,'()')
+      if(iverbose_level.ge.5) write(luscn,'()')
 
 300   continue
-      if(kverbose) then
+      if(iverbose_level.ge.5) then
       write(luscn,'("Read_rec_cat: num_lines/max_lines: ",i4,"/",i4)')
      >    iline,max_rec_lines
       write(luscn,'("Read_rec_cat: num_fmt/max_fmt:     ",i4,"/",i4)')

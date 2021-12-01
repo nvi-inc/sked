@@ -164,21 +164,26 @@ C     **NOTE: "code" IS REALLY ONLY CODE NOW, NOT MODE&BANDWIDTH TOO.
 C
 
       if(nsubc.eq.0) then
-        if (klist) then !list observation in its entirety
-          if(iadd.eq.-1) then
-            write(ludsp,'(a,$)')'SIMUL01: Removing  | '
-          else
-            write(ludsp,'(a,$)')'SIMUL02: Inserting | '
-          endif
+        if(iverbose_level .ge. 1) then 
+          if (klist) then !list observation in its entirety
+            if(iadd.eq.-1) then
+              write(ludsp,'(a,$)')'SIMUL01: Removing  | '
+            else
+              write(ludsp,'(a,$)')'SIMUL02: Inserting | '
+            endif
 !          nc=trimlen(cbuf)
-          write(ludsp,'(a)') cbuf(1:70)
-        else !list observation index only
-          if (iadd.eq.-1) then
-            write(ludsp,'("delete",i5,"  ",$)') iobs
-          else
-            write(ludsp,'("insert",i5,"  ",$)') iobs
+            write(ludsp,'(a)') cbuf(1:70)
+          else !list observation index only
+            if (iadd.eq.-1) then
+             write(ludsp,'("delete",i5,"  ",$)') iobs
+            else
+             write(ludsp,'("insert",i5,"  ",$)') iobs
+            endif
           endif
-        endif
+        else
+          write(ludsp,'(i4," ",$)') iobs          
+          if(mod(iobs,20) .eq. 0) write(ludsp,'()')
+        endif 
       endif
 
 ! 1. *****PARSE INPUT LINE *************

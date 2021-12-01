@@ -32,27 +32,28 @@ C
 C
       CALL READS(luskd,IERR,IBUF,IBLEN,ILCHAR,1)
       DO WHILE (ILCHAR.GE.0.AND.IERR.GE.0) !read original file
-        IF (cbuf(1:6) .eq.'$EXPER'  .OR.   !These are always written out before here.
-     .      cbuf(1:6) .eq.'$PARAM'  .OR.
-     >      cbuf(1:6) .eq.'$ASTRO'  .OR.
+        IF (cbuf(1:6)  .eq.'$EXPER'  .OR.   !These are always written out before here.
+     .      cbuf(1:6)  .eq.'$PARAM'  .OR.
+     >      cbuf(1:6)  .eq.'$ASTRO'  .OR.
      >      cbuf(1:16) .eq.'$TWIN_TELESCOPES'  .OR.
-     >      cbuf(1:6) .eq.'$GROUP'  .OR.
-     >      cbuf(1:7) .eq.'$STATWT'  .OR.
-     >      cbuf(1:6) .eq.'$SRCWT'  .OR.
-     >      cbuf(1:6) .eq.'$MINOR'  .or.
-     >      cbuf(1:6) .eq.'$MAJOR'  .or.
-     >      cbuf(1:9) .eq.'$DOWNTIME' .or.
-     >      cbuf(1:3) .eq.'$OP'     .or.
+     >      cbuf(1:13) .eq. 'MAX_STAT_SCAN'    .or. 
+     >      cbuf(1:6)  .eq.'$GROUP'  .OR.
+     >      cbuf(1:7)  .eq.'$STATWT'  .OR.
+     >      cbuf(1:6)  .eq.'$SRCWT'  .OR.
+     >      cbuf(1:6)  .eq.'$MINOR'  .or.
+     >      cbuf(1:6)  .eq.'$MAJOR'  .or.
+     >      cbuf(1:9)  .eq.'$DOWNTIME' .or.
+     >      cbuf(1:3)  .eq.'$OP'     .or.
      >      cbuf(1:14) .eq.'$CATALOGS_USED' .or.
      >      cbuf(1:10) .eq.'$BROADBAND' .or.
-     >      cbuf(1:6) .eq. '$PROCS' .or. 
-     .     (cbuf(1:7) .eq.'$SOURCE' .AND.KNEWSO).OR.  !these may or may not be.
-     .     (cbuf(1:8) .eq.'$STATION'.AND.(KNEWST.or.Knewfi)).OR.
-     .     (cbuf(1:6) .eq.'$CODES'  .AND.KNEWFR).OR.
-     .     (cbuf(1:5) .eq.'$VLBA'   .and.knewfr).OR.
-     .     (cbuf(1:5) .eq.'$HEAD'   .and.knewfr).OR.
-     .     (cbuf(1:5) .eq.'$SKED'   .AND.KNEWSK).or.
-     .     (cbuf(1:5) .eq.'$FLUX'   .AND.KNEWFL)
+     >      cbuf(1:6)  .eq. '$PROCS' .or. 
+     .     (cbuf(1:7)  .eq.'$SOURCE' .AND.KNEWSO).OR.  !these may or may not be.
+     .     (cbuf(1:8)  .eq.'$STATION'.AND.(KNEWST.or.Knewfi)).OR.
+     .     (cbuf(1:6)  .eq.'$CODES'  .AND.KNEWFR).OR.
+     .     (cbuf(1:5)  .eq.'$VLBA'   .and.knewfr).OR.
+     .     (cbuf(1:5)  .eq.'$HEAD'   .and.knewfr).OR.
+     .     (cbuf(1:5)  .eq.'$SKED'   .AND.KNEWSK).or.
+     .     (cbuf(1:5)  .eq.'$FLUX'   .AND.KNEWFL)
      .                           ) THEN  !get next $ section
            CALL READS(luskd,IERR,IBUF,IBLEN,ILCHAR,1)
         ELSE  !copy this section

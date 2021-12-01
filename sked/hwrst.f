@@ -99,12 +99,12 @@ C  OUTPUT:
 
 190   continue
       close(lucat)
-      if(kverbose) write(luscn,'(a)') ! write the EOL
+      if(iverbose_level.ge.5) write(luscn,'(a)') ! write the EOL
 
 200   continue
       if(num_done .ne. num_sel) then
         do i=1,num_sel
-          if(.not.kdone(i) .and. kverbose)  write(luscn,
+          if(.not.kdone(i) .and. iverbose_level.ge.5)  write(luscn,
      >       "('HWRST: Note - Mask entry not found for: ',A)") cname(i)
         end do
       endif

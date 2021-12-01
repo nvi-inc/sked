@@ -9,6 +9,7 @@ C  for one frequency code.
 !  Each F line is followed by a series of C lines.
 C
 C   HISTORY:
+! 2021-12-01 Gipson. Added iverbose_level, removed kverbose
 C 951128 nrv New.
 C 960221 nrv Change LCH to ICHAN
 C 960513 nrv Write out track assignments by channel index
@@ -78,7 +79,8 @@ C  LOCAL VARIABLES
       logical kerror
 
       ierr=0
-      if(kverbose) write(luscn,'(a)') "Writing out F&C lines."
+      if(iverbose_level.ge.5) 
+     >    write(luscn,'(a)') "Writing out F&C lines."
 
 !  1. Make up the list and station index of (recording formats+Bandwidth)+track format!
 !  Note that if we are using a Mark3 mode (A-E) we ignore the formatter info.
@@ -147,7 +149,7 @@ C              this station on this RXname and in this format
           if(ich .eq.  15) goto 180           !no stations found.
 
           write(lutmp,'(a)') cbuf(1:ich)
-          if(kverbose) write(luscn,'(a)') cbuf(1:ich)
+          if(iverbose_level.ge.5) write(luscn,'(a)') cbuf(1:ich)
 C  3. Set up the mode name.
           cmode_print=" "
 

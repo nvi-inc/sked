@@ -67,11 +67,11 @@ C  2. Loop over each station
         if(ltoken(1) .ne. cloifname(is)) goto 100
 
 ! Found a match
-        if(kverbose)
+        if(iverbose_level.ge.5)
      >    WRITE(LUSCN,'(A,"(",a,") ",$)') cloifname(is),cantna(is)
         iw=iw+icol_wid
         if (iw.gt. iwscn) then
-          if(kverbose) write(luscn,'()')
+          if(iverbose_level.ge.5) write(luscn,'()')
           iw=icol_wid
         endif
 ! Now write out the L lines.
@@ -100,7 +100,7 @@ C  2. Loop over each station
       enddo ! all stations
 
       ierr=0
-      if(iw .ne. 0 .and. kverbose)  write(luscn,'()')
+      if(iw .ne. 0 .and. iverbose_level.ge.5)  write(luscn,'()')
       close(lucat)
 
       RETURN

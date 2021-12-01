@@ -171,7 +171,7 @@
 
 320   continue
 
-      if(kverbose) then
+      if(iverbose_level.ge.5) then
         write(luscn,
      >   '("Read_antenna_cat: num_ants/max_ants:   ",i4,"/",i4)')
      >      num_cat_ant,max_cat_ant

@@ -113,7 +113,7 @@
       kcat_rx=.true.
 300   continue
 
-      if(kverbose) then
+      if(iverbose_level.ge.5) then
       write(luscn,'("Read_rx_cat: num_line/max_line: ",i4,"/",i4)')
      >    iline,max_rx_lines
       endif

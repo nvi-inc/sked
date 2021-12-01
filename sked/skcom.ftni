@@ -1,5 +1,6 @@
 ! Sked common block
 ! Completely rearranged in more logical order.
+! 2021-12-01 Gipson. Added iverbose_level, removed kverbose
 ! 2021-09-24 Gipson. Moved some arrays dealing with num obs, num scans into obs_scan_coutners 
 ! 2021-02-12 JMG Removed kbonn_corr which is no longer used
 ! 2007Oct2  John Gipson.
@@ -156,11 +157,12 @@
       logical kdissub          !dispaly subnet info in scheduling.
       logical kdiswh           !Display info in "Whatsup"
       logical KTMLIN           !display a timeline for the scans.
-      logical kverbose         !display lots of information when writing out stuff.
-      logical kconf_equip    !Confirm the automatic use of the catalog equipment.  
+!      logical kverbose         !display lots of information when writing out stuff.
+      logical kconf_equip      !Confirm the automatic use of the catalog equipment.  
       common /skcom_log/kask,kdebug,kkeep_log,kdissub,kdiswh,ktmlin,
-     >   kverbose,kconf_equip
-
+     >  kconf_equip
+     
+   
 ! Variables used in scheduling observations.
       logical kasnr            !Auto SNR: Automatically schedule obs that meet SNR targets
       logical kauto            !automatic mode is on.
@@ -312,9 +314,10 @@
       integer maxscn            !maximum scan    (seconds)
       integer minscn            !minimum of scan (seconds)
       integer modscn            !make all scans a multiple of this.
-      integer imark6_off        !offset in seconds for Mark6
+      integer imark6_off        !offset in seconds for Mark6      
+      integer iverbose_level    !0 is minimal. Higher more information. 
       common /skcom_int/icalde,idurde,idldef,imintm,imodtm,itsync,
-     >    iwdef,lookah,maxscn,minscn,modscn,imark6_off
+     >    iwdef,lookah,maxscn,minscn,modscn,imark6_off,iverbose_level
 
 ! FILL command - offset ifill_off
       integer ifill_off

@@ -135,6 +135,6 @@ C  OUTPUT:
 
 
 500   continue
-      if(kverbose) write(luscn,'("STCAT FINISHED")')
+      if(iverbose_level.ge.5) write(luscn,'("STCAT FINISHED")')
       END
 

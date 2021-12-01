@@ -553,7 +553,7 @@
 ! Done normalization
 
 ! Write header info
-      if(kdebug .or. kverbose) then
+      if(kdebug .or. iverbose_level.ge.5) then
         call write_minor_score_header(ludsp)
       endif 
 
@@ -615,7 +615,7 @@ CHS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
 CHS Initialization
 C
-      if(kverbose .or. kdebug) then
+      if(iverbose_level.ge.5 .or. kdebug) then
         itst=ibest
         lreason="Final"
         call write_minor_score_and_Scan(ludsp,lreason,itst,Scoremax)

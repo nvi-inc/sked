@@ -70,7 +70,7 @@ C  INPUT:
       if(.not. kdone(iwhere)) then
         num_done=num_done+1
         kdone(iwhere)=.true.
-        if(kverbose)  write(luscn,'(A," ",$)')
+        if(iverbose_level.ge.5)  write(luscn,'(A," ",$)')
      >    cname(iwhere)(1:trimlen(cname(iwhere)))
         i=istart_vec(1)
         ldum(i:i)=cstnid(iwhere)
@@ -88,7 +88,7 @@ C  INPUT:
       if(num_done .ne. num_sel) goto 100      !more to do?
 190   continue
       close(lucat)
-      if(kverbose) write(luscn,'(a)')  !write the end of the line.
+      if(iverbose_level.ge.5) write(luscn,'(a)')  !write the end of the line.
 
 200   continue
       if(num_done .ne. num_sel) then

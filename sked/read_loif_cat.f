@@ -104,7 +104,7 @@
 
 200   continue
       kcat_loif=.true.
-      if(kverbose) then
+      if(iverbose_level.ge.5) then
       write(luscn,'("Read_loif_cat: num_loifs/max_loifs: ",i4,"/",i4)')
      >    num_cat_loif,max_cat_loif
       endif

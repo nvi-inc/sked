@@ -296,27 +296,29 @@ C
      >   iwscn
 
         write(ludsp,
-     >   "(' CONFIRM     ',A1,' (ask before adding obs)   ',$)")
+     >   "(' CONFIRM     ',A1,' (ask before adding obs)  ',$)")
      >   lyn(kask)
+     
+        write(ludsp,
+     >   "(' KEEP_LOG    ',A1,' (keep log upon exit)      ')")
+     >   lyn(kkeep_log)   
+     
+         write(ludsp,
+     >   "(' CONF_EQUIP  ',A1,' (update info from cat)   ',$)")
+     >   lyn(kconf_equip)      
+     
         writE(ludsp,
-     >   "(' DEBUG      ',a1,' (display debugging info)  ')")
+     >   "(' DEBUG       ',a1,' (display debugging info)  ')")
      >    lyn(kdebug)
-        write(ludsp,
-     >   "(' KEEP_LOG    ',A1,' (keep log upon exit)      ',$)")
-     >   lyn(kkeep_log)
+    
+!        write(ludsp,
+!     >   "(' VERBOSE    ',A1,' (output lots of info)    ')")
+!     >   lyn(kverbose)
 
-        write(ludsp,
-     >   "(' VERBOSE    ',A1,' (output lots of info)    ')")
-     >   lyn(kverbose)
-
-        write(ludsp,
-     >   "(' CONF_EQUIP  ',A1,' (update info from cat)   ')")
-     >   lyn(kconf_equip)
-
+       write(ludsp, '(" VERBOSE LEVEL ", i4)') iverbose_level
 
        write(ludsp,'(A)')
      > "---------- Informational only -------------------------------"
-
 
         writE(ludsp, "(' SKED version:     ',a,'           ',$)")
      >     skversion

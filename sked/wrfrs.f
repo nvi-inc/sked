@@ -107,7 +107,7 @@ C  2. Handle each frequency code separately.
           ifreq=icat_mode_freq_ptr(ic)
           irec=icat_mode_rec_ptr(ic)
 
-          if(kverbose) write(luscn,
+          if(iverbose_level.ge.5) write(luscn,
      >     "('Getting catalog information for frequency sequence ',a)")
      >      cat_mode_freq(ifreq)
           isub=0

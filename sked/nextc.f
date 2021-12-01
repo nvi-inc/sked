@@ -236,7 +236,9 @@ C   Calculate all rising/setting times now.
 
       TimeFinish = -1d0
 
-      write(ludsp, '("Auto Mode:       ",L1)') kauto
+      if(iverbose_level .ge. 1) then 
+        write(ludsp, '("Auto Mode:       ",L1)') kauto
+      endif 
 
       if (kauto) then !optimization
 ! 2. Ending time of optimization mode. Default is given by command line.
@@ -252,6 +254,8 @@ C   Calculate all rising/setting times now.
       kFillOBs=.false.    !whenever we enter start with full subnet 
 ! this  ensures that we do at least one time through the loop.
       TimeEndCurObs=TimeFinish-1
+      
+      write(*,'(a,$)') "Scheduling scans "
 
       do while(TimeFinish.ge.TimeEndCurObs)  ! optimization loop
         inquire(file="sked.stop",exist=kexist)
@@ -315,9 +319,11 @@ C   Calculate all rising/setting times now.
           NumSub=NumAll
         endif
 
+        if(iverbose_level .ge. 1) then 
         write(ludsp, 
      >   '("Fill-In Mode:    ",L1,"  Subnet: ", a2,64("-",a2))') 
      >    kfillobs,(cpocod(istnsub(j)),j=1,NumSub)    
+        endif 
 
 ! Calculate what sources are up at which stations.
         call whatsup(IstnSub,NumSub,iSrcVec,NsrcUse,MjdFree,UtFree,
@@ -346,19 +352,23 @@ C   Calculate all rising/setting times now.
          if(kastro .and. kastro_src(i)) then 
              if(dble(NumObsSource(isrc))/dble(NumObs) .ge. 
      &                         rmax_astro(isrc)) then
+               itemp=itemp+1
                kvs(isrc,1:Max_Stn)=.false.
                if(.not.koff) then
                   koff=.true.
-                  write(*,
+                  if(iverbose_level  .eq.1) then 
+                    write(*,
      &             "('Following astro sources meet targets:  ',$)") 
+                  endif
                endif
-               write(*,'(" ",a8, $)') csorna(isrc)
-               itemp=itemp+1
-               if(mod(itemp,10) .eq. 0) write(*,*) " "
+               if(iverbose_level .eq.1) then
+                  write(*,'(" ",a8, $)') csorna(isrc)               
+                  if(mod(itemp,10) .eq. 0) write(*,*) " "
+              endif 
              endif
          endif
        end do
-       if(koff) write(*,*) " "
+       if(iverbose_level .ge. 1 .and. koff) write(*,*) " "
 !       pause
        endif
        
@@ -403,24 +413,29 @@ C   Calculate all rising/setting times now.
 
         NumTst=max(nint(dble(numTrial)*(rBestPerCent)),1)
         NumTst=min(NumTst,max_trial,numTrial)
+        if(iverbose_level .ge. 1) then
         write(ludsp, '("Total tested: ",i4, "  Tested for Minor:",i4)')
-     >     numTrial,NumTst
+     >      numTrial,NumTst
+        endif 
 
 ! NumTst = number of configurations to test.
         if(NumTst.eq.0) then ! no configuration possible
           if(kFillObs) then
-            write(ludsp,*)
-     >      "NEXTC04: No oservations possible with current subnet."
-            write(ludsp,*) "       Going to full network."
+            if(iverbose_level .ge. 1) then 
+              write(ludsp,*)
+     >       "NEXTC04: No oservations possible with current subnet."
+              write(ludsp,*) "       Going to full network."
+            endif 
             kFillObs=.false.
             goto 1100
           else
-            write(ludsp,*)
-     >        "No more observations possible with this subnet"
+            if(iverbose_level .ge. 1) then
+              write(ludsp,*)
+     >          "No more observations possible with this subnet"
+            endif 
             goto 1200
           endif
-        endif
-       
+        endif       
 
 ! get sort key.
 !     Note that this sorts ascending.
@@ -451,7 +466,9 @@ C   Calculate all rising/setting times now.
             write(*,*) "No more valid observations found within time."
             goto 1200
           else if(Kfillin .and. KfillObs) then
-            write(*,*) "Turning off fillin flag!"
+            if(iverbose_level .ge. 1) then 
+              write(*,*) "Turning off fillin flag!"
+            endif 
             kFillObs=.false.
             goto 1100
           endif
@@ -525,5 +542,14 @@ C   Calculate all rising/setting times now.
       kStatWt  =kStatWtOld
       kSkyCov  =kSkyCovOld
       kauto=.false.
+! Need to close out a line       
+      if(iverbose_level .eq. 0)    write(ludsp,*) " "
+      
+      IF (NOBS.GT.0.AND.NSOURC.GT.0.AND.NSTATN.GT.0) THEN  !
+        cbuf="."
+        ibufq(1)=1
+        CALL LICMD(IBUFQ,"LI")
+      END IF  !
+      
       RETURN
       END

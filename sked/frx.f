@@ -5,6 +5,7 @@ C  that use the named setup, and 2) store the LOIFNAME for later
 C  searching the loif catalog. 
 C
 C   HISTORY:
+! 2021-12-01 Gipson. Added iverbose_level, removed kverbose
 C 951127 nrv New.
 ! 2005Jul10 JMGipson. Modified getting rid of hollerith.
 ! 2005Aug10 JMGipson. Pretty print stuff.
@@ -85,7 +86,7 @@ C     LOIF name for each of the stations.
         if(keof) goto 100 
         call splitNtokens(cbuf,ltoken,Maxtoken,NumToken)
         if(ltoken(1)(1:1) .ne. "-") then
-          if(iw .ne. 0 .and. kverbose) write(luscn,'()')
+          if(iw .ne. 0 .and. iverbose_level.ge.5) write(luscn,'()')
           write(*,*) " " 
           goto 110  !done with this group. Find the next one.
         endif
@@ -97,14 +98,16 @@ C     LOIF name for each of the stations.
             istn_rx_xref(istat)=irx
             cloifname(istat)=ltoken(3)
             if(iw .eq. 0) then
-              if(kverbose) write(luscn,'(A,": ",$)') crxname(irx)
+              if(iverbose_level.ge.5) 
+     >            write(luscn,'(A,": ",$)') crxname(irx)
               iw=iwid_pre+icol_wid
             endif
 
-            if(kverbose) write(luscn,'(a, " ",$)') cantna(istat)
+            if(iverbose_level.ge.5) 
+     >          write(luscn,'(a, " ",$)') cantna(istat)
             iw=iw+icol_wid
             if(iw .gt. iwscn) then
-               if(kverbose) write(luscn,'()')   !new line
+               if(iverbose_level.ge.5) write(luscn,'()')   !new line
                iw=0
             endif
           else

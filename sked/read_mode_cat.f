@@ -214,7 +214,7 @@ C 5. Recording mode reference.
 510   continue 
 
       close(lucat)
-      if(kverbose) then
+      if(iverbose_level.ge.5) then
       write(luscn,'("Read_mode_cat: num_modes/max_modes: ",i3,"/",i3)')
      >    num_cat_mode,max_cat_mode
       kcat_mode=.true.

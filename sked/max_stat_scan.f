@@ -27,9 +27,8 @@ C   COMMON BLOCKS USED
 
       if(knumber) then
         write(luscn,'(a)') '  #  Station Scan'
-      endif 
-      
-      write(*,*) "list ", max_ss_list(1:nstatn)  
+      endif       
+  
       do istat=1,nstatn
         if(kall .or. max_ss_list(istat) .ne. 0) then
            istart=1
