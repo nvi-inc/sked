@@ -74,6 +74,7 @@ C 981113 nrv Read 2-digit year from input line but store a 4-digit year.
 ! 2006Sep26 JMGipson. Replaced iflch by trimlen
 ! 2010Apr26 JMGipson. Better error messages.
 ! 2014May02 JMG. Removed ipas,idir, ift from call to set_scan_param. No longer used. 
+! 2021-12-02 JMG. Got rid of filling lpre with blanks. Used cpre 
 
 C
 C
@@ -107,7 +108,8 @@ C
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
       IDUMY = ICHMV(LFRQ,1,IBUF,IC1,2)
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
-      CALL IFILL(LPRE,1,6,oblank)
+!      CALL IFILL(LPRE,1,6,oblank)
+      cpre=" " 
       IDUMY = ICHMV(LPRE,1,IBUF,IC1,min0(IC2-IC1+1,6))
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
       read(cbuf(ic1:ic1+11),"(i2,i3,i2,i2,i2)") iyr,ida,ihr,imin,isc
@@ -149,12 +151,14 @@ C
 
 
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
-      CALL IFILL(LMID,1,6,oblank)
+!      CALL IFILL(LMID,1,6,oblank)
+      cmid=" " 
       IDUMY = ICHMV(LMID,1,IBUF,IC1,min0(IC2-IC1+1,6))
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
       IDLE = IAS2B(IBUF,IC1,IC2-IC1+1)
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
-      CALL IFILL(LPST,1,6,oblank)
+!      CALL IFILL(LPST,1,6,oblank)
+      cpst=" " 
       IDUMY = ICHMV(LPST,1,IBUF,IC1,min0(IC2-IC1+1,6))
       CALL GTFLD(IBUF,ICH,IBUF_LEN*2,IC1,IC2)
       I=1

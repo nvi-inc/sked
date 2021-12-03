@@ -106,34 +106,22 @@ C     Station code
 C   Insert blanks for other stations' codes
       nch = nch + nstatn*2
 C   Tape pass, direction, footage for each station
-      nch = feetscan(ibuf,nch,ipas,ifeet,idrive,istn,icod)
-C     if (ichcm_ch(lstrec(1,istn),1,'S2').eq.0) then
-C       kfor=.true. ! always forward
-C       nch=ichmv_ch(ibuf,nch,cpassorderl(ipas,istn,icod)(1:1)) ! group number
-C     else ! non-S2
-C       NCH = ICHMV_ch(IBUF,NCH+1,pnum(ipas))
-C       i=ipas/2
-C       kfor= ipas.ne.i*2 ! always odd forward, even reverse
-C     endif
-C     if (kfor) cdir='F'
-C     if (.not.kfor) cdir='R'
-C     if (idrive.eq.0) cdir='0'
-C     NCH = ICHMV_ch(IBUF,NCH,cdir)
-C  Put in footage. For S2 this is in seconds.
-C     NCH=  NCH+IB2AS(ifeet,IBUF,NCH,numc5)
-C   Insert blanks for other stations' footages
+!      nch = feetscan(ibuf,nch,ipas,ifeet,idrive,istn,icod)
+      write(cbuf(nch+1:nch+3),'(a)') '1F0'
       nch = nch + nstatn*8 ! (1)pass(1)dur(5)footage(1)space
 C  Procedure flags
       nch=nch+1
       nch = ichmv_ch(ibuf,nch,'YNNN')
 C  Duration
       nch=nch+1
-      nch = durscan(ibuf,nch,idend)
+      write(cbuf(nch:nch+5),'(i5)') idend   
+!      nch = durscan(ibuf,nch,idend)
 C     NCH = 1 + NCH + IB2AS(idend,IBUF,NCH+1,5)
 C   Insert blanks for other stations' durations
       nch = nch + nstatn*6 ! (5)dur(1)space
 C  Good data offset
-      nch = gdscan(ibuf,nch,idstart)
+!      nch = gdscan(ibuf,nch,idstart)
+      write(cbuf(nch:nch+5),'(i5)') idstart 
 C     nch = 1 + nch + ib2as(idstart,ibuf,nch+1,5)
 C   Insert blanks for other stations' good data offsets
       nch = nch + nstatn*6 ! (5)dur(1)space
@@ -149,6 +137,7 @@ C Store the record in common
 C     write(6,'(i5)') nobs
       ISKREC(NOBS) = nobs
       cskobs(iskrec(nobs))=cbuf
+!      write(*,*) trim(cbuf)
 
       return
       end

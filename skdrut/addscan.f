@@ -56,6 +56,7 @@ C Output
 C Local
       integer nst,ich,nch,i,ic1,ic2
       integer feetscan,gdscan,durscan
+      integer iptr 
 
       ierr=0
 
@@ -71,18 +72,19 @@ Cfield: 1         2   3  4       5           6    7      8   9    10
 C                            note direction=0 for a non-recording scan      ^
 
       ich=1
+      iptr=iskrec(irec)
       do i=1,10 ! skip over to station list
-        CALL GTFLD(lskobs(1,iskrec(irec)),ICH,IBUF_LEN*2,IC1,IC2)
+        CALL GTFLD(lskobs(1,iptr),ICH,IBUF_LEN*2,IC1,IC2)
       enddo
       nst=(ic2-ic1+1)/2 ! number of stations so far
 C     Add station code and cable wrap
       nch=ic2+1 ! start after the end of the station field
-      cskobs(iskrec(irec))(nch:nch+1)=cstcod(istn)//cbl
+      cskobs(iptr)(nch:nch+1)=cstcod(istn)//cbl
       nch=nch+2
 C     Skip previous stations' footage
       ich = nch
       do i=1,nst 
-        CALL GTFLD(lskobs(1,iskrec(irec)),ICH,IBUF_LEN*2,IC1,IC2)
+        CALL GTFLD(lskobs(1,iptr),ICH,IBUF_LEN*2,IC1,IC2)
       enddo
       if (ic1.eq.0) then
         ierr=-1 ! problem skipping footages
@@ -94,13 +96,15 @@ C     Only leave 1 space between footages.
 C   Tape pass, direction, footage for each station
 C ** why not use cpassorderl for all stations not just S2?
 C ** because FS uses pass numbers not index positions
-      nch = feetscan(lskobs(1,iskrec(irec)),nch,ipas,ifeet,idrive,
-     .istn,icod)
+
+!      nch = feetscan(lskobs(1,iptr),nch,ipas,ifeet,idrive,istn,icod)
+      write(cskobs(iptr)(nch+1:nch+3),'(a)') '1F0'
+      nch=nch+4 
       ich = nch
-      CALL GTFLD(lskobs(1,iskrec(irec)),ICH,IBUF_LEN*2,IC1,IC2)
+      CALL GTFLD(lskobs(1,iptr),ICH,IBUF_LEN*2,IC1,IC2)
 C   Skip previous stations' duration
       do i=1,nst 
-        CALL GTFLD(lskobs(1,iskrec(irec)),ICH,IBUF_LEN*2,IC1,IC2)
+        CALL GTFLD(lskobs(1,iptr),ICH,IBUF_LEN*2,IC1,IC2)
       enddo
       if (ic1.eq.0) then
         ierr=-2 ! problem skipping durations
@@ -109,14 +113,23 @@ C   Skip previous stations' duration
 C     Only leave 1 space between durations
       nch=ich+1
 C  Duration
-      nch = durscan(lskobs(1,iskrec(irec)),nch,idend)
+!      write(*,*) "NCH ", nch 
+      write(cskobs(iptr)(nch:nch+4),'(i5)') idend 
+      nch=nch+6 
+!      write(*,*) trim(cskobs(iptr))
+!      write(cskobs(iskrec(irec))(nch:nch+4),'(a)') "XXXXX"
+!      write(*,*) trim(cskobs(iskrec(irec)))
+!      nch = durscan(lskobs(1,iskrec(irec)),nch,idend)
+!      write(*,*) trim(cskobs(iptr))
+!      write(*,*) "NCH ", nch 
+!      pause 
 C     i = ib2as(idend,ibufx,1,5) ! convert into a buffer
 C     nch = ic2+1
 C     nch = ichmv(lskobs(1,iskrec(irec)),nch,ibufx,1,5)
 C   Skip previous stations' good data offsets
       ich = nch 
       do i=1,nst 
-        CALL GTFLD(lskobs(1,iskrec(irec)),ICH,IBUF_LEN*2,IC1,IC2)
+        CALL GTFLD(lskobs(1,iptr),ICH,IBUF_LEN*2,IC1,IC2)
       enddo
       if (ic1.eq.0) then
         ierr=-3 ! problem skipping data offsets
@@ -124,7 +137,11 @@ C   Skip previous stations' good data offsets
       endif
       nch=ich+2
 C  Good data offset
-      nch = gdscan(lskobs(1,iskrec(irec)),nch,idstart)
+      write(cskobs(iptr)(nch:nch+5),'(i5)') idstart 
+!      nch = gdscan(lskobs(1,iskrec(irec)),nch,idstart)
+!      write(*,*) "idstart ", idstart
+!      write(*,*) trim(cskobs(iskrec(irec)))      
+!      pause 
 C
       return
       end

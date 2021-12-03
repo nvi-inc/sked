@@ -1,4 +1,6 @@
  This file contains a brief description of the changes made to sked
+2021-12-03 Got rid of OBAR and OCAPR in ../skdrincl/skparm.ftni. Caused problems in some compilers, and not used. 
+2021-12-03 In ../skdrut: Modified newscan.f and addscan.f to use fortran writes in two places.Removed durscan.f gdscan.f
 2021-12-01 Minimize amount of output during auto-sked mode.  Removed kverbose, added iverbose_level.
 2021-12-01 Files affected: skparm.ftni, awrst.f find_best_scan.f ffreq.f frec.f frx.f hwrst.f 
            make_scans.f  max_stat_scan.f newob.f nextc.f open_cat.f prlis.f prout.f prset.f pwrst.f 
