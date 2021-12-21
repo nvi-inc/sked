@@ -23,6 +23,8 @@ C
 C     UNPVH unpacks a record containing horizon mask data.
 C
       include '../skdrincl/skparm.ftni'
+! 2021-12-03 JMGipson.  Added octal_constants.ftni
+      include '../skdrincl/octal_constants.ftni'
 C
 C  INPUT:
       integer*2 IBUF(*)

@@ -33,6 +33,7 @@ C   format for the observation.
 
 C Called by: VOBINP, VOB1INP
 C History
+! 2021-12-03 JMGipson. Got rid of some calls to ib2as. Was causing problems in some compilers.
 C 960527 nrv New.
 C 970114 nrv change 8 to max_sorlen
 C 970721 nrv Add IDRIVE to call, if 0 set direction to 0.
@@ -66,7 +67,7 @@ C Local
 
       integer ical,nch,idl,iyr
       integer ichmv,ichmv_ch,ib2as
-      integer feetscan,gdscan,durscan
+
 C Initialized for leading zeros, left justified
 C     First clear out the entire buffer
 

@@ -22,7 +22,7 @@
       call gtban(icod,nba,iband)
 
       ierr=0
-! check to see that tracks ahve been set, and that we have flux and SEFDs
+! check to see that tracks have been set, and that we have flux and SEFDs
       do i=1,nba !check for tracks
         ib=iband(i)
         do is=1,nstn

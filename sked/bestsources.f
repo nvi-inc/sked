@@ -85,7 +85,7 @@ C   COMMON BLOCKS USED
         open(1,file=lfilnam)
         do iptr=1,Nsourc
           write(1,'(i4,1x,a8,1x,2f8.2)') iptr,csorna(iptr),
-     >     sorpda(1,iptr)*rad2deg,sorpda(2,iptr)*rad2deg
+     >     sorp_now(1,iptr)*rad2deg,sorp_now(2,iptr)*rad2deg
         end do
         close(1)
       endif
@@ -173,7 +173,7 @@ C   COMMON BLOCKS USED
         kvscan=.true.
       endif
 
-      call FindBestSources(Sorpda,NSourc,NumAst,srcrank,
+      call FindBestSources(sorp_now,NSourc,NumAst,srcrank,
      >    NumBest,NumCover,iBestSrc,luscn)
 
       if(NumBest .eq. 0 .and. kAllBLGood) then
@@ -189,7 +189,7 @@ C   COMMON BLOCKS USED
         do i=1,numbest
           iptr=ibestsrc(i)
           write(1,'(i4,1x,a8,1x,2f8.2)') i,csorna(iptr),
-     >     sorpda(1,iptr)*rad2deg,sorpda(2,iptr)*rad2deg
+     >     sorp_now(1,iptr)*rad2deg,sorp_now(2,iptr)*rad2deg
         end do
         close(1)
       endif

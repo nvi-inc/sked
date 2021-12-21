@@ -20,6 +20,7 @@
       LOGICAL FUNCTION KCONT(MJD,UT,DUR,ISOR,IST,Cwrap,ierr)
 C
       implicit none  !2020Jun15 JMGipson automatically inserted.
+
 C     This checks that an observation is continuous, i.e. that it
 C     doesn't end on a different part of the cable from which it began.
 C     KCONT is returned TRUE if the observation is continuous.
@@ -34,7 +35,6 @@ C  Passed
       integer isor           !source number
       integer ist            !station
       character*(*)  cwrap   !wrap
-      integer*2 lcabl
 ! returns
       integer ierr           !-1= goes below lower wrap at end.
                               !+1= goes above upper wrap at end.
@@ -51,6 +51,8 @@ C  LOCAL:
 C
 C  COMMON:
       include '../skdrincl/statn.ftni'
+!Updates
+!2020-12-30 JMG Removed unsed variables
 C
 C   PROGRAMMER: MAH  811125
 C    MODIFICATIONS:
@@ -73,8 +75,7 @@ C     Find delta-az
 C     Check that AZ1+delAZ is on the same cable wrap
 C     Return KCONT = FALSE if the observation is not continuous
 C     If you don't have an AZ-EL antenna return immediately with KCONT=TRUE
-C
-C
+
       kcont=.TRUE.
       ierr=0
       IF (IAXIS(IST).EQ.3.or.iaxis(ist).eq.7.or.iaxis(ist).eq.6) then
@@ -91,7 +92,6 @@ C
 
         Az1=azwrap(az1,cwrap,stnlim(1,1,ist))
 
-C
         AZ2C = AZ1+DELAZ
 C  Check whether we cross into ambiguous section during observation
         IF (AZ2C.LE.STNLIM(2,1,IST).AND.AZ2C.GE.STNLIM(1,1,IST)+TWOPI

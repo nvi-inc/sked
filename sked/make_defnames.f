@@ -259,24 +259,8 @@ C 6. PASS_ORDER names (same as HEAD_POS)
           
 
 C 7. ROLL names
-          itype=7
-          do isx=1,is-1
-            if(cbarrel(isx,ic) .eq. cbarrel(is,ic)) then
-              refdef_name(itype,is,ic)=refdef_name(itype,isx,ic)              
-              goto 700
-            endif ! matches
-          enddo ! check each group so far
-          igroup(itype)=igroup(itype)+1
-          cr=cbarrel(is,ic)
-          if (cr.eq.'    '.or.cr.eq.'NONE'.or. cr.eq.'off ') then
-            refdef_name(itype,is,ic) = 'NO_ROLL'
-          else if (cr.eq.'8:1'.or.cr.eq.'8') then
-            refdef_name(itype,is,ic) = 'ROLL8'
-          else if (cr.eq.'16:1'.or.cr.eq.'16') then
-            refdef_name(itype,is,ic) = 'ROLL16'
-          endif   
-700       continue
-
+! skip
+ 
 C 8. PHASE_CAL_DETECT names (STANDARD is the only one implemented)
           itype=8
           refdef_name(itype,is,ic)='Standard'

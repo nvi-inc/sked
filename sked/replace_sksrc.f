@@ -23,7 +23,7 @@
       open(lusel,file=csofil)
 ! and begin writing the new one.
       do isrc=1,Nsourc
-        CALL RADED(SORP50(1,isrc),SORP50(2,isrc),0.D0,
+        CALL RADED(sorp2000(1,isrc),sorp2000(2,isrc),0.D0,
      >    irahr,iramin,rasec,
      >    L1,Idecdeg,Idecmin,decsec,LDUM,IDUM,IDUM,DUM)
         if(csorna(isrc)(1:8) .eq. ciauna(isrc)(1:8)) then

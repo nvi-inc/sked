@@ -76,9 +76,10 @@ C
       real hanow,hanew,decnow,decnew,x30now,x30new,y30now,y30new
       real x85now,x85new,y85now,y85new
       real x1,x2,y1,y2
-      real tslew1,tslew2       
+      real tslew1,tslew2   
+      integer itemp    
   
-      real*4 az1,az2,trise,elrate
+      real*4 az1,az2,trise
       integer nloops,il
       character*2 cwrap1,cwarp2,cwarp2p
       LOGICAL KUP ! Returned from CVPOS, TRUE if source within limits
@@ -93,10 +94,11 @@ C        NLOOPS - Number of iterations on slewing time
 C        AZ1,AZ2,cwrap1,cwarp2
 C               - current,new values of az,wrap
       real*4 cablw ! function
-      real rme
+      
 C
 C  History
 C      DATE   WHO    CHANGES
+! 2021-12-03  JMG. Changed case statement to else if for f77. Uggh. got rid of unused variables.
 ! 2021-11-10  JMG. Substantial change in the logic to make simpler and use new slew model. 
 ! 2021-04-02  JMG Renamed STNRAT-->slew_rate, istcon-->slew_off.  Made slew_off real
 C
@@ -169,40 +171,46 @@ C
       cwarp2=cwrap_new
       DELAZ = CABLW(ISTN,AZ1,cwrap1,AZ2,cwarp2)
 C                   Function to compute az move including cable wrap
-       select case (iaxis(istn))
-        case(1,5)     
+       itemp=iaxis(istn)
+!       select case (iaxis(istn))
+!        case(1,5)     
+       if(itemp .eq. 1 .or. itemp .eq. 5) then 
           x1=HaNew
           X2=HaNow
           Y1=DecNew
           Y2=DecNow
-        case(2)     
+       else if(itemp .eq. 2) then 
+!        case(2)     
           X1=X30new
           X2=X30Now
           Y1=DecNew
           Y2=Decnow
-        case(3,6)
+      else if(itemp .eq. 3 .or. itemp .eq. 6) then
+!        case(3,6)
           X1=Az1
           X2=Az2
           Y1=ElNew
           Y2=ElNow
-        case(4)
+!        case(4)
+      else if(itemp .eq. 4) then 
           X1=x85New
           X2=X85Now
           Y1=Y85New
           Y2=Y85Now
-        case default  
+!        case default  
+      else 
 ! This is algonquin.  Should never hit
           write(*,*) "Slewt:  unknown axis offset ", iaxis(istn)
           stop
-        end select
+!       end select
+      endif 
       tslew1=slew_time(x1,X2,
      &             slew_off(1,istn),slew_vel(1,istn),slew_acc(1,istn))
       tslew2=slew_time(Y1,y2,
      &             slew_off(2,istn),slew_vel(2,istn),slew_acc(2,istn))
     
       tslewc=max(tslew1,tslew2) 
- 
- 
+  
 C
       IF ((ABS(TSLEWC-TSLEWP).LT.10).OR.(NLOOPS.GE.5)) GOTO 110
       

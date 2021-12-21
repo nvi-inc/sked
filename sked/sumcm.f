@@ -143,6 +143,7 @@ C      - true if source is up, from CVPOS
       integer binsize, bins, evenBins
       real*8 iobs_avg
       real az_now,az_new 
+      real el_now,el_new
       
       real*8 temp,temp5
             
@@ -154,7 +155,7 @@ C  INITIALIZED
      >   5.3,3.8,2.5,1.4,0.6,0.1,0.0/
       data uniform10/1.7,4.9,7.4,9.3,10.5,11.0,10.9,10.3,9.2,7.9,6.3,
      >   4.7,3.2,1.8,0.8,0.1,0.0,0.0/
-! F     
+   
           
 !      
 C
@@ -461,14 +462,14 @@ C
         END IF
         J1 = ISTCUR(1)
         K = NSORcur(J1)
-        KSK=.FALSE.
+        KSK=.FALSE.  
  
         DO  I=1,NST !check stations
           DO  II=1,nstncur
             IF (IST(I).EQ.ISTCUR(II)) KSK=.TRUE.
           END DO
-        END DO  !check stations
-
+        END DO  !check stations       
+        
         IF (ISORCM.NE.0.AND.K.NE.ISORCM) KSK=.FALSE.
 C
 C   5. This scan is to be included.
@@ -777,7 +778,7 @@ C
             ctemp=" " 
             CALL SLEWT(NSPRE(KJ),MJDCUR(KJ),UTCUR(KJ),NSORcur(KJ),KJ,
      >         cwrap_pre(KJ),ctemp,TSLEW,look,trise,tsris,st0cur,frac,
-     >         knov,islew_info,az_now,az_new)
+     >         knov,islew_info,az_now,el_now,az_new,el_new)
             if (tslew.gt.0.0) TSLW(KJ) = TSLW(KJ)+TSLEW
 
 C           IDTPRE(KJ) = (MJDCUR(J1)-MJD1)*1440+(UTCUR(J1)+IDURcur(J1))/60.D0       

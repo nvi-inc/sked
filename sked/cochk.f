@@ -15,7 +15,7 @@ C
 C
 C  INPUT:
       integer ic   !index of this code
-      character*2 code(max_frq)
+      character*2 code(max_code)
 !  Output
 !    character*2 code(ic)        which may be changed.
 ! local

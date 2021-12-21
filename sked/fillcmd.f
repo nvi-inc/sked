@@ -58,8 +58,9 @@ C  LOCAL VARIABLES
       integer idurscan_orig                        ! original scan duration 
       real*4 durscan 
 
-      integer iset,imaxsl,isrc_time                ! local variables for when_at_next_source
-      real buf_time                                ! local variable for when_at_next_source
+      integer isetup_time
+      integer isrc_time                            ! local variables for when_at_next_source
+      integer ibuf_time                            ! local variable for when_at_next_source
       integer ih1,im1,is1
 
       logical found_stat                           ! logical to see if a station is from the selected list
@@ -105,7 +106,7 @@ C  LOCAL VARIABLES
       integer*4 itemp          !temporary variable 
 
 ! Variables for functions when_at_next_source and cvpos
-      real*4 azbeg,elbeg,azend,elend,ha,dc,x30,y30,x85,y85 
+      real*4 azbeg,elbeg,azend,elend,ha,dc,x30,y30,x85,y85   
       logical kup
 
 ! Variable dealing with tokens
@@ -346,12 +347,14 @@ C
       found_end=.false.
 ! The loop is done until it is not needed : end of time range + MAXSCAN+iMaxSlewTime
 ! However, it will loop a last observation for nothing to avoid another if / then / else 
+      write(ludsp, '("Filling in ",$)') 
       do while (.not.found_end .and. iobs.le.nobs 
      >             .and. num_stat_to_do.gt.0)
         cbuf=cskobs(iskrec(iobs)) 
 !       put the info of iobs in TST variables
 !       => The TST variables correspond to the end of the scan we will study
         call unpak(kerr,1)
+        write(ludsp,'(a,$)') "." 
  
         ! check if the observation investigated is after the selected end time + MAXSCN+iMaxSlewTime
         call addsec2ut(jdencm,utencm,MAXSCN+iMaxSlewTime,
@@ -385,11 +388,14 @@ C
 !               give time tmp1 = time after observations + other time
 !                                constraints + slewing
 !                             => time when at next source
-                call when_at_next_source(istat,nsorcur(istat),
-     >               nsortst(istat),mjdcur(istat),utcur(istat),
-     >               idurcur(istat),idlcur(istat),icalcur(istat),iset,
-     >               cwrap_cur(istat),cwrap_tst(istat),tslew1,imaxsl,
-     >               mjdtmp1,uttmp1,azbeg,azend,isrc_time,buf_time)
+                call when_at_next_source(kdisplay,ludsp,
+     >               istat,nsorcur(istat),nsortst(istat),
+     >               mjdcur(istat),utcur(istat),
+     >               idurcur(istat),idlcur(istat),icalcur(istat),
+     >               cwrap_cur(istat),cwrap_tst(istat),
+     >               mjdtmp1,uttmp1,azbeg,azend,elbeg,elend,tslew1,
+     >               isetup_time,isrc_time,ibuf_time,ierr)               
+         
 !               need information on the date at the end of the scan to check if we
 !               are still in the time window
                 mjdtmp=mjdtmp1
@@ -464,13 +470,14 @@ C
                     found_idle=.false. 
                     do while(idurscan .gt. idurscan_orig .and. 
      >                                 .not. found_idle)  
-                    call when_at_next_source(istat,nsorcur(istat),
-     >                    nsortst(istat),mjdcur(istat),utcur(istat),
-     >                    idurscan,idlcur(istat),
-     >                    icalcur(istat),iset,
-     >                    cwrap_cur(istat),cwrap_tst(istat),tslew2,
-     >                    imaxsl,
-     >                    mjdtmp2,uttmp2,azbeg,azend,isrc_time,buf_time)
+                      call when_at_next_source(kdisplay,ludsp,
+     >                  istat,nsorcur(istat),nsortst(istat),
+     >                  mjdcur(istat),utcur(istat),
+     >                  idurscan,idlcur(istat),icalcur(istat),
+     >                  cwrap_cur(istat),cwrap_tst(istat), 
+     >                  mjdtmp2,uttmp2,azbeg,azend,elbeg,elend,tslew2, 
+     >                  isetup_time,isrc_time,ibuf_time,ierr)
+             
 
 !                 call allday(mjdcur(istat),nsorcur(istat),istcur(istat))
 !!     >              tsris,tsset 
@@ -516,7 +523,7 @@ C
      >                    utcur(istat), csorna(nsorcur(istat)),
      >                    ih1,im1,is1
                   write(*,*) "durcur:    ",idurcur(istat),idlcur(istat),
-     >                    icalcur(istat),iset
+     >                    icalcur(istat),isetup_time
                   write(*,*) " Slewing: ",tslew1!,itslew1
                   write(*,*) "Beg+dur+idle+sle1:",mjdtmp1,uttmp1
                   write(*,*) "Idle time:  ",idleTIME 
@@ -609,7 +616,7 @@ C
          endif
          call pakup(kerr, 0)
          cskobs(iskrec(iobs))=cbuf
-         write(ludsp,*) cbuf(1:34) 
+!         write(ludsp,*) cbuf(1:34) 
       end do
       write(ludsp,*) "End of FILL command."
 

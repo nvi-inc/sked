@@ -21,6 +21,8 @@
      .ifeet,ipas,idrive,cbl,ierr)
 
       implicit none 
+! 2021-12-03 JMGipson. Got rid of ib2as. Was causing problems in some compilers.
+!
 
 C   ADDSCAN adds a new station to an existing scan.
 C*** ib2as accepts only character indices up to 256
@@ -54,8 +56,7 @@ C Output
       integer ierr ! non-zero trouble
 
 C Local
-      integer nst,ich,nch,i,ic1,ic2
-      integer feetscan,gdscan,durscan
+      integer nst,ich,nch,i,ic1,ic2   
       integer iptr 
 
       ierr=0

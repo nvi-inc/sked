@@ -43,10 +43,10 @@ C  Calls: gtfld,  ifill, wrerr
 
 C  LOCAL
       real speed
-      double precision s2sp,k4sp
+      double precision k4sp
       integer*2 LKEYWD(12)
       integer ikey_len,ich,ic1,ic2,nch,i,istn
-      integer ival,idum,icode,ias2b
+      integer ival,idum,icode
       integer i2long,ichmv
       logical kdefault,ks2,kk4
       character*24 ckeywd
@@ -64,22 +64,20 @@ C  LOCAL
       parameter (ilist_hl=4)
       character*12 list_hl(ilist_hl)
 
-      integer ilist_lens2
-      parameter (ilist_lens2=2)
-      character*3 lists2(ilist_lens2)
-
-      integer ikey,ikeyhl,ikeys2
+       integer ikey,ikeyhl
 
       data list/"MARK5A","MARK5B","MARK5C","MARK6","FLEXBUFF","K5"/
       data list_hl/'HIGH','LOW','SUPER','DUPER'/
-      data listS2/'LP','SLP'/
-
+   
       data ikey_len/20/
-C
+
+!Updates
+! 2021-09-16 JMG Fixed bug. Was changing tape to wrong type when reading in sked files produced by VieSched++
+! 2020-12-30 JMG Removed unused variables
+! 2020-10-02 JMG Removed all references to S2
+! 2020-06-09 JMG Added MARK6, got rid of THICK,THIN,SHORT
+
 C MODIFICATIONS:
-! 2021-09-16 JMG. Fixed bug. Was changing tape type to wrong value.
-! 2020-10-02 JMG. Removed all references to S2
-! 2020-06-09 JMG. Added MARK6, got rid of THICK,THIN,SHORT
 C 990524 nrv New. Copied from STAPE.
 C 990621 nrv Remove tape_dens and tape_length and use standard common
 C            variables bitdens and maxtap.
@@ -210,7 +208,7 @@ C       Station ID is valid. Check tape type now.
               write(luscn,'("  Valid types: ",10a)') (list(i),i=1,6)
               return
             else if(ikey .ge. 4 .and. ikey .le. 7) then
-               ckeywd=list(ikey)  
+               ckeywd=list(ikey)
                if(istn .eq. 0) then
                   do istn=1,nstatn
                      cstrec_old(istn)=cstrec(istn,1)

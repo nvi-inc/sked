@@ -39,6 +39,7 @@ C Local:
       double precision utend
       integer islew_info        !info about slewing
       real az_now,az_new 
+      real el_now,el_new
 
 C  1. Initialize
 
@@ -52,7 +53,7 @@ C  1. Initialize
         else if (nspre(j).gt.0) then !initialized
             CALL SLEWT(NSPRE(J),mjdstart(J),utstart(J),NSORcur(J),J,
      >      LCBPRE(J),BLNK,TSLEW,look,trise,tsris,st0cur,frac,
-     >      knov,islew_info,az_now,az_new) 
+     >      knov,islew_info,az_now,el_now,az_new,el_new)
 C         UTCUR is the mutal good data start time.
 C         UTSTART is the time this station has data start on the new source
 C         This may be earlier than UTCUR for continuous or adaptive motion.

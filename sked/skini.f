@@ -310,7 +310,7 @@ C  Number of selected sources, stations, codes
       NSTATN = 0
       nsubst = 0
       NCODES = 0
-      do ic=1,max_frq
+      do ic=1,max_code
         do is=1,max_stn
           do iv=1,max_chan
             ibbcx(iv,is,ic)=0

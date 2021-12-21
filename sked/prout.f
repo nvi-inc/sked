@@ -147,7 +147,7 @@ C Line 1.
 
       call date_and_time_sked(itime_vec)
         write(cline,
-     >  '("SCHEDULE_CREATE_DATE ",i4,2("/",i2.2),1x,2(i2.2,":"),i2.2)')
+     >  '("SCHEDULE_CREATE_DATE ",i4,2("-",i2.2),1x,2(i2.2,":"),i2.2)')
      >   itime_vec
       call wrt_param_line(cline,lutmp,ciin)
 

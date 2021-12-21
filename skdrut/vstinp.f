@@ -57,8 +57,7 @@ C OUTPUT:
       logical kvalid_rack
       logical kvalid_rec  
 
-C LOCAL:
-      logical kline
+C LOCAL:      
       integer ierr1
       real slcon(2),SLRATE(2),ANLIM1(2),ANLIM2(2)
       character*8 cocc,crec
@@ -66,13 +65,12 @@ C LOCAL:
       character*8 cant,cter,csit
       character*4 caxis
 
-      realr slcon(2)
-      real AZH(MAX_HOR),ELH(MAX_HOR)
+      realr slcon(2)   
       real DIAM
       real sefd(max_band),par(max_sefdpar,max_band)
       integer*2 lb(max_band)
       double precision POSXYZ(3),AOFF
-      INTEGER J,nr,maxt,npar(max_band),nel,i
+      INTEGER nr,maxt,npar(max_band),nel,i
       character*2 ctlc
       character*2 cid
       character*4 cidt
@@ -151,10 +149,6 @@ C       2.1 Antenna information
         cSTCOD(I) = cID
         cPOCOD(I) = cid
         call axtyp(caxis,iaxis(i),1)
-!        slew_rate(1,I) = SLRATE(1)
-!        slew_rate(2,I) = SLRATE(2)
-!        slew_off(1,I) = ISLCON(1)
-!        slew_off(2,I) = ISLCON(2)
 
         do i12=1,2            
           slew_vel(i12,I) = SLRATE(i12)

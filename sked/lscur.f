@@ -226,7 +226,7 @@ C
         DO  I = 1,NSTN !list footage counters
           J = ISTN(I)
           IF (KStat(J)) THEN  !this one
-             write(LUDSP,'("1F",I6.6," ",$)',ERR=999),IFTCUR(J)
+             write(LUDSP,'("1F",I6.6," ",$)',ERR=999)IFTCUR(J)
 C            endif ! new tape/not
           ELSE  !not this one
             write(LUDSP,'(8x," ",$)',ERR=999)

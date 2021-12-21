@@ -29,11 +29,12 @@
 ! local
       character*12 lname
 ! History
+! 2021-09-28 JMG. Treat mk5c or flexbuff differently
+! 2021-01-31 JMG Modified for DBBC3_DDC 
 ! 2007May28 JMGipson.  Modified to add Mark5B support.
 ! 2014Dec06 JMG. Added Mark5C support
 ! 2015Jun05 JMG.  A.) Don't output 'mk5=ss_rev?';  B.) Lowercase all output text.
 ! 2016Sep06 JMG. Replace 'mk5=status?' with 'mk5_status'
-
 
       lname="exper_initi"
 
@@ -48,24 +49,33 @@
       if(km5A .or. km5A_piggy) then
         write(lufile,'(a)')   "mk5=dts_id?"
         write(lufile,'(a)')   "mk5=os_rev1?"
+
         write(lufile,'(a)')   "mk5=os_rev2?"
         write(lufile,'(a)')   "mk5=ss_rev1?"
         write(lufile,'(a)')   "mk5=ss_rev2?"
-        write(lufile,'(a)')   "mk5_status"
-      else if(km5B .or. Km5C) then
+      else if(kflexbuff) then 
+        write(lufile,'(a)')   "fb=dts_id?"
+        write(lufile,'(a)')   "fb=os_rev?"
+        write(lufile,'(a)')   "fb=ss_rev?" 
+      else if(km5B.or. km5c) then 
         write(lufile,'(a)')   "mk5=dts_id?"
         write(lufile,'(a)')   "mk5=os_rev?"
-        if(kflexbuff) then
-! Moved to local_shed_initi....
-!          write(lufile,'("jive5ab=version?")')
-        else
-          write(lufile,'(a)')   "mk5=ss_rev?"
-        endif
-        write(lufile,'(a)')   "mk5_status"
+        write(lufile,'(a)')   "mk5=ss_rev?"      
       endif
-      if(kdbbc_rack)     write(lufile,'("dbbc=version")')
-      if(kfila10g_rack)  write(lufile,'("fila10g=version")')
+      if(kflexbuff) then
+        write(lufile,'(a)')   "fb_status"
+      else 
+        write(lufile,'(a)')   "mk5_status"
+      endif 
 
+      if(cstrack_cap .eq. "DBBC3_DDC") then
+        write(lufile,'(a)') "dbbc3=version"
+      else if(kdbbc_rack) then
+        write(lufile,'(a)') "dbbc=version "
+      else if(kfila10g_rack) then
+        write(lufile,'(a)') "fila10g=version"
+      endif 
+           
       write(lufile,'(a)') "enddef"
 
       return

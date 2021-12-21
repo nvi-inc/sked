@@ -147,8 +147,6 @@ C  Numerical values
           ISETTM = INUM
         else if(ckey .eq. 'M6') then
           imark6_off=inum
-        ELSE IF (ckey.eq.'CH') THEN
-          ITCTIM = INUM                    !tape change time.
         ELSE IF (ckey.eq.'PA') THEN
           IPARTM = INUM
         ELSE IF (ckey.eq.'SO') THEN

@@ -397,7 +397,7 @@ C    stations selected (maybe).
 
       if (kcode) then !read CODES
         write(luscn,'("Re-reading CODES.",$)')
-        call frinit(nstatn,max_frq)
+        call frinit(nstatn,max_code)
         OPEN(lusel,file=CFRFIL,iostat=IERR,status='old')
         call reads(lusel,ierrcm,ibuf,iblen,ilen,2)
         ibufq(1) = ilen
@@ -411,9 +411,6 @@ C    stations selected (maybe).
         close(lusel)
       endif
 
-C    Now we can read the HEAD section.
-      if (khead) then
-      endif
 C
 C    Move the satellite source names so that they are contiguous with
 C      the celestial soure names. This is pretty inelegant and will
@@ -473,13 +470,10 @@ C     FINALLY Close the original schedule file
          minsubnetsize=nstatn
       endif
 
-
-
 160   continue 
       write(luscn,'(a," ",$)') "$OP" 
       call op_read(luskd)       !Read in the $OP  section
       rewind(luskd) 
-
 
 ! find a line that begins with a $ 
 200   continue
@@ -759,8 +753,8 @@ C     Now that we have a date, precess the source positions.
       tjd=mjdcur(1)+2440000.d0
      
       DO  I=1,NCELES
-        call apstar_Rad(tjd,sorp50(1,i),sorp50(2,i),
-     >         sorpda(1,i),sorpda(2,i))
+        call apstar_Rad(tjd,sorp2000(1,i),sorp2000(2,i),
+     >         sorp_now(1,i),sorp_now(2,i))
       END DO  !
 C
 C       Now check that we have gotten complete station information.

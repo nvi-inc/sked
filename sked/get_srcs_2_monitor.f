@@ -313,11 +313,11 @@ C   COMMON BLOCKS USED
         j=nint((i-1)*stride)+1
         isrc=ikey(j)
         csorna(i)=lsrc_name(isrc)
-        sorpda(1,i)=src_ra(isrc)
-        sorpda(2,i)=src_dec(isrc)
-        sorp50(1,i)=src_ra2k(isrc)
-        sorp50(2,i)=src_dec2k(isrc)
-        call getiauname(ciauna(i),sorp50(1,i),sorp50(2,i))
+        sorp_now(1,i)=src_ra(isrc)
+        sorp_now(2,i)=src_dec(isrc)
+        sorp2000(1,i)=src_ra2k(isrc)
+        sorp2000(2,i)=src_dec2k(isrc)
+        call getiauname(ciauna(i),sorp2000(1,i),sorp2000(2,i))
       end do
       call replace_sksrc()
 
@@ -340,7 +340,7 @@ C   COMMON BLOCKS USED
       if(Num2Monitor .lt. Nsourc) then
         NumCover=3         !
         NumKeep=0
-        call FindBestSources(Sorpda,NSourc,NumKeep,src_rank,
+        call FindBestSources(sorp_now,NSourc,NumKeep,src_rank,
      >    Num2Monitor,NumCover,iBestSrc,luscn)
 
         call Keep_Some_Srcs(iBestSrc,Num2Monitor,csofil,ierr)
@@ -365,8 +365,8 @@ C   COMMON BLOCKS USED
         rmin_astro(isrc)=1./100.
         rmax_astro(isrc)=1.5/100.
         if(luscn .ne.0) write(*,'(i4,1x,a,1x,2f8.2,2(1x,a8))') isrc,
-     >      csorna(isrc)(1:8), sorpda(1,isrc)*rad2ha,
-     >      sorpda(2,isrc)*rad2deg,
+     >      csorna(isrc)(1:8), sorp_now(1,isrc)*rad2ha,
+     >      sorp_now(2,isrc)*rad2deg,
      >      (lfluxtype(iflux_type(ib,isrc)),ib=1,nband)
       end do
 

@@ -58,7 +58,7 @@ C  2. Write out data file
 C
       do i=1,nsourc
         ic = sonum(i)
-        write(lutmp,9100) ic,sorp50(1,i)*rad2ha,sorp50(2,i)*rad2deg
+        write(lutmp,9100) ic,sorp2000(1,i)*rad2ha,sorp2000(2,i)*rad2deg
 9100    format(1x,i3,1x,2f6.1)
       enddo
 C

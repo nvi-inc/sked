@@ -26,9 +26,9 @@
 ! 2018Jul20 First version
 
       cprfx='" '
-    
+   
       write(lu_out,
-     > "(a,'drudg version ',a9,' compiled under FS ',i2,2('.',i2.2),$)")
+     > "(a,'drudg version ',a,' compiled under FS ',i2,2('.',i2.2),$)")
      >    cprfx,cversion,iVerMajor_FS,iverMinor_FS,iverPatch_FS
 
       if(crel_FS .eq. " ") then

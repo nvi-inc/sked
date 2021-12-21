@@ -295,8 +295,8 @@ C     ix_band is the band index for X-band
 
 ! Get ready to compute the partials.  Compute terms used many times.
 ! source stuff
-      raap=sorpda(1,isor)
-      deap=sorpda(2,isor)
+      raap=sorp_now(1,isor)
+      deap=sorp_now(2,isor)
       sd=dsin(deap)
       cd=dcos(deap)
       h=gst-raap

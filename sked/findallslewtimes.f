@@ -37,6 +37,7 @@ C   COMMON BLOCKS USED
       integer i,j
       double precision trise
       real az_now,az_new
+      real el_now,el_new
 
 ! 2005Jun13 JMGipson.  Modified to compute time when all stations on source.
       DO  I=1,NumSrc ! source loop for mutual vis
@@ -50,7 +51,7 @@ C   COMMON BLOCKS USED
             CALL SLEWT(NSORcur(istat),MJD(istat),ut(istat),
      .      ISrc,istat,cwrap_cur(istat),cwrap_new,
      .      TSLEW(isrc,istat),0,trise,tsris,st0cur,frac,knov,islew_info,
-     &      az_now,az_new)
+     &      az_now,el_now,az_new,el_new)
           ELSE  ! not initialized
             TSLEW(isrc,istat) = 0.
           ENDIF

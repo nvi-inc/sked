@@ -24,6 +24,8 @@ C
 C     UNPLO unpacks the record holding information on a LO configuration
 C
       include '../skdrincl/skparm.ftni'
+! 2021-12-03 JMGipson.  Added octal_constants.ftni
+      include '../skdrincl/octal_constants.ftni'
 
 C  History:
 C  900126 NRV Changed last parameter so no error is generated

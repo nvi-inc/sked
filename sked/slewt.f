@@ -1,6 +1,6 @@
       SUBROUTINE SLEWT(NSNOW,MJD,UT,NSNEW,ISTN,cwrap_cur,cwrap_new,
      > TSLEW, lookah,trise,tsris,st0cur,frac,knov,islew_info,
-     > aznow,aznew)
+     > aznow,elnow,aznew,elnew)
 C
 C   SLEWT calculates the slew time and the cable wrap
 C

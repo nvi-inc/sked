@@ -79,13 +79,13 @@ C 1. Summary information
 
       write(ludsp,'(a)')
      > "  Mode      Tot.Rate  #Chan  Chan.BW  Tot.BW   #BBC  #bits "
-     > //"Tracks*(fan) Tot.tracks Barrel" 
+     > //"Tracks*(fan) Tot.tracks" 
       write(ludsp,
      > "(1x,a8,1x,i5, ' Mbps ', i5, i5, ' Mhz ', i5, ' Mhz '
      >   i4, 2x,i4,4x,i4,'*(',i1,')',4x,i6,6x,a )") 
      >  cmode(is,ic), nint(samprate(is,ic)*ntot), ntmp, nint(ChanBW), 
      >  nint(ChanBw*ntmp), nchan(is,ic), ibit,
-     >  ntot,ifan(is,ic),ittrack,cbarrel(is,ic)
+     >  ntot,ifan(is,ic),ittrack
    
       do j=1,nband !# of bands
         fmax=0.0

@@ -1,7 +1,7 @@
       subroutine check_stations(ierr)
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
-      include '../skdrincl/sourc.ftni'
+!      include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
       include '../skdrincl/freqs.ftni'
       include 'flux.ftni'
@@ -40,5 +40,5 @@
       enddo !check for tracks
       return
       end
-
-
+      
+   

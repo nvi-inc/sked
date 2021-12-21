@@ -93,6 +93,9 @@ C added by JMGipson
       double precision TimeFree(max_stn)
       double precision TimeEarly                !Time of Earliest station.
       double precision TimeLast                 !And time of last station
+      
+      real  cpu_time_beg, cpu_time_end          !used for timing
+      
 
       integer MJDExp
 
@@ -257,6 +260,8 @@ C   Calculate all rising/setting times now.
       
       write(*,'(a,$)') "Scheduling scans "
 
+
+      call cpu_time(cpu_time_beg)   !get starting time
       do while(TimeFinish.ge.TimeEndCurObs)  ! optimization loop
         inquire(file="sked.stop",exist=kexist)
         if(kexist) goto 1200
@@ -463,6 +468,7 @@ C   Calculate all rising/setting times now.
 
         if(ibest .eq. -1) then
           if(.Not.kFillObs) then
+            write(*,*) " " 
             write(*,*) "No more valid observations found within time."
             goto 1200
           else if(Kfillin .and. KfillObs) then
@@ -483,7 +489,7 @@ C   Calculate all rising/setting times now.
 !          if(i .eq. 1) then
 !            isrc0=nsortst(isttst(1))
 !            call make_unit_vector(
-!     >      sorp50(1,isrc0),sorp50(2,isrc0),src0_unit)
+!     >      sorp2000(1,isrc0),sorp2000(2,isrc0),src0_unit)
 !          endif
 
           call ptobs("AU",0,ierr)
@@ -502,7 +508,7 @@ C   Calculate all rising/setting times now.
               call unpak(ierr,1)
               isrc=nsortst(isttst(1))
               call make_unit_vector(
-     >        sorp50(1,isrc),sorp50(2,isrc),src_unit)
+     >        sorp2000(1,isrc),sorp2000(2,isrc),src_unit)
               dist=acos(dot8(src_unit,src0_unit))
               if(dist .gt. dist_max) then
                 dist_max=dist
@@ -520,7 +526,6 @@ C   Calculate all rising/setting times now.
           enddo
         endif
 
-
 ! Find end time of current observation. This is to check if we are done.
         TimeEndCurObs=0.d0
         do i=1,NumAll
@@ -533,6 +538,7 @@ C   Calculate all rising/setting times now.
 
 ! standard return
 1200  continue
+ 
 ! restore everything that got changed.
       rBestPerCent=rBestPerCentold
 
@@ -544,6 +550,9 @@ C   Calculate all rising/setting times now.
       kauto=.false.
 ! Need to close out a line       
       if(iverbose_level .eq. 0)    write(ludsp,*) " "
+      
+      call cpu_time(cpu_time_end)
+      write(*,"('Total cpu time ', f8.3)") cpu_time_end-cpu_time_beg 
       
       IF (NOBS.GT.0.AND.NSOURC.GT.0.AND.NSTATN.GT.0) THEN  !
         cbuf="."

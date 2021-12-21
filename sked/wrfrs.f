@@ -48,7 +48,7 @@ C 970408 nrv Add lrecfmtname to frec call, add to WRFCLINES call
       integer renam ! function
 C  LOCAL:
       integer ierr,ic
-      character*2 c2code(max_frq)
+      character*2 c2code(max_code)
       integer isub(max_stn) ! indices into LNASEL for sub-codes
       integer istn_rx_xref(max_stn) ! the station's RXname index
       integer nrx ! number of sub-codes in a frequency sequence
@@ -134,10 +134,13 @@ C     for the $CODES section are written out for one frequency code.
      >     nfr,cat_mode(ic), cfmt,bw_stn,ichan,ibbc,csw,cb,csky,cpcfr,
      >     itrk_xref,ierr)        !write the "F" and C" lines
           if (ierr.ne.0) return
+          
+          write(lutmp,'("R ",a2,1x,f8.3)') cfrcode,samprate
 
-          call wrrblines(rcat_mode_samp(ic),c2code(num_sel),
-     >         cbarrelname,ierr)        ! write "R" and "B" lines for this code
-          if (ierr.ne.0) return
+! no longer write barrel lines 
+!          call wrrblines(rcat_mode_samp(ic),c2code(num_sel),
+!     >         cbarrelname,ierr)        ! write "R" and "B" lines for this code
+!          if (ierr.ne.0) return
 
           call wrllines(cloifname,c2code(num_sel),nfr,ierr)                    ! write "L" lines for this code
           if (ierr.ne.0) return

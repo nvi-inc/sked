@@ -1,37 +1,40 @@
-      subroutine ChkSrcUp4Scan(istat,isource,nceles,csorna,cstnna,
-     >  MJD,UT,idur,cwrap_new, ludsp,kdisplay,ierr)
+      subroutine ChkSrcUp4Scan(istat,isource,
+     >  MJD,UT,idur,cwrap, ludsp,kdisplay,ierr)
       implicit none
+      include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
+      include '../skdrincl/statn.ftni'
+      include '../skdrincl/sourc.ftni' 
 
 ! functions
-      logical kcont
-      integer trimlen
+      real*4 azwrap 
       
 ! Passed
       integer istat     !station
       integer isource   !source#
-      integer nceles    !number of celestial sources.
-      character*8 csorna
-      character*8 cstnna
+      
       integer MJD
       Double precision UT       !Time in seconds
       integer idur
-      character*2 cwrap_new    !cable wrap   
+      character*2 cwrap !cable wrap   
       integer ludsp     !lu to print
       logical kdisplay
 ! returned
-      integer ierr      !0 if an error.
+      integer ierr      !0 if NO error.
                         !1 not up at start
                         !2 not up at end
                         !3 not continuous
-      character*50 lmessage
+      character*24 lmessage
 ! local
       logical kup
-      real az,el,ha,dec,x30,y30,x85,y85   !All returned by CVPOS
+      real az(2),el(2),ha,dec,x30,y30,x85,y85   !All returned by CVPOS
       integer ihr, imin,isec
       real*8 ut_test                      !time to test if source up.
-      real   dur_tmp
-      integer i
+      integer i                           !counter 
+      real*8 delaz                        !Az distance traveled.
+      real*8 AZ2C                         !Ending az taking into account wrap. 
+      character*4 lbeg_end(2)
+      data lbeg_end/"beg", "end"/
       
 ! History
 !    2003Mar25 JMGipson. First version. Originally tired to use isup, but this
@@ -39,51 +42,69 @@
 !    2008Nov05 JMGipson. Better error messages
 !    2008Nov12 JMgipson. Reorganized slightly. Replaced two calls (start, end) with loop.  
 !    2009Jan09 JMGipson.  Changed error message from "too low" to "not visible"
-
-         
-      call seconds2hms(ut,ihr,imin,isec)
+!    2021-12-06 JMGipson. Removed call to kup which reproduces many of the calculations here.
+!         
 !      write(*,'(2(a,1x),2(i2.2, ":"),i2.2)')csorna,cstnna,ihr,imin,isec
-      
-      do i=1,2
+      az=0.d0
+      el=0.d0    
+      do i=1,2  
         if(i.eq.1) then
           ut_test=ut
-          ierr=1
-          lmessage="ERROR! (chksrcup4scan): At scan start time "
+          ierr=1    
         else
           ut_test=ut+idur
-          ierr=2
-          lmessage="ERROR! (chksrcup4scan): At scan end time "
+          ierr=2       
         endif
-
-!        if(isource .gt. nceles) then
-          CALL CVPOS(isource,istat,MJD,UT_test,
-     >       AZ,EL,HA,DEC,X30,Y30,X85,Y85,KUP) ! start of obs
-!        else
-!           CALL isup(Isource,istat,UT,KUP,nrs)
-!        endif
-         if(.not.kup) then   
-           if(kdisplay) then           
-             write(ludsp,
-     >    '(a,1x, 2(i2.2,":"),i2.2," source ",a," not visible at ",
-     >      a,": az, el= ",2f6.1)') trim(lmessage), ihr,imin,isec, 
-     >      csorna, cstnna, az*rad2deg,el*rad2deg         
-          endif
-          return
-         endif
+        CALL CVPOS(isource,istat,MJD,UT_test,
+     >       AZ(i),EL(i),HA,DEC,X30,Y30,X85,Y85,KUP) ! start of obs
+        if(.not.kup) goto 500  ! Exit with an error.                       
       end do
-  
-! Continuity
-      dur_tmp=float(idur)
-      IF (.NOT.kcont(MJD,UT,dur_tmp,isource,istat,cwrap_new,ierr)) THEN
-        ierr=3
-        if(kdisplay) then 
-          write(ludsp,
-     >   "('ERROR! (chksrcup4scan): Source track ', a8, 
-     >      'not continous at ',a8)")    csorna, cstnna       
-        endif
+      ierr=0 
+! at this point know that source was visible both at start and end. 
+! Now make sure that it doesn't cross wrap limit boundaries. 
+! The bottom checks if  AZ-el antennas. If not then we can skip. 
+      IF(IAXIS(ISTAT).ne.3 .and. iaxis(istat).ne.7 .and. 
+     &  iaxis(istat).ne.6) return
+
+! Below is adapted from kcont.f 
+      DELAZ = AZ(2)-AZ(1)
+      IF (DELAZ.GT.PI) then
+          DELAZ = -(TWOPI-DELAZ)
+      else IF (DELAZ.LT.-PI) then
+          DELAZ = TWOPI+DELAZ
       endif
-      ierr=0
-      return
+!        write(*,'(a,1x, 2f8.2)') cstnna(ist), az1*rad2deg, az2*rad2deg
+
+      Az(1)=azwrap(az(1),cwrap,stnlim(1,1,istat))
+
+      AZ2C = AZ(1)+DELAZ
+C  Check whether we cross into ambiguous section during observation
+      IF (AZ2C.LT.STNLIM(1,1,ISTat) .or. AZ2C.GT.STNLIM(2,1,ISTat)) then      
+        ierr=3
+        lmessage="is not continuous" 
+        goto 500
+      endif      
+      ierr=0 
+      return       !return w/o an error.
+             
+! Common error exit.       
+ 500  continue          
+! Write error message. Something like
+! ERROR! ChkSrcUpForScan: At 11:12:34 source 3C84 at HOBART 314.4 9.8 is down at start of scan. 
+      if(kdisplay) then           
+         call seconds2hms(ut_test,ihr,imin,isec)
+         write(ludsp,
+     >       '("Error! ChksrcUpforScan:  At ", 2(i2.2,":"),i2.2, $)') 
+     >       ihr,imin,isec
+         write(ludsp,'("source ",a," at ", a, 2f8.2,$ )') 
+     >       csorna(isource), cstnna(istat), az(1)*rad2deg,el(1)*rad2deg
+         if(ierr .le. 2) then     
+             write(ludsp, '(" is down at ", a)') lbeg_end(i)
+         else
+            write(ludsp, '(a)') "is not continous"
+         endif
+      endif  
+      return    
       end
 
 

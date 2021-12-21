@@ -99,7 +99,7 @@ C
         ic = sonum(i)
         ic = 80
         write(lutmp,'(i3,1x,2f6.1)') ic,
-     .	     sorp50(1,i)*rad2ha,sorp50(2,i)*rad2deg
+     .	     sorp2000(1,i)*rad2ha,sorp2000(2,i)*rad2deg
       enddo
 
 C     Sun's position throughout the year as "*"

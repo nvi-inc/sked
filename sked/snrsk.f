@@ -80,8 +80,6 @@ C
 C  1. Check that the parameters we need were set.
 C
       IERR=0
-      call check_trk_flux_sefd(istn,nstn,nsor,icod,lu,ierr)
-      if(ierr .ne. 0) return
       call gtban(icod,nba,iband)
 
 ! This assumes that all stations use the same efficiency.
@@ -112,6 +110,15 @@ C
           iactbl(i,j)=-1
         enddo
       enddo
+      
+      do iba=1,2 
+         do i =1, Nstn 
+            j=istn(i)         
+            sefdstel(iba,j) =sefdel(iba,nsor,j,mjd,ut)
+         end do
+       end do     
+      
+      
       do k=1,nband ! each band
         iba=iband(k)
         DO I=1,NSTN-1 ! first station
@@ -120,13 +127,12 @@ C
             JS=ISTN(J)
             ibl=ibnum(is,js)
             IF (kvscan) then !compute scan lengths
-               temp=snr_per_sec(icod,iba,nsor,is,js,ibl,mjd,ut,
+               temp=snr_per_sec(icod,iba,nsor,is,js,mjd,ut,
      >                   ibit,corr_eff,bit_eff)             
 ! Here we calculate the required duration to acheive the SNR. 
                  if(temp .gt. 0) then
                    iactbl(iba,ibl)=
      >               int((dble(isnrbl(iba,ibl))/temp)**2)+1
-!       write(*,*) "temp: ", cstnna(is), cstnna(js),temp ,iactbl(iba,ibl)
                  else
                    iactbl(iba,ibl)=0
                  endif                                       

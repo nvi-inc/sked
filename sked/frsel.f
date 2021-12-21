@@ -82,7 +82,7 @@ C
       cbuf=" "
       CALL READF_ASC(lusel,IERR,IBUF,IBLEN,ILEN)
       NCODES = 0
-      call frinit(max_stn,max_frq)
+      call frinit(max_stn,max_code)
       DO WHILE (IERR.GE.0.AND.ILEN.GT.0)
 C     read each frequency record
         CALL FRINP(IBUF,ILEN,LUSCN,IERRCM)

@@ -85,8 +85,8 @@ C
 
       do i=1,nsourc
         ic = sonum(i)
-        rha=sorpda(1,i)-rha_del
-        rdec=sorpda(2,i)
+        rha=sorp_now(1,i)-rha_del
+        rdec=sorp_now(2,i)
         call equal_area_proj(rha,rdec,xd,yd)
         write(lutmp,"(i3,2f9.2)") sonum(i),xd,yd
       enddo

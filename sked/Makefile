@@ -49,8 +49,8 @@ OBJ_FOR=   \
     clear_close_sources.o \
     cabl1.o \
     chcmd.o \
-    check_trk_flux_sefd.o \
     chout.o chpar.o \
+    check_sources.o \
     check_stations.o \
     chstn.o \
     chske.o \
@@ -288,7 +288,6 @@ OBJ_FOR=   \
     vsoout.o \
     vsiout.o \
     vpcout.o \
-    vroout.o \
     vscout.o \
     vstout.o \
     vtrout.o  \
@@ -303,7 +302,7 @@ OBJ_FOR=   \
     write_minor_score_header.o \
     wrsts.o  \
     wrfclines.o \
-    wrllines.o wrrblines.o \
+    wrllines.o \
     wrt_param_line.o \
     xlcmd.o \
     xncmd.o \

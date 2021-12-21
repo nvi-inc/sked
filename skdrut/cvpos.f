@@ -45,7 +45,6 @@ C   COMMON BLOCKS USED
 ! Function
       integer iwhere_in_range4
 
-
 C
 C     LOCAL VARIABLES:
       real*4 slat,clat,sha,cha,saz,sel,cel,azx,
@@ -99,6 +98,7 @@ C                value is checked between (i) and (i+1).
 C 960223 nrv Change to using (az,el) points actually on the horizon
 C            and interpolating between the line segments. Keep the
 C            coordinate mask unchanges.
+! 2021-01-25 JMG renamed SATP50-->satpos, SORPDA-->sorp_now
 C
 C
 C     1. Define the statement function ACOS.
@@ -111,28 +111,26 @@ C     2. Now calculate hour angle and dec, and sin/cos.
 C
       IF  (NSOR.LE.NCELES) THEN  !
         CALL SIDTM(MJD,ST0,FRAC)
-        HAD = ST0+UT*FRAC - STNPOS(1,ISTN) - SORPDA(1,NSOR)
-        DEC=SORPDA(2,NSOR)
+        HAD = ST0+UT*FRAC - STNPOS(1,ISTN) - sorp_now(1,NSOR)
+        DEC=sorp_now(2,NSOR)
       ELSE  !
         NORB=NSOR-NCELES
-        OINC=SATP50(1,NORB)
-        OECC=SATP50(2,NORB)
-        OPER=SATP50(3,NORB)
-        ONOD=SATP50(4,NORB)
-        OANM=SATP50(5,NORB)
-        OAXS=SATP50(6,NORB)
-        OMOT=SATP50(7,NORB)
+        OINC=satpos(1,NORB)
+        OECC=satpos(2,NORB)
+        OPER=satpos(3,NORB)
+        ONOD=satpos(4,NORB)
+        OANM=satpos(5,NORB)
+        OAXS=satpos(6,NORB)
+        OMOT=satpos(7,NORB)
         IOEY=ISATY(NORB)
         OEDY=SATDY(NORB)
 C
         ALON=STNPOS(1,ISTN)
         ALAT=STNPOS(2,ISTN)
         CALL XAT(OINC,OECC,OPER,ONOD,OANM,OAXS,OMOT,IOEY,OEDY,
-     .                   MJD,UT,ALAT,ALON,HAD,DEC,RANGE)
-        CALL XAT(OINC,OECC,OPER,ONOD,OANM,OAXS,OMOT,IOEY,OEDY,
-     .                   MJD,UT,ALAT,ALON,HAD,DEC,RANGE)
-      END IF  !
-
+     .                   MJD,UT,ALAT,ALON,HAD,DEC,RANGE) 
+      END IF  !      
+       
       SDEC = DSIN(DEC)
       CDEC = DCOS(DEC)
       DC=SNGL(DEC)
@@ -302,6 +300,12 @@ C     Now check horizon mask for stations that have one.
         endif
         KUP=KUP.AND.EL.GE.eli
       ENDIF
+
+      if(.false.) then
+      write(*,'(a8,1x,a8,i8, f10.2, 2f8.2)') 
+     > csorna(nsor), cstnna(istn), mjd, ut, az*rad2deg,el*rad2deg
+      endif 
+      
 C
       RETURN
       END

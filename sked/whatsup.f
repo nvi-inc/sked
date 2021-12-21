@@ -32,6 +32,7 @@ C   COMMON BLOCKS USED
       double precision dsecdif          !double precision differenc in times.
       real speed                        !tape speed
       integer iwhere_in_string_list 
+      real sefdel                       !Elevation dependent SEFD 
 
 ! passed variables
       integer NumStn,NumSrc
@@ -90,6 +91,7 @@ C   COMMON BLOCKS USED
       integer is,ifix1,ivars,ivarm,nrise,nset
       integer ispinDelay
       integer istat1, istat2
+      integer iband                      !band 
       
       ispinDelay=0
 
@@ -230,10 +232,24 @@ C         If no observations on this source so far, re-initialize
 C         the difference to look as if it's been observed far enough
 C         in the past that it's now available again.
           IF (MJPRSO(IS).eq.0) TDIFF(is)=iminbetween+1.0
-C
+          
+          if(.false.) then
+! Initialize the                     
+          do iband=1,2 
+           do istat1 =1, NumStn 
+             j=istnvec(istat1)
+             sefdstel(iband,istat1) =
+     >          sefdel(iband,is,istat1,mjdlast,utlast) 
+           end do
+          end do     
+          endif 
+          
 C   Compute SNR and duration for stations and baselines
-          if (kvscan)   CALL SNROK(istnvec,NumStn,is,icod,-1,iokst,
+          if (kvscan)  then         
+              CALL SNROK(istnvec,NumStn,is,icod,-1,iokst,
      >                              mjdcur(j),utcur(j))
+          endif 
+     
           DO  J=IFST,ILST ! one station entry                   
             istn = istnvec(J)
             el=-1                       !Set source elevation to negative. Default not up

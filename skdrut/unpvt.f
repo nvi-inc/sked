@@ -26,6 +26,8 @@ C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/statn.ftni'
       include '../skdrincl/valid_hardware.ftni'
+! 2021-12-03 JMGipson.  Added octal_constants.ftni
+      include '../skdrincl/octal_constants.ftni'
 C
 C  Called by: stinp
 C

@@ -217,7 +217,7 @@ C         If (IFBRK().LT.0) GOTO 900
               J = ISTN(IS)
 C             Calculate max elevation of this source at this station
               if (isor.le.nceles) then ! max elevation
-                ELMAX=PIov2-DABS(STNPOS(2,J)-SORPDA(2,ISOR))
+                ELMAX=PIov2-DABS(STNPOS(2,J)-sorp_now(2,ISOR))
                 MAXEL = nint(ELMAX*rad2deg)
               else
                 maxel = -1.0

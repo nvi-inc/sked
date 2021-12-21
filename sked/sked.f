@@ -22,11 +22,6 @@ C
       include 'cat_name_version.ftni' 
       include 'cat_mode.ftni'
       include 'cat_freq.ftni'
-    
-!      include 'minor.ftni'
-
-C   CALLED BY: sked (C main program)
-
 
 C   Functions
       integer ifunc,gtcmd! function
@@ -249,12 +244,16 @@ C  4. Open schedule file and read it in.
     
 ! Do a quick check to make sure that things are setup at the stations.
       call check_stations(ierr)
-
-      if(ierr .ne. 0 .or. ierrcm .ne. 0) then
-         write(*,'(a)') "Try again!"
-         nch=0
-         goto 210
+      if(ierr .ne. 0) then
+         write(*,'(a)') "Fix problem with stations and try again."
+         stop        
       endif
+      
+      call check_sources(ierr)
+      if(ierr .ne. 0) then
+         write(*,'(a)') "Fix problems with sources and try again."
+         stop
+      endif       
 
       IF (IYRCUR(1).NE.-1) GOTO 700
       GOTO 800

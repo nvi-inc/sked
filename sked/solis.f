@@ -75,11 +75,11 @@ C       Find the longest source name.
         enddo
 
         DO I=1,NCELES
-          CALL RADED(SORP50(1,I),SORP50(2,I),0.D0,IRH1,IRM1,RS1,
+          CALL RADED(sorp2000(1,I),sorp2000(2,I),0.D0,IRH1,IRM1,RS1,
      .    L1,IDD1,IDM1,DS1,LDUM,IDUM,IDUM,DUM)
-          CALL RADED(SORPDA(1,I),SORPDA(2,I),0.D0,IRH2,IRM2,RS2,
+          CALL RADED(sorp_now(1,I),sorp_now(2,I),0.D0,IRH2,IRM2,RS2,
      .    L2,IDD2,IDM2,DS2,LDUM,IDUM,IDUM,DUM)
-          call prefr(sorp50(1,i),sorp50(2,i),2000,raout,decout)
+          call prefr(sorp2000(1,i),sorp2000(2,i),2000,raout,decout)
           CALL RADED(raout,decout,0.D0,IRH3,IRM3,RS3,
      .    L3,IDD3,IDM3,DS3,LDUM,IDUM,IDUM,DUM)
 !          j=istcur(1)
@@ -117,7 +117,7 @@ C
         DO NSAT=1,NSATEL
           I=NCELES+NSAT
           WRITE(LUDSP,9150) I,cSORNA(i)(1:8),
-     .                  (SATP50(J,NSAT),J=1,7),ISATY(NSAT),SATDY(NSAT)
+     .                  (satpos(J,NSAT),J=1,7),ISATY(NSAT),SATDY(NSAT)
 9150      FORMAT(I4,1X,A8,1X,F7.2,F7.5,3F7.2,F11.1,F8.3,I5,F7.2)
         ENDDO
       ENDIF

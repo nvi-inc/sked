@@ -25,7 +25,7 @@
       integer k,iobs
 
 ! Make unit vector in the direction of this source.
-      call make_unit_vector(sorpda(1,isrc),sorpda(2,isrc),src_vec0)
+      call make_unit_vector(sorp_now(1,isrc),sorp_now(2,isrc),src_vec0)
 
       sky_cov=twopi
 
@@ -33,7 +33,8 @@
         iobs=iskrec(k)
         if(kobc(iobs)) then            !use this observation?
           isor=isrc_obs(iskrec(k))
-          call make_unit_vector(sorpda(1,isor),sorpda(2,isor),src_vec)
+          call make_unit_vector(sorp_now(1,isor),sorp_now(2,isor),
+     >      src_vec)
           dtemp=dot8(src_vec0,src_vec)
           if(dtemp .gt. 0.9999999) then
             angle=0.d0

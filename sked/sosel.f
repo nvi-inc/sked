@@ -155,8 +155,8 @@ C
       IF  (NCELES.GT.0) THEN
         tjd  =mjdcur(1)+2440000.d0
         DO  I=1,NCELES
-          call apstar_Rad(tjd,sorp50(1,i),sorp50(2,i),
-     >         sorpda(1,i),sorpda(2,i))
+          call apstar_Rad(tjd,sorp2000(1,i),sorp2000(2,i),
+     >         sorp_now(1,i),sorp_now(2,i))
         END DO  !
       END IF  !
 C

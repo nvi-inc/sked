@@ -3,7 +3,7 @@
 !  NEWOB decodes an observation command line, checks to see ifthe observation is feasible.
 !  If it is not feasible with original station list, tries removing some of them. 
 !  Beginning at 920 we start with original list of stations.
-!  If the source is not up at a station, then it is removed.
+!  If the source is not up at a station, then it is removed.f
 
       implicit none 
       include '../skdrincl/skparm.ftni'
@@ -13,10 +13,10 @@
 ! functions
       logical kstatup                   !is station up for scan?
       logical kcont
-      real speed                        ! tape speed
       logical kyes_to_prompt            ! returns true if anser is "Y" or "Yes"
       integer  trimlen
       integer isecdif                   !difference in time between two scans.
+      real*4  sefdel                    !elevation dependent SEFD
  
 C  INPUT:
       character*(*) cinstq              ! Input character string
@@ -52,13 +52,16 @@ C  LOCAL VARIABLES
       double precision UTT(MAX_STN)  !Trial time (seconds)
       integer MJDT(MAX_STN)           !Trial date 
 
-      integer mjdbeg                ! MJD beginning of new scan
-      double precision utbeg       ! UT  beginning of scan
-      integer mjdtmp                ! MJD temporary holder
-      double precision uttmp       ! UT temporary holder
-
+      integer mjd_beg                ! MJD beginning of new scan
+      double precision ut_beg        ! UT  beginning of scan
+      integer mjdtmp                 ! MJD temporary holder
+      double precision uttmp         ! UT temporary holder
+      integer mjd_at(max_stn)
+      double precision ut_at(max_stn) 
+      
+      integer idur_tmp(max_stn)      ! holds duration
+            
       character*20 lproblem         ! Description of potentional problem
-
 
 C     iStat1 - first station in this subnet
 C     J - index of station in selected list
@@ -66,20 +69,17 @@ C        ICH  - character counter
 C        IDURSO,IDLE,ICAL,NSOR,IYR,IDA,IHR,iMIN,ISC
 C               - Holders for decoded values
 
-      double precision UT,utcmd      !Holder for decoded UT.
+      double precision UT,ut_cmd      !Holder for decoded UT.
       LOGICAL KOK                     !All stations pass KUP test
-
-      LOGICAL KNENEW(MAX_STN),KRWNEW(MAX_STN) ! true when new tape or rewind is needed, by station
-
+    
       integer*2 LPRE(3),LMID(3),LPST(3)    !Procedures 
       character*6 cpre,cmid,cpst
       equivalence (cpre,lpre), (cmid,lmid),(cpst,lpst)
       character*2 cmdcod
 
       integer*2 LCABLE(MAX_STN)
-      character*2 cwarp(max_stn)
-      equivalence (cwarp,lcable)
-      character*2 cwarp_temp  
+      character*2 cwrap(max_stn)
+      equivalence (cwrap,lcable)     
 
       CHARACTER*1 CANS           ! NC and CANS are used for user response
       INTEGER NC
@@ -92,18 +92,27 @@ C               - Holders for decoded values
       character*20 lfrnt_msg
       integer istat1             ! first station in subnet.
      
-      integer i,nsor,iyrcmd,idaycmd,ihr,imin,isc,mjdcmd
+      integer i,nsor,iyrcmd,idaycmd,ihr,imin,isc,mjd_cmd
       integer j        !station index (replace istat)
       integer idur,idurso,ical,idle,icod,mjd
       integer lu
+      integer iband              !iband 
       
-      integer istbad(max_stn) ! not used here
+      integer istbad(max_stn)    ! not used here
       logical kdisplay
       integer islew_info         !info about slew
       real  dur_temp
       integer itdif              !timedifference
       real az_now,az_new 
-C
+      real el_now,el_new
+      integer isetup_time
+      integer isrc_time
+      integer ibuf_time 
+ 
+      character*2 cwrap_new,cwrap_now
+      integer*2 iwrap_now
+      equivalence (iwrap_now,cwrap_now)
+
 C  History
 ! 2021-02-19 JMG  slew now returns az_now,az_new 
 C   811125  MAH    CHECK FOR CONTINUITY OF OBS
@@ -185,9 +194,8 @@ C 27Aug2003 JMG  If a source is near cable wrap limits, reject it.
 !                     calculation.  Assume the antenna can do it!
 ! 2014May02 JMG. Removed ipas,idir, ift from call to set_scan_param. No longer used. 
 
-!      kdisplay=nsubc .eq. 0 .or. kdebug 
-      kdisplay = kdebug
-
+      kdisplay=nsubc .eq. 0 .or. kdebug 
+!      kdisplay = kdebug
 C
 C   1. Check for enough info to start.  Call NEWPR to parse
 C   the input line and return all parameters.
@@ -196,15 +204,18 @@ C
         IERR = 13
         RETURN
       END IF  !not enough info yet
-C  
+
+! Parse command line. 
        CALL NEWPR(cINSTQ,NSOR,iyrcmd,idaycmd,IHR,iMIN,ISC,
-     >  utcmd,mjdcmd,IDUR,
-     >  IDURSO,ICAL,IDLE,cwarp,ICOD,cPRE,cMID,cPST,NSTN,ISTN,KVIS,IERR)
+     >  ut_cmd,mjd_cmd,IDUR,
+     >  IDURSO,ICAL,IDLE,cwrap,ICOD,cPRE,cMID,cPST,NSTN,ISTN,KVIS,IERR)
 
       IF (IERR.NE.0) RETURN
       
-!      write(*,"('NEWOB: ',i3,'-',2(i2.2,':'),i2.2)") idaycmd,ihr,imin,isc
-!      write(*,*) mjdcmd
+      if (kdisplay) then
+        write(luscn,'("Checking new obs on ",a," with ",30(A2,1x))')
+     >    cSORNA(NSOR),  (cpoCOD(ISTN(j)),j=1,NSTN)   
+      endif  
 
 C    Initialize rise/set times if needed.
       if (.not.krsini) call rsini
@@ -212,220 +223,101 @@ C    Initialize extra durations to zero for scheduling.
       do i=1,nstatn
         idurxt(i)=0
       enddo
-
-!
-! Iterate. First we start with all stations in the command list.
-!   We try to schedule them. If there is a problem with some station it is marked as bad. (KOK = .false.)
-!   and removed from station list.  
- 
-      KOK = .TRUE.     
-920   Continue  
-      if(.not.Kok) then
-        if(kdebug) then 
-          write(luscn,'(a," problem with following: ",$)') 
-     >      lproblem(1:trimlen(lproblem))                          
-          do i=1,nstn               
-            if(istn(i) .lt. 0) then
-               write(luscn,'(" ",i2," ", a, $)') i,cstnna(-istn(i))
-            endif
-          end do 
-          write(luscn,'(a)') 
-        endif       
-!        write(*,'("Newob 242  ",i4," | ",12i4)')  nstn,istn(1:nstn)
-        CALL DESTN(NSTN,ISTN)
-    
-!        if(nstn .gt. 0) then
-!          write(*,'("Newob 246  ",i4," | ",12i4)') nstn,istn(1:nstn)
-!        else
-!          write(*,*) "Newob 248: All deleted"
-!        endif        
-        Kok=.true.
-      ENDIF  
-
-! We calculate the nominal "begining" of the scan several times below with different
-! levels of precision until we converge on the final time.
-      iStat1 = ISTN(1) ! first station in requested subnet
-      IF (NSORcur(iStat1).GT.0.AND.mjdcmd.NE.-1.AND.
-     >    isecdif(mjdcmd,utcmd,mjdcur(istat1),utcur(istat1)).lt.0) then     
-        if (kdisplay) WRITE(LUSCN,'(a)')
-     >   "WARNING! (newob): Start time is earlier than current time..."        
-      endif
-        
-      IF (NSTN.LT.2) THEN !too few left
-        if (kdisplay)
-     >     WRITE(LUSCN,'(a)') 
-     >     "ERROR! (newob): Less than two stations left. Can't observe."       
-        IERR=1
-        RETURN
-      ENDIF !too few left
-
-      MJD=mjdcmd  !reset MJD to the date specified in the command
-      UT=utcmd    !reset UT to the time specified in the command
       
-      if (kdisplay) then
-        write(luscn,'("Checking new obs on ",a," with ",30(A2,1x))')
-     >    cSORNA(NSOR),  (cpoCOD(ISTN(j)),j=1,NSTN)   
-      endif
-
-! 2.1 See if source is visible at station at the start of the scan. 
-      lproblem="ChkSrcUp4Scan:  start"
-! Get first guess for time of scan start. 
-      if(mjd .ne. -1) then    
-! observation time specified.
-         mjdbeg=mjd
-         utbeg =ut
-      else
-! no time specified.  Initialize to current time of first station in scan. 
-         mjdbeg=mjdcur(istat1)
-         utbeg= utcur(istat1)
-         do i=1,nstn
-           j=istn(i)
-! Calculate when a station becomes free at end of current scan. 
-           call addsec2ut(mjdcur(j),utcur(j),
-     >         idlcur(j)+idurcur(j),mjdtmp,uttmp)
-! Make the time the latest of all times. This is earliest time trial scan can occur. 
-           if(isecdif(mjdtmp,uttmp,mjdbeg,utbeg) .gt. 0) then
-              mjdbeg=mjdtmp
-              utbeg =uttmp
-            endif  
-         enddo     
-     
-        DO  I = 1,NSTN !Check source is up at start of scan. If not, kick station out.
-            j=istn(i)
-            call ChkSrcUp4Scan(j,Nsor,nceles,
-     >        csorna(nsor),cstnna(j),mjdbeg,utbeg,
-     >        Idurst(j),lcable(j),luscn,kdisplay,ierr)
-            if(ierr .ne. 0) then
-              Kok=.false.
-              istn(i)=-iabs(istn(i))
-            endif
-         END DO  !make sure we can observe at this time
-         if(.not.kok) goto 920            
-      endif
-
+! Find how long it would take the stations to get to the specified source. 
+      DO  I=1,NSTN !get latest start time
+         J = ISTN(I)   
+         iwrap_now=lcblcur(j)          
+         call when_at_next_source(kdisplay,luscn,
+     >     j,nsorcur(j),nsor,mjdcur(j),utcur(j),
+     >     idurcur(j),idle,ical, cwrap_now,cwrap(j),mjd_at(j),ut_at(j),
+     >     az_now,el_now,az_new,el_new,tslew(j),
+     >     isetup_time,isrc_time,ibuf_time, ierr)         
    
-! OK, all sources are up at the end of the previous scan. Now take into account slewing.      
-      lproblem="Slewing "
-      DO I=1,NSTN
-        j = ISTN(I)
-        call addsec2ut(mjdcur(j),utcur(j),
-     >         idurcur(j)+idlcur(j),mjdt(j),utt(j))
- 
-! If the time between 'now' and the end of the last scan is large enough, skip slew calcuation.
-! 2012May
-         itdif=isecdif(mjdbeg, utbeg,mjdcur(j),utcur(j))  
-!        IF  (NSORcur(j).GT.0 .and. itdif .lt. 600) then 
-!
-!         write(*,*) nsorcur(j)
-        if(nsorcur(j) .gt. 0) then       
-          CALL SLEWT(NSORcur(j),mjdt(j),utt(j),
-     >      NSOR,j,LCBLcur(j),LCABLE(j),TSLEW(j),lookah,trise(j),
-     >      tsris,st0cur,frac,knov,islew_info,az_now,az_new) 
-!             write(*,*) "JMG!!",  cstnna(j), islew_info, tslew(j) 
-          if(islew_info .eq. 0) then
-            UTT(j)=UTT(j)+Tslew(j)
-          else 
-            KOK =.FALSE.
-            ISTN(I)=-iabs(ISTN(I))
-            if(kdisplay) then
-              if(islew_info .lt. 0) then 
-                lfrnt_msg='ERROR! (newob): '
-              else
-                lfrnt_msg='WARNING! (newob): '
-              endif  
-              call print_slew_info_warning(ludsp,lfrnt_msg,islew_info,j)                  
-            endif        
-          endif 
-        ELSE
-          TSLEW(j) = 0.0
-          trise(j) = -1.0
-          call cabl1(j,nsor,mjdt(j),utt(j),lcable(j))
-        ENDIF
-      ENDDO
-C
-      IF (.NOT.KOK) THEN
-        IF (KVIS) THEN !mutual vis required
-          IERR=1
-          RETURN
-        ELSE !remove bad stations           
-           goto 920         
-        ENDIF
-      endif
-C
-C     If the source is about to rise, ask whether to wait for it or just
-C     drop the station from the list. If in autosked mode, then "kask"
-C     will be true, so drop the station automatically.
-
-      lproblem = "Rising"
+                       
+        if(ierr .ne. 0) then
+           istn(i)=-istn(i)         !Remove stations that cannot participate. 
+         endif  !got a later time           
+      end do 
+! Remove stations that can't observe      
+      CALL DESTN(NSTN,ISTN)  
+      if(nstn .lt. 2) goto 900   
+      
+200   continue   
+! Some stations might have been removed. 
+! Recalculate start time.         
+      mjd_beg=-1
+! update start of scan time. This is latest of all the times.  
       do i=1,nstn
         j=istn(i)
-        if (trise(j).gt.0) then !ask if wait for rise
-          if (kask.and.kdisplay) then
-            nc=-1
-            do while (nc.lt.0)
-              write(luscn,9412) cstnna(j),trise(j)/60.0
-9412          format('NEWOB91 - Source will rise at ',a,' in ',f4.1,
-     >         ' minutes.  Do you want to ',/,
-     >         '(D)elay the start time until it rises',/,
-     >         '(S)kip this station ',/, 
-     >         '(A)bandon the observation? ',$)              
-              CALL read_cap_char(cans)            
-              if (CANS.eq.'A') then
-                ierr = 1
-                return
-              else IF (CANS.EQ.'S') then !remove
-                istn(i)=-iabs(istn(i))
-                kok=.false.
-                nc=0
-              else if (cans.ne.'D') then
-                nc=0
-              endif
-            enddo
-          else !in auto mode, remove station
-            istn(i)=-iabs(istn(i))
-            kok=.false.
-          endif !auto or not
-        endif !ask if wait for rise
-      enddo     
-        if(.not.kok) then          
-          goto 920
-        endif 
-
-C   2.2. Calculate dur/SNR for this source and subnet.
-C        Check that each station is OK and print messages if not.
-C********Return here to re-calculate SNRs using the calculated start time.
-C
-       itersnr = 1
-930   continue 
-      lproblem="Duration" 
-! Find time scan start. 
-! Note:  MJD is either mjdcmd (set above), or is set below as a result of calculation.
-      if(mjd .ne. -1) then    
-! observation time specified, or from previous iteration.
-        mjdbeg=mjd
-        utbeg= ut
-      else
-!no time specified.  Initialize to current time of first station in scan. 
-        mjdbeg=mjdcur(istat1)
-        utbeg=utcur(istat1)
+        if(mjd_at(j) .gt. mjd_beg) then
+           mjd_beg=mjd_at(j)
+           ut_beg =ut_at(j) 
+        else
+           ut_beg=max(ut_at(j), ut_beg)
+        endif  
+      end do       
+   
+! If this is a manual scheduled scan AND we specified the time
+!    then check to see if scheduled time  is AFTER begin time
+      if(mjd_cmd.ne.-1 .and. 
+     &   isecdif(mjd_cmd,ut_cmd, mjd_beg,ut_beg) .lt. 0) then     
         do i=1,nstn
-          j=istn(i)
-          call addsec2ut(mjdcur(j),utcur(j),
-     >     idlcur(j)+idurcur(j)+isortm+ical+nint(tslew(j)),mjdtmp,uttmp)
-! Make the time the latest of all times. This is when scan occurs.
-          if(isecdif(mjdtmp,uttmp,mjdbeg,utbeg) .gt. 0) then
-             mjdbeg=mjdtmp
-             utbeg =utbeg
-          endif  
-        enddo
-      endif   
+          j=istn(i) 
+          IF (isecdif(mjd_cmd,ut_cmd,mjd_at(j),ut_at(j)).lt.0) then      
+            WRITE(LUSCN,
+     >  '("ERROR (newob): At Station ",a," start time ",i6,1x,f8.1 )')
+     >        cstnna(j), mjd_cmd, ut_cmd
+            write(luscn, '(29x,"before free time time ",i6,1x,f8.1)')
+     >       mjdcur(j),utcur(j)
+             ierr=-1
+          endif                             
+        end do 
+        if(ierr .ne. 0) return 
+        mjd_beg=mjd_cmd
+        ut_beg =ut_cmd 
+      endif     
+        
+!     Check sun distance and quit if it's too close.
+      call ChkSunDist(nsor,csorna(nsor),mjd_beg,ut_beg,
+     >     kdisplay,luscn,rSunMinAngle,ierr)
+      if(ierr .ne. 0) return 
+         
+! Now calculate the SEFD at each station, taking into account the elevation.
+      if(.false.) then
+      do iband=1,2 
+        do i =1, nstn 
+           j=istn(i)
+           sefdstel(iband,j) =sefdel(iband,nsor,j,mjd_beg,ut_beg)
+!           write(*,*) sefdstel(iband,j) 
+        end do
+      end do          
+      endif  
 
-! Now calculate the durations.
-      IF (IDUR.EQ.0) THEN !calculate durations
-        if (kvscan) then !calculate
+! Duration.   
+! Now calculate the durations if not set in the command. 
+      KOK=.true. 
+      IF (IDUR.ne.0) then
+! Duration set in the command use it.       
+        do i=1,nstn
+           j=istn(i)
+           idurst(i)=idur
+        end do  
+        lu=luscn
+        if (nsubc.gt.0) lu=-1
+        if (kvscan) then ! calculate SNRs anyway
+          call snrac(nstn,istn,nsor,icod,lu,mjd_beg,ut_beg,ierr)
+          if (ierr.ne.0) return
+        endif
+      else 
+        if(.not. kvscan) then   !don't calculate duration, yes defualts. 
+          do i=1,nstn
+            idurst(istn(i))=isscan(nsor)
+          enddo
+        else                   !heere we calculate duration to meet SNR targets.        
           lu=luscn
           if (nsubc.gt.0) lu=-1       
-          call snrok(istn,nstn,nsor,icod,lu,iokst,mjdbeg,utbeg)             
+          call snrok(istn,nstn,nsor,icod,lu,iokst,mjd_beg,ut_beg)             
           do i=1,nstn
             j=istn(i)
             if(iokst(i).lt.0) then ! some problem
@@ -459,158 +351,57 @@ C
               endif !ask/reject
             endif ! some problem
           enddo     
-!          write(*,*) "Newob 469: ", kok 
-          if (.not.kok) goto 920            !remove bad station
-! Don't have to do this because already done in "snrok"
-          if(.false.) then 
-          call snrsk(isscan(nsor),nstn,istn,nsor,icod,ierr,0,
-     >        mjdbeg,utbeg)
-          endif 
-          if (ierr.lt.0) return         
-        else !use scan times
-          do i=1,nstn
-            idurst(istn(i))=isscan(nsor)
-          enddo
-        endif !calculate/use scan times
-      ELSE !duration specified
-        DO I=1,NSTN
-          IDURST(ISTN(I))=IDUR
-        ENDDO
-        lu=luscn
-        if (nsubc.gt.0) lu=-1
-        if (kvscan) then ! calculate SNRs anyway
-          call snrac(nstn,istn,nsor,icod,lu,mjdbeg,utbeg,ierr)
-          if (ierr.ne.0) return
-        endif
-      ENDIF !calc/spec durations
-C     3. Determine the mutual tape location for this observation.
-!     
-
-C    5. Calculate start time.
-C     Reset these variables when iterating so that start time is re-calculated
-! 
-      MJD=mjdcmd  !reset MJD to the date specified in the command
-      UT=utcmd    !reset UT to the time specified in the command
-      IF (MJD.EQ.-1) THEN !no start time specified
-        kfirstobs=.true.
-        do i=1,nstn
-           if(nsorcur(istn(i)).ne.0) kfirstobs=.false.
-        end do
-!        IF (NSORcur(iStat1).NE.0) THEN !we're initialized, use AUTOT
-        if(.not. kfirstobs) then !initialized. Use Autot.
-          cmdcod=" "   
-          itemp=0     !minimum idle time.        
- 
-          CALL AUTOT(cmdcod,itemp,MJDCUR,UTCUR,NSORcur,IDURcur,IDLCUR,
-     >      ical,istn,nstn, cwrap_cur,nsor,
-     >       MJD,UT, MJDT,UTT,cwarp,istbad)    
- 
-        ELSE !not initialized, use starting day
-          UT = UTCUR(iStat1)
-          MJD  = MJDCUR(iStat1)
-          do i=1,nstn
-            utt(istn(i))=ut
-            mjdt(istn(i))=mjd
-          enddo
-        END IF !initialized/not initialized        
-C
-C    Check sun distance and quit if it's too close.
-C
-        call ChkSunDist(nsor,csorna(nsor),mjd,ut,
-     >     kdisplay,luscn,rSunMinAngle,ierr)
-        if(ierr .ne. 0) return
+        endif 
+      endif
+! At this stage have the duration for all of the stations. (Either given or calculated.)
+      if(.not. KOK) then 
+        call destn(nstn,istn) 
+        if(nstn .lt. 2) goto 900    !Common exit on two few stations.   
+        goto 200
+      endif 
      
-      END IF !no start time specified
-      lproblem="Source_not_up"     
+! Now check for downtime. 
+      lproblem= "DOWN" 
       DO  I = 1,NSTN !Check source is visible for all observations.
         j=istn(i)
-        call ChkSrcUp4Scan(j,Nsor,nceles,
-     >      csorna(nsor),cstnna(j),MJD,UT,
-     >      Idurst(j),lcable(j),luscn,kdisplay,ierr)
-
-        if(ierr .ne. 0) then
-          Kok=.false.           
-          istn(i)=-iabs(istn(i))
-        endif 
-      END DO  !make sure we can observe at this time
-      if(.not.kok) goto 920
-
- ! Now we also check to see if we have problems with cable wrap.  
-        lproblem="Cable wrap"     
-        DO  I=1,NSTN
-! calculate when antenna is on source at new source. This is mjdtmp, uttmp.
-          call addsec2ut(mjdcur(j),utcur(j),
-     >     idlcur(j)+idurcur(j)+isortm+ical+int(tslew(j)+0.9),
-     >      mjdtmp,uttmp)
-! dur_temp is time from on source (after previous scan) to end of scan.
-          dur_temp=isecdif(mjd,ut,mjdtmp,uttmp)+idurst(j)
-          cwarp_Temp=cwarp(j)
-          IF (.NOT.kcont(mjdtmp,uttmp,dur_temp,nsor,j,cwarp(j),ierr))
-     >     THEN
-            if(iverbose_level .ge. 1) then 
-            WRITE(LUDSP,
-     >        "('ERROR! (newob):  Cable wrap problem! ',
-     >        'Scan not continous for ', A8,' at ',A8)") 
-     >         cSORNA(NSOR),cstnna(j)
-            endif 
-            kok=.false.
-            istn(i)=-iabs(istn(i))
-          endif
-
-          if(cwarp_temp .ne. cwarp(j)) then   
-          if(cwarp_temp .eq. " ") cwarp_temp="-"
-            if(iverbose_level .ge. 1) then 
-             write(ludsp,
-     >	      "('ERROR! (newob): Cable wrap changed at ',a ' from ',
-     >           a,' to ',a)")      cstnna(j),cwarp_temp,cwarp(j)
-            endif 
-            kok=.false.
-            istn(i)=-iabs(istn(i))
-          endif
-        end do
-        if(.not.kok) goto 920 
-       
- 
-      lproblem="Misc"
-      IF (.NOT.KOK) THEN
-        IF (KVIS) THEN !mutual vis required
-          IERR=1
-          RETURN
-        ELSE !remove bad stations
-          goto 920
-        ENDIF
-      ENDIF
-C
-C    Iterate until the SNR calculations are being done at the same time as the
-C    calculated start time, or max 3 times.
-
-! Note. utbeg effects not only snr, but tape footages as well, through itrun above.
-      if (mjd.ne.mjdbeg.or.(int(dabs(utbeg-ut)).ge.imodtm)) then !iterate     
-         itersnr = itersnr + 1
-!        write(*,*) "Iterating !", itersnr,isecdif(mjd,ut,mjdbeg,utbeg)
-        if (itersnr.le.3) goto 930
-      endif !iterate
-
-! Now check for downtime. 
-       lproblem= "DOWN" 
-       DO  I = 1,NSTN !Check source is visible for all observations.
-         j=istn(i)
 !  Now turn off station if station is not up for scan. (Becase of downtime.
-         if(.not.(kstatup(j,mjdbeg,utbeg,idurst(j)))) then 
-           if(iverbose_level .ge. 1) then 
-           write(*,
-     >    '("Station ",a, " can not participate because of downtime")')
+        if(.not.(kstatup(j,mjd_beg,ut_beg,idurst(j)))) then 
+          if(iverbose_level .ge. 1) then 
+             write(luscn,
+     >     '("Station ",a, " can not participate because of downtime")')
      >             cstnna(j)                
-           endif 
-             kok=.false.
-             istn(i)=-iabs(istn(i))
-          endif   
-        end do   
-        if(.not.kok) goto 920
-
+          endif 
+          kok=.false.
+          istn(i)=-iabs(istn(i))
+        endif   
+      end do  
+      if(.not. KOK) then 
+        call destn(nstn,istn) 
+        if(nstn .lt. 2) goto 900    !Common exit on two few stations.   
+        goto 200
+      endif 
+         
+! Check to make sure that the source will be up for the entire scan.    
+      KOK =.true. 
+      DO I = 1,NSTN !Check source is up at start of scan. If not, kick station out.
+         j=istn(i)
+         call ChkSrcUp4Scan(j,Nsor,mjd_beg,ut_beg,
+     >        Idurst(j),lcable(j),luscn,kdisplay,ierr)  
+         if(ierr .ne. 0) then
+            Kok=.false.
+            istn(i)=-iabs(istn(i))
+         endif
+      END DO  !make sure we can observe at this time
+ ! Remove stations where we had problems.     
+      if(.not. KOK) then 
+        call destn(nstn,istn) 
+        if(nstn .lt. 2) goto 900    !Common exit on too few stations.   
+        goto 200
+      endif 
+  
 !     7.  Everything looks OK.  Write out info on screen.
       if(kdisplay) then       
-        call display_scan_info(mjd,ut,mjdt,utt,icod,
+        call display_scan_info(mjd_beg,ut_beg,mjd_at,ut_at,icod,
      >     nsor,nstn,istn, tslew)
       endif
 
@@ -623,13 +414,12 @@ C    calculated start time, or max 3 times.
       ENDIF
 
 !     9. Everything is OK.  Put all of the stuff we've just calculated into cur or tst variables.
-
       
       keep_index=.true.  
       if (nsubc. eq. 0) then
 ! A real scan
        call set_scan_param(
-     >  nstn,   istn,    mjd,    ut,
+     >  nstn,   istn,    mjd_beg,    ut_beg,
      >  nsor,   ical,    idle,   icod, ircur,   idurst,  lcable,
      >  cpre,cmid,cpst, keep_index,
      >  nstncur,istcur,  mjdcur, utcur,gstcur,st0cur,iyrcur, idacur,
@@ -642,7 +432,7 @@ C    calculated start time, or max 3 times.
       else
 ! A test scan
        call set_scan_param(
-     >  nstn,   istn,    mjd,    ut,
+     >  nstn,   istn,    mjd_beg,    ut_beg,
      >  nsor,   ical,    idle,   icod, ircur,   idurst,  lcable,
      >  cpre,cmid,cpst,keep_index,
      >  nstntst,isttst,  mjdtst, uttst,gsttst,st0tst,iyrtst, idatst,
@@ -651,5 +441,14 @@ C    calculated start time, or max 3 times.
       endif
 
       IERR = 0
+      return 
+! Common exit on two few stations      
+900   continue   
+      ierr=-1
+      if (kdisplay) then
+        WRITE(LUSCN,'(a)') 
+     >     "ERROR! (newob): Less than two stations left. Can't observe."                   
+      ENDIF !too few left            
+      
       RETURN
       END

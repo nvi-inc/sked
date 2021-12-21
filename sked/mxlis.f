@@ -22,7 +22,7 @@ C        of the parameter.
       write(ludsp,9100) 
 9100  format('Maximum array sizes currently set in sked and drudg')
       write(ludsp,9121) max_sor,max_cel,max_sat,max_sorlen,
-     .max_cat_src,max_stn,max_hor,max_cat_stat,max_frq,
+     .max_cat_src,max_stn,max_hor,max_cat_stat,max_code,
      .max_subpass,max_cat_mode,max_band,max_obs,
      .max_par_opti,max_sor_esti,max_trial
 9121  format(

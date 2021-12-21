@@ -26,6 +26,8 @@ C 000516 nrv New.
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/skobs.ftni'
       include 'drcom.ftni'
+! 2021-12-03 Split off octal_constants from skparm.ftni 
+      include '../skdrincl/octal_constants.ftni'
 
 C Local
       integer jchar,i,ierr,ilen

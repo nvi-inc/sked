@@ -140,6 +140,7 @@ C     character*128 tape_motion_new(max_stn)
       integer islew_info !near edge of cable wrap
       logical kfirst_obs       !true if first observation. Then we don't have to do all the checking. 
       real az_now,az_new       !azimuth current and in the future 
+      real el_now,el_new
    
       real  dur_temp   
       logical kwrite
@@ -179,7 +180,8 @@ C
       
           CALL SLEWT(NSPRE(J),MJDPRE(J),UTPRE(J)+idurpre(j)+idlpre(j),
      >     NSORcur(J),J, cwrap_pre(J),cwrap_new(J),TSLEW,lookah,
-     >     trise,tsris,st0cur,frac, knov, islew_info,az_now,az_new) 
+     >     trise,tsris,st0cur,frac, knov, islew_info,
+     >     az_now,el_now,az_new,el_new)
 
         if(kwrite) then
            writE(ludsp,*) i, cstnna(j)," ", lq//cwrap_pre(j)//lq, 
@@ -317,10 +319,8 @@ C
       DO  I=1,NSTNCUr !check source within limits
         istat=istcur(i)
         isource=nsorcur(istat)
-        call ChkSrcUp4Scan(istat,isource,nceles,
-     >    csorna(isource),cstnna(istat), MJDcur(istat),
-     >    UTcur(istat), idurcur(istat),cwrap_new(istat),
-     >    ludsp,kdisplay,ierr)
+        call ChkSrcUp4Scan(istat,isource,MJDcur(istat),UTcur(istat), 
+     >    idurcur(istat),cwrap_new(istat),ludsp,kdisplay,ierr)
         if(ierr .ne. 0) then
           kerr=3
           istbad(istat)=1

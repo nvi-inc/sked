@@ -338,10 +338,6 @@ C  Write the VEX format file.
           call vpcout ! $PHASE_CAL_DETECT
           call vex_end_section_comment(  '$PHASE_CAL_DETECT')
 
-          call vex_begin_section_comment('$ROLL')
-          call vroout ! $ROLL
-          call vex_end_section_comment(  '$ROLL')
-
           call vex_begin_section_comment('$SCHED')
           call vscout ! $SCHED
           call vex_end_section_comment(  '$SCHED')

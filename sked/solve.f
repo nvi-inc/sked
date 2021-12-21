@@ -96,7 +96,7 @@ C  3. Write out the source list.
 
       write(lutmp,"('$SOURCES',i6)") nsourc
       do i=1,nsourc
-        CALL RADED(SORP50(1,I),SORP50(2,I),0.D0,IRH1,IRM1,RS1,
+        CALL RADED(sorp2000(1,I),sorp2000(2,I),0.D0,IRH1,IRM1,RS1,
      .  L1,IDD1,IDM1,DS1,LDUM,IDUM,IDUM,DUM)
         WRITE(LUTMP,9302) cSORNA(I), IRH1,IRM1,RS1,L1,IDD1,IDM1,DS1
 9302    FORMAT(A8,3X,I2,1X,I2,1X,F4.1,2X, A1,I2.2,1X,I2,1X,F3.0)

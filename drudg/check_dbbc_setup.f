@@ -40,51 +40,43 @@
       integer ib      !counter over bbcs.
       integer ib0, ib_beg, ib_end
       character*1 lyesno
-      logical kfreq_error, kfilter_error,kpol_error
-      
- 
+
       ierr=0
       do if_num=1,4     !this is over Ifs
         ib0=0
         ib_beg=(if_num-1)*4+1
         ib_end=if_num*4
-! Initilize to no error for this IF.         
-        kfreq_error=.false.
-        kfilter_error=.false.
-        kpol_error=.false. 
-        
         DO ib=ib_beg, ib_end
-          if(ibbc_present(ib,istn,icode) .gt. 0) then    !Check if BBC is present 
-! if so, check for some errors. 
-            if(flo(ib_beg) .ne. flo(ib)) 
-     >         kfreq_error=.true.
-            if(ibbc_filter(ib_beg) .ne. ibbc_filter(ib)) 
-     >         kfilter_error=.true. 
-            if(cbbc_pol(ib_beg) .ne. cbbc_pol(ib)) 
-     >         kpol_error=.true.
-          endif           
-        end do 
-        if(kfreq_error .or. kfilter_error .or. kpol_error) then
-          ierr=1                                                           
-! write the kind of error     
-          call write_return_if_needed(luscn, kwrite_return)  
-          write(luscn, '("DBBC_error for IF# ",i3)') if_num
-          if(kfreq_error)
-     >       write(luscn,'(a)')   "   Inconsistent lo frequencies"
-          if(kfilter_error)
-     >        write(luscn,'(a)')  "   Inconsistent filters"           
-          if(kpol_error) 
-     >        write(luscn,'(a)')   "   Inconsistent polarizations"      
-          write(luscn, '(a)') "   BBC#    Freq   Filter  Pol "
-          do ib=ib_beg,ib_end
-            if(ibbc_present(ib,istn,icode) .gt. 0) then        
-              write(luscn, '(i5,2x, f10.2,2x,i2,4x, a3)') 
-     >         ib, flo(ib), ibbc_filter(ib), cbbc_pol(ib)
+          if(ibbc_present(ib,istn,icode) .le. 0) goto 100  !quick exit if no bbc, or not used.
+          if(ib0  .eq. 0) then
+            ib0=ib
+          else
+            if(flo(ib0) .ne. flo(ib)) then
+               call write_return_if_needed(luscn,kwrite_return)
+               write(luscn, '("DBBC_error: For BBCs ",2i4,
+     >              " LO frequencies differ",2f10.2)')
+     >             ib0, ib, flo(ib0), flo(ib)
+               ierr=1
             endif
-          end do    
-         endif        
-       end do
-       if(ierr .ne. 0) then
+            if(ibbc_filter(ib0) .ne. ibbc_filter(ib)) then
+               call write_return_if_needed(luscn,kwrite_return)
+               write(luscn,'("DBBC_error: For BBCs ",2i4,
+     >           "filters differ ", 2i10)')
+     >             ib0, ib, ibbc_filter(ib0), ibbc_filter(ib)
+               ierr=1
+            endif
+           if(cbbc_pol(ib0) .ne. cbbc_pol(ib)) then
+               call write_return_if_needed(luscn,kwrite_return)
+               write(luscn,'("DBBC_error: For BBCs ",2i4,
+     >           " polarizations differ: ", "      ",2a3)')
+     >             ib0, ib,   cbbc_pol(ib0), cbbc_pol(ib)
+               ierr=1
+            endif
+          endif
+100       continue       !quick exit
+        end do
+      end do
+      if(ierr .ne. 0) then
          lyesno="G"
          do while(lyesno .ne. "Y")
            write(luscn,'(a)')

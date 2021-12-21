@@ -23,6 +23,8 @@ C
 C     UNPFR unpacks the "F" lines in the $CODES section.
 C
       include '../skdrincl/skparm.ftni'
+! 2021-12-03 JMGipson.  Added octal_constants.ftni
+      include '../skdrincl/octal_constants.ftni'
 
 C  900117 NRV Created, modeled after UNPFR of old FRCAT program
 C  930225 nrv implicit none

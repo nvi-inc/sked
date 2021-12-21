@@ -281,7 +281,7 @@
           if(kLowDec) then
 !             DEC=SORPDA(2,NSOR)
              TstLowDec(itst)=TstLowDec(itst)-
-     >                       (abs(sorpda(2,isrc)*rad2deg)/10.)*scan_wt
+     >                       (abs(sorp_now(2,isrc)*rad2deg)/10.)*scan_wt
            endif
            if(KSkyCov) then
              TstSkyCov(itst)=TstSkyCov(itst)+sky_Trial_vec(itrial)
@@ -376,9 +376,43 @@
 
 !  Check to see if this scan includes any idle stations that haven't been observed
 !  If so, upweight it.
+
+!  Check to see if this scan includes any idle stations that haven't been observed
+!  If so, upweight it.
         if(kStatIdle) then
-!          write(*,*) "Source ",csorna(isrc) 
-! 2019Sep09.  Modified. 
+! Make TstStatIdle be Large if there are many antennas which are excluded from this scan.
+          istn1=isttst(1)
+          del_ut=0
+          do i=1,NstnUse
+            istn=istnvec(i)
+            if(kstatup(istn,mjdtst(istn1),uttst(istn1),idurtst(istn1)))
+     >         then    
+              if(mjdtst(istn) .ne. 0) then      !station in this observation
+                if(nsorcur(istn).eq. 0) then
+                  Del_ut=10
+                else
+                  Del_ut= dsecdif(mjdtst(istn1),uttst(istn1),
+     >                            mjdcur(istn),utcur(istn))/60.d0
+                  if(del_ut .lt. 0) del_ut=0.d0
+                endif
+              else
+                Del_ut= dsecdif(mjdtst(istn1),uttst(istn1),
+     >                          mjdcur(istn),utcur(istn))/60.d0 
+                if(del_ut .lt. 0) del_ut=0.d0
+                del_ut=-10.*del_ut    !downweight if station hasn't been observed.
+              endif
+!              write(*,*) Del_ut, istn, mjdtst(istn),
+!     >          uttst(istn1), mjdtst(istn1), utcur(istn),mjdcur(istn) 
+              TstStatIdle(itst)=TstStatIdle(itst)+Del_ut
+!              write(*,*) cstnna(istn),  del_ut, TstStatIdle(itst)
+            endif
+          end do
+        endif    !kstatIdle
+
+! 2019Seo09 Version
+        if(kstatIdle) then 
+!        if(kStatIdle) then
+!          write(*,*) "Source ",csorna(isrc)  
 ! Make TstStatIdle be large if there are many antennas which have been idle for a while in this scan.
 ! Previous version added a penalty for stations that had been observed recently.     
           istn1=isttst(1) 
@@ -403,6 +437,8 @@
           end do
 !          write(*,*) "StatIdle: ", TstStatIdle(itst) 
         endif    !kstatIdle
+        
+        
       enddo ! itst=1,NumTst
 
       ibest=-1 ! initialize to -1 in case there are no possible configurations

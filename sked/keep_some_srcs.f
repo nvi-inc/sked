@@ -28,7 +28,7 @@ C   COMMON BLOCKS USED
 ! Define the temporary arrays
       character*(max_sorlen) csorna_keep(NumKeep), ciauna_keep(NumKeep)
 
-      double precision sorp50_keep(2,NumKeep),sorpda_keep(2,NumKeep)   !source positions
+      double precision sorp2000_keep(2,NumKeep),sorp_now_keep(2,NumKeep)   !source positions
       integer ISSCAN_keep(NumKeep)                       !scan lengthis
       real Flux_keep(max_flux,max_band,NumKeep)
       integer NFLux_keep(max_band,NumKeep)  !flux info.
@@ -66,8 +66,8 @@ C   COMMON BLOCKS USED
          rmax_astro_keep(ikp)   =rmax_astro(iptr)
 
          do j=1,2
-           sorp50_keep(j,ikp)	=sorp50(j,iptr)
-           sorpda_keep(j,ikp)	=sorpda(j,iptr)
+           sorp2000_keep(j,ikp)	=sorp2000(j,iptr)
+           sorp_now_keep(j,ikp)	=sorp_now(j,iptr)
          end do
          do j=1,max_band
            Nflux_keep(j,ikp)  	=Nflux(j,iptr)
@@ -89,8 +89,8 @@ C   COMMON BLOCKS USED
 
 
         do j=1,2
-          sorp50(j,ikp) =sorp50_keep(j,ikp)
-          sorpda(j,ikp) =sorpda_keep(j,ikp)
+          sorp2000(j,ikp) =sorp2000_keep(j,ikp)
+          sorp_now(j,ikp) =sorp_now_keep(j,ikp)
         end do
         do j=1,max_band
           Nflux(j,ikp)	=Nflux_keep(j,ikp)

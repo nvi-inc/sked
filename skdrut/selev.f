@@ -24,6 +24,8 @@ C     SELEV reads/writes station elevation limits
 C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
+! 2021-12-03 JMGipson.  Added octal_constants.ftni
+      include '../skdrincl/octal_constants.ftni'
 C
 C  INPUT:
       integer*2 LINSTQ(*)
@@ -79,7 +81,8 @@ C     2. Something is specified.  Get each station/elevation combination.
 C
       DO WHILE (IC1.NE.0) !more decoding
         NCH = IC2-IC1+1
-        CALL IFILL(LKEYWD,1,20,oblank)
+!        CALL IFILL(LKEYWD,1,20,oblank)
+        ckeywd=" "
         IDUMMY = ICHMV(LKEYWD,1,LINSTQ(2),IC1,MIN0(NCH,20))
         IF  (JCHAR(LINSTQ(2),IC1).EQ.OUNDERSCORE) THEN  !all stations
           CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)

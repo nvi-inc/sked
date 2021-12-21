@@ -20,7 +20,7 @@
       common /cat_trk_ch/cat_trk
       common /cat_trk/num_cat_trk,icat_trk_fan,icat_trk_bit
 
-      integer icat_trk_map(max_cat_trk,max_headstack,max_trk)  !This is where the rest of the info is stored.
+      integer icat_trk_map(max_cat_trk,max_headstack,max_track)  !This is where the rest of the info is stored.
       common /cat_trk/icat_trk_map
 
       character*40 cat_trk_map(max_cat_trk,max_chan)   !This stores the info in ascii form

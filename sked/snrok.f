@@ -14,7 +14,6 @@ C  Input:
       integer mjd 
       real*8 ut
 !
-C
 C  Output:
       integer iokst(max_stn) ! error codes for each station
 C                              0=ok, -1=no flux, -2=low SNR
@@ -135,7 +134,6 @@ C
            endif
          endif
       end do 
-
 
 C
 C  5. Delete stations marked.

@@ -43,7 +43,7 @@ C  LOCAL:
       integer*2 IBUF1(60),IBUF2(60)
       character*120 cbuf1,cbuf2
       equivalence (ibuf1,cbuf1),(ibuf2,cbuf2)
-      integer itmin,iset
+      integer itmin
       integer ih1,im1,is1,ih2,im2,is2,nch1,nch2,isp
       integer itdiff,itsec
    
@@ -52,13 +52,16 @@ C     UT_out, MJD_out - trial starting UT,MJD for new observation
       integer ib2as,ichmv_ch,i,j,ipk
       logical  kwrite_header 
 
-      integer isrc_time      !extra time to allow antenna to settle
-      real     buf_time       !extra buffer time. 
-      real     tslew          !time to slew
-      real     aznew, aznow          
-      integer imaxsl         !slewtime rounded up
+      integer  isrc_time       !extra time to allow antenna to settle
+      integer  ibuf_time       !extra buffer time. 
+      integer  isetup_time     !setup time
+      real     tslew           !time to slew
+      real     aznow, aznew 
+      real     elnow, elnew   
+      logical kdisplay 
+      integer luout           !Argument
+      integer ierr 
    
-
 C
 C  MODIFICATIONS
 C      ** 880310 NRV UN-COMPC'D
@@ -115,15 +118,18 @@ C
       kwrite_header=.true.    
       ut_scan = 0.D0
       mjd_scan = 0
+      kdisplay=.false.         !don't output stuff in when_at_next_source
+      luout = 0 
       DO  I=1,NSTN !get latest start time
         J = ISTN(I)      
 
-        call when_at_next_source(j,nsor(j),nsornew,mjd(j),ut(j),
-     >   idur(j),idle(j),ical,iset,
-     >   cwrap(j),cwrap_new(j),tslew,imaxsl,mjd_out(j),ut_out(j),
-     >    aznow,aznew,isrc_time, buf_time)
-
-
+        call when_at_next_source(kdisplay,luout,
+     >    j,nsor(j),nsornew,mjd(j),ut(j),
+     >    idur(j),idle(j),ical,cwrap(j),cwrap_new(j),
+     >    mjd_out(j),ut_out(j),
+     >    aznow,elnow,aznew,elnew,tslew, 
+     >    isetup_time,isrc_time,ibuf_time,ierr)          
+ 
         IF (mjd_scan.EQ.MJD_out(J)) ut_scan = DMAX1(ut_scan,UT_out(J))
 C                   If dates are equal, pick up the latest time-of-day
         IF (MJD_out(J).GT.mjd_scan) THEN  !got a later time
@@ -146,21 +152,21 @@ C       KTMLIN = .TRUE.
  
           WRITE(cbuf2,9121) cpoCOD(J),IH1,IM1,IS1,
      >       cwrap(j),cwrap_new(j),  aznow*rad2deg,aznew*rad2deg,
-     >       idur(j),ITAPTM,isrc_time,iMAXSL,ICAL,  IH2,IM2,IS2 
+     >       idur(j),ITAPTM,isrc_time,int(tslew+.99),ICAL,IH2,IM2,IS2 
 9121    FORMAT(1X,A2,1x,  2(I2.2,':'),I2.2,2(1x,a2), 2f7.1, 5I5,
      >     1X,2(I2.2,':'),I2.2,1x,"|")
           nch2 = 68
        
           nch1=ichmv_ch(ibuf1,nch1," SLEW -or- ")      
-          nch2=nch2+ib2as(int(tslew+0.9),ibuf2,nch2+1,8)   
+          nch2=nch2+ib2as(int(tslew+0.99),ibuf2,nch2+1,8)   
            
-          IF (ISET.NE.0) THEN !setup procedure
+          IF (ISETup_time.NE.0) THEN !setup procedure
             NCH1=ichmv_ch(IBUF1,NCH1,'SETUP')
-            NCH2=NCH2+IB2AS(ISET,IBUF2,NCH2+1,6)
+            NCH2=NCH2+IB2AS(ISETup_time,IBUF2,NCH2+1,6)
           ENDIF !setup procedure      
           if(cstrec(j,1) .eq. "Mark6".or.idata_mbps(j) .gt. 0) then
             NCH1=ichmv_ch(IBUF1,NCH1,'+BUFF_TIME')
-            NCH2=NCH2+IB2AS(int(buf_time),IBUF2,NCH2+1,12)
+            NCH2=NCH2+IB2AS(ibuf_time,IBUF2,NCH2+1,12)
           endif             
               
           IF (ituse(j)*ITEARL(j).NE.0) THEN !early parameter

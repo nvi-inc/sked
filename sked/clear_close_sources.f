@@ -36,7 +36,7 @@ C   COMMON BLOCKS USED
       do i=1,NsrcUse
         isrc=isrcvec(i)
         call make_unit_vector(
-     >       sorp50(1,isrc),sorp50(2,isrc),src_unit)
+     >       sorp2000(1,isrc),sorp2000(2,isrc),src_unit)
 !            write(*,"('XXX',i3,3f8.2)") isrc, src_unit
         cVSMap=" "
         do j=1,NumSub
@@ -51,7 +51,7 @@ C   COMMON BLOCKS USED
             else
 !            write(*,"(i3,3f8.2)") isrc, src_unit
               call make_unit_vector(
-     >            sorp50(1,isrcj),sorp50(2,isrcj),srcj_unit)
+     >            sorp2000(1,isrcj),sorp2000(2,isrcj),srcj_unit)
               dist=dot8(src_unit,srcj_unit)
             endif
             dist=acos(dist)*rad2deg

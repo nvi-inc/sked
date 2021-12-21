@@ -349,7 +349,7 @@
       character*6   cprede,cmidde,cpstde  !PREOB, MIDOB, POSTOB  procedures.
 
       CHARACTER*(IBUF_LEN*2) cbuftmp    !temporary character array
-      character*24 refdef_name(9,max_stn,max_frq)
+      character*24 refdef_name(9,max_stn,max_code)
 !  File names for SKED's scratch files
       CHARACTER*128 CSKFIL,CTMFIL,CTMFI2,CLGFIL,COPFIL,
      >   CFRFIL,CSTFIL,CSOFIL,CPRFIL,CFLFIL,CHDFIL,

@@ -6,10 +6,11 @@ C History
 C 950411 nrv New version for 2-letter codes.
 C 951017 nrv Fix gtfld call.
 C 991120 nrv Check for duplicate stations and remove them.
-
+      implicit none 
       INCLUDE '../skdrincl/skparm.ftni'
       INCLUDE 'skcom.ftni'
       include '../skdrincl/statn.ftni'
+      include '../skdrincl/octal_constants.ftni'
 C
 C  INPUT:
       integer ich,lu

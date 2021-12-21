@@ -82,17 +82,14 @@ C 991119 nrv Use single-baseline SNR target if specified.
 !                A) 2-bit sampling; B) DiFX processing.
 ! 2013Sep17 JMG. Added ast_margin
 ! 2014Mar27 JMG. Now this routine just calculates SNR. A separate routine determines if good/bad. 
+! 2021-12-07 JMGipson. Removed checking to see if stations and sources were set up.
+!            This is now done once after the schedule file is read. 
 
 C
 C
-C  1. Check that the parameters we need were set.
-C     If any SNRs have been set, we need BASESCAN too.
-C
-
+C 
       IERR=0
-      call check_trk_flux_sefd(istn,nstn,nsor,icod,lu,ierr)
-      if(ierr .ne. 0) return
-C
+      
 C  2. Calculate actual SNR achieved by baseline using the
 C     shortest scan length of the two stations, since this
 C     is the amount of data that will be correlated.
@@ -127,6 +124,15 @@ C
       endif 
 !      write(*,*) "Duration: ", idurst(1:nstn) 
 
+
+! Initialize elevation dependent SEFDs for the staitons.               
+       do iba=1,2 
+         do i =1, Nstn 
+            j=istn(i)         
+            sefdstel(iba,j) =sefdel(iba,nsor,j,mjd,ut)
+         end do
+       end do     
+     
       DO I=1,NSTN-1 ! first station
         IS=ISTN(I)          
         DO J=I+1,NSTN ! second station
@@ -141,7 +147,7 @@ C Calculate scan-time w/o the synch factor.
           do k=1,NumBand
             iba = iband(k)  
             if(kvscan) then 
-              temp=snr_per_sec(icod,iba,nsor,is,js,ibl,mjd,ut,
+              temp=snr_per_sec(icod,iba,nsor,is,js,mjd,ut,
      >                   ibit,corr_eff,bit_eff)
               if(temp .gt. 0) then
 !                 write(*,*) iscan_time, i,j,temp*sqrt(dble(iscan_time))

@@ -60,7 +60,7 @@ C IAU name
          endif 
 
 C ra, dec, epoch
-        CALL RADED(SORP50(1,is),SORP50(2,is),0.0d0,IRAH,IRAM,RAS,
+        CALL RADED(sorp2000(1,is),sorp2000(2,is),0.0d0,IRAH,IRAM,RAS,
      .   LDS,IDCD,IDCM,DCS,L,I,I,D)
         if (ras+0.00005d0.ge.60.d0) then
           ras=0.d0
@@ -87,7 +87,7 @@ C ra  hhhmmss.sssss, eg. 12h32m43.12345s
         call fcreate_ra(ptr_ch(cna))
 C dec sddmmss.ssss, eg. -26d18'43.3860""
 
-        if(sorp50(2,is) .lt. 0) then
+        if(sorp2000(2,is) .lt. 0) then
           j=2
           cna(1:1)="-"
         else
@@ -117,31 +117,31 @@ C source_type
 C source_name
         call fcreate_source_name(ptr_ch(cna))
 C inclination
-        write(cna,'(f7.2)') satp50(1,is)
+        write(cna,'(f7.2)') satpos(1,is)
         call null_term(cna)
         call fcreate_inclination(ptr_ch(cna),ptr_ch('deg'//char(0)))
 C eccentricity
-        write(cna,'(f7.2)') satp50(2,is)
+        write(cna,'(f7.2)') satpos(2,is)
         call null_term(cna)
         call fcreate_eccentricity(ptr_ch(cna))
 C arg_perigee
-        write(cna,'(f7.2)') satp50(3,is)
+        write(cna,'(f7.2)') satpos(3,is)
         call null_term(cna)
         call fcreate_arg_perigee(ptr_ch(cna),ptr_ch('deg'//char(0)))
 C ascending_node
-        write(cna,'(f7.2)') satp50(4,is)
+        write(cna,'(f7.2)') satpos(4,is)
         call null_term(cna)
         call fcreate_ascending_node(ptr_ch(cna),ptr_ch('deg'//char(0)))
 C mean_anomaly
-        write(cna,'(f7.2)') satp50(5,is)
+        write(cna,'(f7.2)') satpos(5,is)
         call null_term(cna)
         call fcreate_mean_anomaly(ptr_ch(cna),ptr_ch('deg'//char(0)))
 C semi-major_axis
-        write(cna,'(f11.1)') satp50(6,is)
+        write(cna,'(f11.1)') satpos(6,is)
         call null_term(cna)
         call fcreate_semi_major_axis(ptr_ch(cna),ptr_ch('km'//char(0)))
 C mean_motion
-        write(cna,'(f8.3)') satp50(7,is)
+        write(cna,'(f8.3)') satpos(7,is)
         call null_term(cna)
         call fcreate_mean_motion(ptr_ch(cna))
 C orbit_epoch

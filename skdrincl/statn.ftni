@@ -75,7 +75,7 @@ C             false if it's step functions
 
       real  SEFDST(MAX_BAND,MAX_STN)             !SEFD
       real  sefdpar(max_sefdpar,max_band,max_stn)  !function to determine el dependent SEFD
-      real  sefdstel(max_band,max_stn)           !elevation dependent SEFD
+      real  sefdstel(max_band,max_stn)             !elevation dependent SEFD
 
 
 ! Integer/logical
@@ -123,14 +123,14 @@ C             false if it's step functions
       character*1 cstcod(max_stn)               !Single letter code. Only used internally.
       character*20 cstrack_orig(max_stn)        !This keeps track of original configuration.
       character*8 cstrec_orig(max_stn,2)
-      character*20 cstrack_cap(max_stn)
+!      character*20 cstrack_cap(max_stn)
 
 
       common /statn_ch/cstnna,cantna,coccup,cterna,cstrec,cstrack
       common /statn_ch/cterid,cfirstrec,cbsefd
       common /statn_ch/cpocod,chccod,cstcod
       common /statn_ch/cstrack_orig, cstrec_orig
-      common /statn_ch/cstrack_cap
+!      common /statn_ch/cstrack_cap
 
       character*128 stndefnames
       character*128 tape_motion_type

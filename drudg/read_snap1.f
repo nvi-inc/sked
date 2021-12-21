@@ -44,6 +44,5 @@ C Output
       ierr=0
       cbuf(1:1)=" "   !get rid of first character.
       read(cbuf,*) cexper,iyear,cstn,cid1,cid2
-      write(*,*) cexper,iyear,cstn,cid1,cid2
       return
       end

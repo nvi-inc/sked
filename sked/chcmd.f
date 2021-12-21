@@ -86,7 +86,8 @@ C         footage count, direction, code, and pass.
       integer istat            !station index
       integer isource          !source index
       integer islew_info       !info about slew.
-      real az_now, az_new 
+      real az_now, az_new
+      real el_now, el_new  
 C
 C History
 ! 2021-02-19 JMG slewt now returns az_now,az_new
@@ -253,9 +254,8 @@ C
         do i=1,nstncur
           istat= istcur(i)
           isource=nsorcur(istat)
-          call ChkSrcUp4Scan(istat,isource,nceles,
-     >    csorna(isource),cstnna(istat), MJDCUR(istat),
-     >    UTCUR(istat), Idurcur(istat),cwrap_new,ludsp,kdisplay,ierr)
+          call ChkSrcUp4Scan(istat,isource,MJDCUR(istat),UTCUR(istat),    
+     >              Idurcur(istat),cwrap_new,ludsp,kdisplay,ierr)
         end do 
 
         do i=1,nstncur  
@@ -307,9 +307,8 @@ C
         istat=jT
         j1=istcur(1)
         isource=nsorcur(j1) 
-        call ChkSrcUp4Scan(istat,isource,nceles,
-     >      csorna(isource),cstnna(istat), MJDCUR(j1),
-     >      UTCUR(j1), Idurcur(j1),cwrap_new,ludsp,kdisplay,ierr)
+        call ChkSrcUp4Scan(istat,isource,MJDCUR(j1),UTCUR(J1),
+     >      Idurcur(j1),cwrap_new,ludsp,kdisplay,ierr)
         if(ierr .ne. 0) goto 110            !Source not up so we can't tag it.        
 
         MaxDuraInScan=MAXDU(idurcur,nstncur,istcur)  !find maximum scan length of other stations.
@@ -415,7 +414,8 @@ C         Calculate slewing just to get the cable wrap
             cwrap_cur(jt)=" "       
             CALL SLEWT(NSPRE(JT),MJDPRe(jt),UTpre(jt),NSORcur(J1),JT,
      >         cwrap_pre(JT),cwrap_cur(jt),tslew,lookah,trise,tsris,
-     >         st0cur,  frac,knov,islew_info,az_now,az_new) 
+     >         st0cur,  frac,knov,islew_info,
+     >         az_now,el_now,az_new,el_new) 
 !             write(*,*) "cwrap_new ", cwrap_cur(jt) 
 !             write(*,*) idurcur(jt), idlcur(jt) 
            

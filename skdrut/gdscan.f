@@ -17,39 +17,33 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
-      subroutine proc_vcname(kk4vcab,code,vcband,cnamep)
+      integer function gdscan(ibuf,nch,igdata)
       implicit none  !2020Jun15 JMGipson automatically inserted.
-      include 'hardware.ftni'
 
-! passed
-      logical kk4vcab
-      character*2 code          !code
-      real vcband               !Bandwidth
-! returned
-      character*12 cnamep
-! funcions
-      character*1 cband_char
+C GDSCAN add the "good data offset" to the scan line
+C NOTE: ibuf and nch are modified on return.
+C History
+C 970722 nrv New. Removed from addscan and newscan
 
-! local
-      character*30 ctemp   !temporary array.
-      integer nch
+C Called by: NEWSCAN
 
-      if(kdbbc_rack) then
-        cnamep="dbbc"
-      else if(kbbc) then
-        cnamep="bbc"
-      else if(kifp) then
-        cnamep="ifp"
-      elseif (kvc) then
-        cnamep="vc"
-      endif
+C Input AND Output
+      integer*2 ibuf(*)
+      integer nch ! character to start with in ibuf
+      integer igdata ! good data offset in seconds
 
-      ctemp=cnamep//code//cband_char(vcband)
-      call squeezeleft(ctemp,nch)
-      nch=nch+1
-      cnamep=ctemp
-      if (kk4vcab.and.krec_append) cnamep(nch:nch)=crec(irec)
-      call lowercase(cnamep)
+C Local
+      integer*2 ibufx(4)
+      integer i
+      integer ib2as ! function
+      integer ichmv ! function
+
+C  Convert the integer into a temporary buffer because
+C  ib2as can't handle array indices greater than 256.
+      i = ib2as(igdata,ibufx,1,5) ! put into temporary buffer
+C  Now move the converted value into the buffer
+      nch = ichmv(ibuf,nch,ibufx,1,5)
+      gdscan=nch
+
       return
       end
-

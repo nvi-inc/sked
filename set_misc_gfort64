@@ -30,7 +30,8 @@ setenv READ_CMDLINE read_cmdline.o
 #->setenv BLAS_LIB  /opt/lib/libf77blas.a 
 #->setenv CURSES_LIB /usr/lib/libncurses.a
 setenv CURSES_LIB -lncurses
-setenv FLEX_LIB  -lfl
+#setenv FLEX_LIB  -lfl
+setenv FLEX_LIB  " "  
 setenv READLINE_LIB -lreadline
 setenv READLINE_LIB " "
 #
