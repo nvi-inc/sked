@@ -50,9 +50,11 @@ C  Local:
        read(iunit,'(a1024)',end=20,iostat=k) ch
        kerr = k
        il   = trimlen(ch)
-       if(il .gt. 0 .and. ch(il:il) .eq. char(13)) then
-         ch(il:il)=" "
-         il=trimlen(ch)
+       if(il .gt. 0) then 
+         if(ch(il:il) .eq. char(13)) then
+           ch(il:il)=" "
+           il=trimlen(ch)
+         endif 
        endif
 
        if (kerr .ne. 0) then

@@ -33,7 +33,8 @@ C 001109 nrv scan_name is character now.
       integer igetsrcnum                !get the source number
       integer igetstatnum               !get the station number
 
-      integer igtfr,julda,ias2b,ichmv,ptr_ch,isecdif ! function
+      integer igtfr,julda,ias2b,ichmv,ptr_ch
+      integer*4 isecdif ! function
 C
 C     CALLED BY:   SKCLS
 C

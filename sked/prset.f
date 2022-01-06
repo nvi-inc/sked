@@ -1,4 +1,4 @@
-      SUBROUTINE PRSET(LINSTQ)
+      SUBROUTINE PRset(LINSTQ)
 C
 C   PRSET allows the user to set default values of parameters
 C
@@ -60,7 +60,7 @@ C               - Key word, longest is 22 characters
       equivalence (lfrqde,cfrqde)
 
       integer MaxPr
-      parameter (MaxPr=66)
+      parameter (MaxPr=67)
       character*22 listPr(MaxPr),cParam
       character*2  listPrShort(MaxPr)
 
@@ -86,7 +86,8 @@ C               - Key word, longest is 22 characters
      > "CORRELATOR","CORSYNCH", "DEBUG",      "DESCRIPTION","DURATION",
      > "EARLY",     "END",      "EXPERIMENT", "FILLIN",    "FILLBEST",
      > "FILLSUB",   "FILLTIME", "FILL_OFF","FREQUENCY", "GET", "HEAD",
-     > "IDLE",      "JAVA",     "KEEP_LOG",  "LOOKAHEAD", "MAXSCAN",
+     > "IDLE",      "JAVA",     "KEEP_LOG",  "LIST","LOOKAHEAD", 
+     > "MAXSCAN",
      > "MIDOB",      "MIDTP", "MINBETWEEN","MINIMUM",    "MINSLEW",
      > "MINSCAN",
      > "MARK6_OFF", 
@@ -107,7 +108,7 @@ C               - Key word, longest is 22 characters
      >"TC","CR","DG","DE","DU",
      >"TE","EN","EX","FI","FB",
      >"FS","FT","FO","FR","GT","HD",
-     >"ID","JA","KP","LO","XS",
+     >"ID","JA","KP","LI","LO","XS",
      >"MI","MT","MB","MN","ML","MS","M6",
      >"SM","MD","MO","NR","PA",
      >"PO","PS","PR","PP","PF",
@@ -184,19 +185,45 @@ C  1. Now parse the input string, getting each key word and its value.
 C
       ICH = 1
       ilen = linstq(1)
+! list command       
+      if(ilen .eq. 0) then
+         call prlis(lintsq)
+         return
+      endif      
+      
 100   continue
       CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
       IF  (IC1.EQ.0) RETURN 
       NC = min0(IC2-IC1+1,24)
       ckeywd=" "                      !initialize
       IDUMMY = ICHMV(LKEYWD,1,LINSTQ(2),IC1,NC)
-      ikey=iStringMinMatch(listpr,MaxPr,ckeywd)
-
+      ikey=iStringMinMatch(listpr,MaxPr,ckeywd)      
+!      write(*,*) ckeywd, ikey 
+!      if(ikey .eq. 0) then
+!         write(*,*) listpr(1:MaxPR)
+!         stop
+!      endif 
+      
       IF  (IKEY.EQ.0) THEN  !invalid
         write(luscn,9110) ckeywd
 9110    format('PRSET01 - ',a24,' is not a valid parameter name.')
         RETURN
-      END IF  !invalid
+      Else if(ikey .eq. -1) then
+        write(luscn, 
+     >   '("PRSET02 -", a, " ambiguous command.")') trim(ckeywd)
+        if(ckeywd .eq. "VERBOSE") then
+          CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
+          goto 100
+        else
+         write(luscn,*) "Skipping rest of line" 
+          return
+        endif 
+      endif 
+      
+      if(listpr(ikey) .eq. "LIST") then
+         call prlis(lintsq)
+         return
+      endif 
       
       select case(listpr(ikey))
 
@@ -209,12 +236,6 @@ C
       case default
       end select 
 
-
-      IF  (IKEY.EQ.-1) THEN  !ambiguous
-        write(luscn,9120) ckeywd
-9120    format('PRSET02 - ',a24,' is an ambiguous parameter name.')
-        RETURN
-      END IF  !ambiguous
       ckey=listPrshort(ikey)
       Cparam=listpr(ikey)
     
@@ -284,7 +305,8 @@ C
              iFillTime=20
           endif
         ELSE IF (ckey.eq.'HD') THEN
-          IHDTM = INUM
+!obsolete command        
+!          IHDTM = INUM
         ELSE IF (ckey.eq.'ID') THEN
           IDLDEF = INUM
         ELSE IF (ckey.eq.'LO') THEN
@@ -302,13 +324,15 @@ C
         ELSE IF (ckey.eq.'MS') THEN
          MINSCN = INUM
         ELSE IF (ckey.eq.'MT') THEN
-          IMTPTM = INUM
+! obsolte midtape command        
+!          IMTPTM = INUM
         else if(ckey .eq. 'FO') then
          ifill_off=inum
         else if(ckey .eq. 'M6') then
          imark6_off=inum
         ELSE IF (ckey.eq.'PA') THEN
-          IPARTM = INUM
+! Obsolete parity command         
+!          IPARTM = INUM
 !        ELSE IF (ckey.eq.'PP') THEN
 !          IPRETM = INUM
         ELSE IF (ckey.eq.'XS') THEN

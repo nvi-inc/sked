@@ -26,7 +26,7 @@
       max_baseline=max_stn*(max_stn-1)/2
 ! Allocate if neccessary      
       if(.not. allocated(NumObsSource)) then
-         write(*,*) "OBs_scan_counters Allocating space!"    
+!         write(*,*) "OBs_scan_counters Allocating space!"    
         allocate (NumObsSource(Max_sor))     !Number of observations so far for source
         allocate (NumScanSource(Max_sor))    !Number of scans so far for source
         allocate(NumObsStat(Max_stn))       !Ditto for stations      

@@ -60,7 +60,7 @@ C
 
 100   continue
       read(iunit,'(a1024)',err=500,end=600) ldum
-
+      if(ldum .eq. " ") goto 100
       nend=trimlen(ldum)
       nbeg=ifirst_non_white(ldum)
       if(nbeg .ge. 1024) then

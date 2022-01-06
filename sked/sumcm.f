@@ -19,7 +19,7 @@ C  INPUT VARIABLES:
       real speed    ! function
       integer sonum ! function
       integer trimlen
-      integer isecdif
+      integer*4 isecdif
 
 C
 C  OUTPUT VARIABLES:

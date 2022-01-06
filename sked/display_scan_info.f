@@ -12,7 +12,7 @@
 
 ! functions
       real*8 speed 
-      integer isecdif
+      integer*4 isecdif
 
 ! Input variables
       integer mjd                    !time of scan.

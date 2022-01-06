@@ -1,4 +1,10 @@
  This file contains a brief description of the changes made to sked
+2021-01-06 fillcmd.f  Essentially re-written from scratch.  Fixed some bugs and made it clearer. 
+2021-01-06 slewt.f. The part that deals with lookahead is not working. commented it out.
+2021-01-06 when_at_next_source.f.  Initiaize kup to true.
+2021-01-05 made isecdif integer*4.: auchk.f, autot.f, chcmd.f, display_scan_info.f, gtrun.f kstatup.f,
+           newob.f, sumcm.f, thin_cmd.f, vscout.f 
+2022-01-03 wrfrs.f. Fixed bug in writting out Sample rate. sked.f: Fixed bug in skipping unknown command. prset.f. Same.
 2021-12-03 Got rid of OBAR and OCAPR in ../skdrincl/skparm.ftni. Caused problems in some compilers, and not used. 
 2021-12-03 In ../skdrut: Modified newscan.f and addscan.f to use fortran writes in two places.Removed durscan.f gdscan.f
 2021-12-01 Minimize amount of output during auto-sked mode.  Removed kverbose, added iverbose_level.

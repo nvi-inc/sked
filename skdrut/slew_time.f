@@ -1,16 +1,17 @@
 !*************************************************************************************************      
-      real function slew_time(x1,x2,off,vel,acc)      
+      real function slew_time(x1,x2,off,vel,acc)   
+      implicit none    
 ! Passed      
       real x1,x2   !starting stopping point
       real off     !settling time
       real vel     !velocity          
       real acc     !acceleration
-
-!2021-12-15 JMGipson. Added missing factor of 2.0 in front of sqrt.
+! 2021-12-15 JMGipson.   Added forgotten 2.0 before sqrt.
 
 ! local
       real dist 
       real t_acc   !time to accelerate to terminal velocity
+
       
       dist=abs(x1-x2)
       t_acc=vel/acc

@@ -5,7 +5,7 @@
 # 
 # Set the compilers and linkers:
 
-setenv FC "gfortran -fno-range-check -ffpe-trap=zero,invalid,overflow,denormal -fpie -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
+setenv FC "gfortran -fno-range-check -fcheck=all -ffpe-trap=zero,invalid,overflow,denormal -fpie -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
 #setenv FC "gfortran -fno-range-check -fallow-argument-mismatch -fallow-invalid-boz -ffpe-trap=zero,invalid,overflow,denormal -fpie -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
 
 setenv LINK gfortran

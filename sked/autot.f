@@ -1,6 +1,6 @@
       SUBROUTINE AUTOT(cmdcod, MinIdle, MJD,UT,nsor,IDUR,idle,ical,
      >  ISTN,NSTN,cwrap,nsornew, 
-     >  mjd_scan,ut_scan,MJD_out,UT_out,cwrap_new, istbad)
+     >  mjd_beg,ut_beg,mjd_at,ut_at,cwrap_new, istbad)
 C     AUTOT automatically calculates a start time for SKED scan. 
 C
       implicit none 
@@ -17,7 +17,7 @@ C  INPUT:
       character*2 cmdcod             !Command code. Indicates who is calling
       integer MinIdle                 !Minimum idle time before printing a message.    
       integer MJD(max_stn)            !time on entry. 
-      double precision UT(*)         !UTC part of time.    
+      double precision UT(*)          !UTC part of time.    
       integer NSOR(max_stn)
       integer IDUR(max_stn)           !duration of scan
       integer idle(max_stn)           !idle time after scan
@@ -25,19 +25,19 @@ C  INPUT:
       integer istn(*)                 !stations in scan 
       integer nstn                    !number of stations.
       character*2  cwrap(*)           !cable wrap of stations, 
-      integer nsornew                   !source to go to. 
+      integer nsornew                 !source to go to. 
 
  ! Output 
-      integer mjd_scan                !starting time of new scan.
-      double precision ut_scan       !ending time.      
+      integer mjd_beg                  !starting time of new scan.
+      double precision ut_beg          !ending time.      
   
-      integer MJD_out(max_stn)           !Ending time???
-      double precision UT_out(max_stn)  !ending time. 
+      integer mjd_at(max_stn)          !Time when station arrives on source
+      double precision ut_at(max_stn)  !
       character*2 cwrap_new(*)
       integer istbad(max_stn)            !array holding information about bad station.      
 
 ! functions
-      integer isecdif
+      integer*4 isecdif
 
 C  LOCAL:
       integer*2 IBUF1(60),IBUF2(60)
@@ -47,7 +47,7 @@ C  LOCAL:
       integer ih1,im1,is1,ih2,im2,is2,nch1,nch2,isp
       integer itdiff,itsec
    
-C     UT_out, MJD_out - trial starting UT,MJD for new observation
+
       integer itidl(max_stn) !idle time by station
       integer ib2as,ichmv_ch,i,j,ipk
       logical  kwrite_header 
@@ -67,7 +67,7 @@ C  MODIFICATIONS
 C      ** 880310 NRV UN-COMPC'D
 C         880404 NRV ADDED CHECK FOR IDLE TIME
 C    881227 GAG ADDED NRV's TIME LINE DISPLAY
-C         890428 NRV Added MJD_out,UT_out to returned parameters
+C         890428 NRV Added mjd_at,ut_at to returned parameters
 C    900116 NRV Changed MXFEET to MAXTAP(J)
 C    910224 nrv changed calc of "maxslew" to include ITEARL
 C               and removed IPKTM (never used)
@@ -116,32 +116,32 @@ C     based on tape change and rewind time.
 C
 !      IF (cmdcod.eq.'CH') IDUR(1) = 0     
       kwrite_header=.true.    
-      ut_scan = 0.D0
-      mjd_scan = 0
+      ut_beg = 0.D0
+      mjd_beg = 0
       kdisplay=.false.         !don't output stuff in when_at_next_source
       luout = 0 
       DO  I=1,NSTN !get latest start time
         J = ISTN(I)      
-
         call when_at_next_source(kdisplay,luout,
      >    j,nsor(j),nsornew,mjd(j),ut(j),
      >    idur(j),idle(j),ical,cwrap(j),cwrap_new(j),
-     >    mjd_out(j),ut_out(j),
+     >    mjd_at(j),ut_at(j),
      >    aznow,elnow,aznew,elnew,tslew, 
      >    isetup_time,isrc_time,ibuf_time,ierr)          
  
-        IF (mjd_scan.EQ.MJD_out(J)) ut_scan = DMAX1(ut_scan,UT_out(J))
-C                   If dates are equal, pick up the latest time-of-day
-        IF (MJD_out(J).GT.mjd_scan) THEN  !got a later time
-          mjd_scan = MJD_out(J)
-          ut_scan = UT_out(J)
-        END IF  !got a later time
+        if(i .eq. 1) then
+           mjd_beg=mjd_at(j)
+           ut_beg=ut_at(j)
+        else if(isecdif(mjd_at(j),ut_at(j),mjd_beg,ut_beg).gt.0) then 
+           mjd_beg=mjd_at(j)
+           ut_beg =ut_at(j)      
+        endif     
 C
 C     Display times (only non-zero ones) added to get new start time
 C       KTMLIN = .TRUE.
         IF (KTMLIN) THEN !display time line
           call seconds2hms(ut(j),ih1,im1,is1)
-          call seconds2hms(UT_out(j),ih2,im2,is2)
+          call seconds2hms(ut_at(j),ih2,im2,is2)
 
           cbuf1=
      >  ' STN  PREV   Wraps  AzBeg  AzEnd  DUR  TAPE SRC  SLEW '
@@ -187,9 +187,9 @@ C       KTMLIN = .TRUE.
           J = ISTN(I)
           if(nsor(j) .gt. 0) then        !observerd a source before.
             istbad(j)=0
-C         Allow 5-sec slack in checking the time
-            itdiff=isecdif(MJD_out(j),UT_out(j),mjdcur(j),utcur(j))
-            IF  (itdiff .gt. 5) then
+C         Allow 3-sec slack in checking the time
+            itdiff=isecdif(mjd_at(j),ut_at(j),mjdcur(j),utcur(j))
+            IF  (itdiff .ge. 3) then
               call sec2minsec(itdiff,itmin,itsec)
               istbad(j)=1
               WRITE(LUDSP,"('ERROR! (autot): Following obs occurs ',

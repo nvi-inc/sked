@@ -3,6 +3,7 @@ C
 C     WRFRS reads the catalogs and writes the scratch files
 C     for the frequency codes and head positions.
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
@@ -23,6 +24,8 @@ C               WRLLINES     write "L" lines in $CODES
 C               FHDPOS       read hdpos.cat, write $HEAD section
 
 C  History
+! 2022-01-03 JMG. Found unitialized variable. Added implicit none. 
+! 2021-12-29 JMG. Don't write out barrel roll. Now write out R line here.
 ! 2020-06-02 JMG Don't write out head position. 
 !
 C 951127 nrv New version. Calls one routine for each catalog file
@@ -83,7 +86,6 @@ C     Storage for reference names from catalogs
 !AEM increase size due to frec.f:30
       character*6 cfmt(max_stn)
 
-
 C  0. First check for complete information, i.e. a sub-code, mode, and
 C     bandwidth must all be selected.
 C     Find the unique frequency codes and sub-codes.
@@ -128,15 +130,19 @@ C     for the $CODES section are written out for one frequency code.
      >      itrk_xref, cfmt,cbarrelname, 
      >      bw_stn,ierr)                                           ! read rec.cat
           if (ierr.ne.0) return
-
+          
           call wrfclines(nrx,cat_mode_freq(ifreq),c2code(num_sel),
      >     istn_rx_xref,
      >     nfr,cat_mode(ic), cfmt,bw_stn,ichan,ibbc,csw,cb,csky,cpcfr,
      >     itrk_xref,ierr)        !write the "F" and C" lines
-          if (ierr.ne.0) return
-          
-          write(lutmp,'("R ",a2,1x,f8.3)') cfrcode,samprate
-
+          if (ierr.ne.0) return          
+       
+          write(lutmp,'("R ",a2,1x,f8.3)') c2code(num_sel),
+     >     rcat_mode_samp(ic)
+ 
+!          stop                 
+!         write(*,*) "CTMFIL ",ctmfil
+!          stop
 ! no longer write barrel lines 
 !          call wrrblines(rcat_mode_samp(ic),c2code(num_sel),
 !     >         cbarrelname,ierr)        ! write "R" and "B" lines for this code
@@ -150,6 +156,8 @@ C     for the $CODES section are written out for one frequency code.
 C  3. Now the $CODES section is done. Close the temp file and rename it.
       close(lutmp)
       ierr = renam(ctmfil,cfrfil)
+!      write(*,*) "cfrfil ", cfrfil
+!      stop 
       if(ierr .lt. 0) goto 900
 
 C  4. Open the temporary file to which the head lines will be written.

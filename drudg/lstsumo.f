@@ -34,6 +34,11 @@
       include 'lstsum.ftni'
 
 C Writes an output line for LSTSUM.
+! 2021-12-24 JMG. Added another column to G-byte listing so that in 16GB mode would be still be space. 
+! 2021-12-22 JMG. Minor pretty print changes. 
+! 2021-12-13 JMGipson. Got rid of cdir, cpass.  Rename cnewtap by cinfo
+! 2021-01-19 JMG  Changed 1024-->1000 to reflect decimal storage. 
+! 2020-06-08 JMG. Included new broadband.ftni
 C 960917 nrv New. Removed lines from LSTSUM to make this routine.
 C 970131 nrv Remove updating of IFEET and put it back into LSTSUM.
 C 970131 nrv Add KET to call. Change tape start into a string.
@@ -70,10 +75,7 @@ C 021011 nrv Another digit for printing gap time.
 ! 2008Jan07 JMGipson.  Changed so that will ALWAYS print line numbers if recorder type is none.
 !             Previously relied on recorder starting and stopping info, which is absent in the "none" case.
 ! 2014Jan17 JMGipson. Modified call to setup_name.  Removed pass info. 
-! 2020Jun08 JMG. Included new broadband.ftni
-! 2021-01-19 JMG  Changed 1024-->1000 to reflect decimal storage. 
-! 2021-12-13 JMGipson. Got rid of cdir, cpass.  Rename cnewtap by cinfo
-
+!
 ! Functions
       integer julda
       integer trimlen
@@ -198,7 +200,7 @@ C  1. Headers.
 9204            format(" Tape motion:     ADAPTIVE (gap=",i3,")",3x,$)
               else
                 write(luprt,9205) tape_motion_type(istn)(1:10)
-9205            format(" Tape motion:     ",a,11x,$)
+9205            format(" Tape motion:     ",a,11x)
               endif
             endif
       
@@ -235,7 +237,7 @@ C  1. Headers.
               write(luprt,'(a,1x,$)') csetup_name            
               lcodeTmp=lcode(icode)
               call c2lower(ccodetmp,ccodetmp)
-              write(luprt,'(1x,"IFD proc: ifd",a2)') ccodetmp
+              write(luprt,'(5x,"IFD proc: ifd",a2)') ccodetmp
               iline=iline+1
             end do
           end do
@@ -433,10 +435,10 @@ C  Duration
       idurs = idur - idurm*60
       write(luprt,'(2x,i3,":",i2.2,$)') iDurM,iDurS
 
-C  Footage        
+C Gbytes       
       if(kdisk .or. CSTREC_CAP .eq. "NONE") then 
         if(kskd) then
-          write(luprt,'(f8.1,$)') counter/1000  !convert megabytes to Gigabytes
+          write(luprt,'(f9.1,$)') counter/1000  !convert megabytes to Gigabytes
         endif    
       endif
 

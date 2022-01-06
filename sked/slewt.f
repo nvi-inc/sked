@@ -20,7 +20,7 @@ C     INPUT VARIABLES:
        character*2  cwrap_cur  !Current cable wrap
        real*8  tsris(Max_sor,max_stn,*)    !Rise set times
        real*8  st0cur(max_stn)             !Mean sideral time 0hrs UT. 
-       logical knov        !special VLBA mode. 
+       logical knov        !special VLBA mode.      
      
 ! Output variables
        real tslew        !slew time
@@ -61,9 +61,10 @@ C   LOCAL VARIABLES
       real x85now,x85new,y85now,y85new
       real x1,x2,y1,y2
       real tslew1,tslew2                       !slewing times for two axis 
-      integer nloops
+      real slew_tol 
+      integer iter
       integer nrs        !which rise-set interval. Some sources can rise a few times (e.g., go behind a mountain.)  
-      character*2 cwrap1,cwrap2,cwrap2_pre
+      character*2 cwrap1,cwrap2
       double precision gst                       !current gst
       real rme
       double precision edge_tol     !How close can we be to the edge    
@@ -82,6 +83,7 @@ C   LOCAL VARIABLES
       character*2 cwrap_first
       LOGICAL KUP                    ! Returned from CVPOS, TRUE if source within limits
       logical kdebug                 !If true, print out debugging
+      logical kdebug_slew 
 
 C        TSLEWP,TSLEWC - previous, current slew times.  For iterating.
 C        DELAZ,DELEL,DELDC,DELHA,DELX30,DELY30,DELX85,DELY85
@@ -89,13 +91,14 @@ C        AZNOW,AZNEW,ELNOW,ELNEW,HANOW,HANEW,DECNOW,DECNEW
 C        X30NOW,X30NEW,Y30NOW,Y30NEW,X85NOW,X85NEW,Y85NOW,Y85NEW
 C               - Increments, current, next values of az,el,ha,x,y
 
-C        NLOOPS - Number of iterations on slewing time
+C        iter - Number of iterations on slewing time
 C        AZ1,AZ2,cwrap1,cwrap2
 C               - current,new values of az,wrap
 
 C
 C  History
-
+! 2022-01-06 JMGipson. Removed unused cwrap2_pre. Made do loop more standard. 
+!                      Reduced convergence to .5 secionds.  Write message if fails. 
 ! 2021-11-10 JMGipson  Modified slewing algorithms. 
 C      DATE   WHO    CHANGES
 C     811125  MAH    CHECK THAT SLEWING DOES CONVERGE FOR AZ-EL ANTENNAS
@@ -124,6 +127,7 @@ C 970120 nrv change variable RME to single precision for AMAX1
 ! 2012May07  JMGipson.  Another fix to cable wrap. Now check to see if going near border. 
 !                       Also clean up the code. 
 ! 2016Sep26  JMGipson. Modified calculation of trise to be consistent with lookahead. 
+!
 C
 C
 C     1. First we find the position of the telescope at the end of
@@ -142,6 +146,7 @@ C
       move_test=185.d0*deg2rad
       kdebug=.false.
       tslew=0.d0    !initilize to no slew 
+      slew_tol=0.25   !convergence criteria 
 
       CALL CVPOS(NSNOW,ISTN,MJD,UT,
      >  AZNOW,ELNOW,HANOW,DECNOW,X30NOW,Y30NOW,X85NOW,Y85NOW,KUP)
@@ -156,13 +161,21 @@ C                    this calculates the current telescope position
       endif
       trise=-1.0
       TSLEWC = 0.0
-      NLOOPS = 0
-100   NLOOPS = NLOOPS + 1
-      TSLEWP = TSLEWC
-      cwrap2_pre = cwrap2
+      kdebug_slew=.false. 
+
+100    continue 
+      do iter=1,5  
+      TSLEWP = TSLEWC  
+      if(kdebug_slew .and. iter .eq. 1) then    
+         write(*,'("NOW:  stat=",a," ",a, 2f8.2,1x,a2)')
+     >   cstnna(istn), csorna(nsnow), aznow*rad2deg,
+     >   elnow*rad2deg,cwrap_cur
+      endif 
+      
 C     This calculates the new source location:
       CALL CVPOS(NSNEW,ISTN,MJD,UT+TSLEWC,
      >  AZNEW,ELNEW,HANEW,DECNEW,X30NEW,Y30NEW,X85NEW,Y85NEW,KUP)
+!      write(*,*) csorna(nsnew), rad2deg*aznew,rad2deg*elnew, kup 
       if(kdebug) then
          write(*,'("slewt 141: stat=",a, " aznew ",f8.2)')
      >      cstnna(istn), aznew*rad2deg
@@ -175,10 +188,18 @@ C     This calculates the new source location:
         write(7,*) 'SLEWT 167:  bad aznew ',aznew*rad2deg
         stop
       endif
-C
+      
+      if(kdebug_slew) then    
+        write(*,'("NEW:  stat=",a," ",a, 2f8.2,1x,a2)')
+     >     cstnna(istn), csorna(nsnew), aznew*rad2deg,
+     >     elnew*rad2deg, cwrap_cur
+      endif 
+          
 C     If the source is not up now but will be up within the lookahead
 C     time, find out when it rises, then calculate its position at that time.
-      if (.not.kup.and.lookah.gt.0) then ! check for source being up within lookahead
+      if(.false.) then 
+!code below does not work.        
+!      if (.not.kup.and.lookah.gt.0) then ! check for source being up within lookahead
         CALL isup(NSNEW,ISTN,UT+lookah,kup,nrs)
         if (kup) then !rising within lookahead time
 ! Compute the local GST 
@@ -189,17 +210,20 @@ C     time, find out when it rises, then calculate its position at that time.
            if(trise .lt. 0) trise=trise+twopi
 ! convert from radians to seconds.           
             trise=trise/frac 
+          if(kdebug_slew) then
+             write(*,*) "TRISE ", trise,lookah  
+          endif 
           CALL CVPOS(NSNEW,ISTN,MJD,UT+trise,
      >    AZNEW,ELNEW,HANEW,DECNEW,X30NEW,Y30NEW,X85NEW,Y85NEW,KUP)
 C       Now we have the time to rising and position at rise (xxNEW).
         endif
       endif
 
-      IF (.NOT.KUP) then
+      IF (.NOT.KUP) then   
        islew_info=-4
        return
       endif
-C
+
       AZ1=AZNOW
       cwrap1=cwrap_cur
       AZ2=AZNEW
@@ -211,7 +235,19 @@ C
          write(*,'("slewt 179: stat=",a, " aznew ",f8.2,1x, a2)')
      >      cstnna(istn), az2*rad2deg, cwrap2
       endif 
-      DELAZ = CABLW(ISTN,AZ1,cwrap1,AZ2,cwrap2)   !On exit AZ1, AZ2 are beg, ending AZ including cablewrap.       
+      
+      if(kdebug_slew) then
+        write(*,'("AZ1  AZ2 ", 2f8.2,2x,"wrap= ",a2)') 
+     &    az1*rad2deg, az2*rad2deg, cwrap2
+      endif        
+      
+      DELAZ = CABLW(ISTN,AZ1,cwrap1,AZ2,cwrap2)   !On exit AZ1, AZ2 are beg, ending AZ including cablewrap.             
+      if(kdebug_slew) then
+          write(*,'("AZ1  AZ2 ", 2f8.2,2x,"wrap= ",a2)') 
+     &    az1*rad2deg, az2*rad2deg, cwrap2
+        write(*,'("AZ1  AZ2 ", 2f8.2)') az1*rad2deg, az2*rad2deg
+      endif     
+      
       if(kdebug) then
          write(*,'("slewt 186: stat=",a, " AZ1   ",f8.2,1x,a2)')
      >      cstnna(istn), az1*rad2deg, cwrap1
@@ -226,9 +262,10 @@ C
           islew_info=3
           return
         endif
-      endif
- 
-C                   Function to compute az move including cable wrap
+      endif            
+           
+       
+C   Function to compute az move including cable wrap
 ! See if at edge. Only do for Az-el mounts.
       IF (IAXIS(ISTN).EQ.3.or.iaxis(istn).eq.6.or.iaxis(istn).eq.7) then
          if(abs(abs(delaz)-pi) .lt. tol_180) then
@@ -280,11 +317,35 @@ C                   Function to compute az move including cable wrap
      &             slew_off(2,istn),slew_vel(2,istn),slew_acc(2,istn))
     
       tslewc=max(tslew1,tslew2) 
+      if(kdebug_slew) then
+         write(*,*) "Slew old, slew new ", tslewc, tslewp
+      endif 
 C
-      IF ((ABS(TSLEWC-TSLEWP).LT.10).OR.(NLOOPS.GE.5)) GOTO 110
-      GOTO 100
+!      write(*,*) "iter ",iter , tslewc-tslewp 
+      IF (ABS(TSLEWC-TSLEWP).LT. slew_tol) GOTO 110        !jump out if converged 
+      end do 
+      
+      write(*,*) " "
+      write(*,*) "Slewt: Failed to converge at station ",cstnna(istn),
+     > " DelT ", tslewc, tslewp, abs(tslewc-tslewp), 
+     > " moving from ",csorna(nsnow), csorna(nsnew), 
+     >   aznow*rad2deg, elnow*rad2deg, aznew*rad2deg,elnew*rad2deg
+       if(kdebug_slew) then
+          write(*,*) "Sleeping bug "
+          write(*,*) "Please save the schedule that casued this and"
+          write(*,*) "And send to John gipson"
+          write(*,*) "Togehter with what caused it to crash"
+          stop
+       endif 
+       kdebug_slew=.true.
+       tslewc = 0.0
+!       goto 100 
+   
 C     We get here if the slew has converged OR we iterated 5 times.
-110   IF  (kcont(MJD,UT+TSLEWC,TSLEWP-TSLEWC,NSNEW,ISTN,cwrap_cur,ierr))
+110   continue 
+!      write(*,*) "slew_info 298 ",kup, islew_info
+
+      IF  (kcont(MJD,UT+TSLEWC,TSLEWP-TSLEWC,NSNEW,ISTN,cwrap_cur,ierr))
      .  THEN  !continuity OK
         TSLEW = TSLEWC
 
@@ -321,10 +382,8 @@ C       calculated using az,el at UT+trise).
 !             write(*,'("At ",4f8.2)') az1,el1,az2,el2
 !          endif
        endif
-         
-      
-      
-      
+!       write(*,*) "slewt 340 ",kup,islew_info
+ 
 
 990   RETURN
       END

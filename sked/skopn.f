@@ -722,11 +722,13 @@ C  NO, change to: if there was an initial observation, always REset
 C  the nominal start to that time.
 
       if (nobs.gt.0) i1=istcur(1) ! first station in first scan
-      if (i1.gt.0.and.iyrcur(i1).ne.0) then ! change nominal start
-        iyr_start = iyrcur(1)
-        ida_start = idacur(1)
+      if (i1.gt.0) then
+        if(iyrcur(i1).ne.0) then ! change nominal start
+          iyr_start = iyrcur(1)
+          ida_start = idacur(1)
 C       Figure out hms from ut
-        call seconds2hms(utcur(1),ihr_start,imin_start,isc_start)
+          call seconds2hms(utcur(1),ihr_start,imin_start,isc_start)
+        endif 
       endif ! change nominal start
 ! Make sure end is at least 1 hour later. If less than 1 hour, set to 1 day.
       call AdjustEndTime(itimestart,itimeend,3600)

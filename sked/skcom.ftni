@@ -14,7 +14,6 @@
 ! 2010.11.05  Added cline as temporary ASCII output.
 ! 2013Sep17  JMGipson.  Moved some parameters from skdrincl/skparm.ftni to here. 
 ! 2013Sep18  JMGipson. Added "ast_margin". Separate margin for astrometric sources.
-! 2016Apr18  KOLeBail. Added iprevscan to indicate in which scan stations previously were
 ! 2017Oct06  KOLeBail. Added kconf_equip: if .true., the catalog equipment will be used automatically;
 !                      if .false., SKED will continue to ask: "Use catalog equipment?" when needed.
 !
@@ -55,7 +54,6 @@
       integer idlcur(max_stn)           !idle time
       integer itucur(max_stn)           !tape moving
       integer ireccur(max_stn)
-      integer iprevscan(max_stn)        !previous scan in which the station was in
       integer*2 lcblcur(max_stn)        !cable wrap indicator.
       character*6 cmidcur(max_stn),cpstcur(max_stn),cprecur(max_stn)
 
@@ -66,7 +64,7 @@
       common /skcom_obs/
      > nstncur,istcur,mjdcur,iyrcur,idacur,nsorcur,icalcur,
      > idurcur,icodcur,iftcur,iftend_cur,
-     > idlcur,lcblcur,itucur,ireccur,iprevscan
+     > idlcur,lcblcur,itucur,ireccur
 
       common /skcom_obs_ch/cmidcur,cpstcur,cprecur
 !

@@ -28,7 +28,7 @@ C Input:
       integer nspre(max_stn),idirpr(max_stn),iftpre(max_stn),
      .icodpr(max_stn),itupr(max_stn)
       integer*2 lcbpre(max_stn)
-      integer isecdif ! function
+      integer*4 isecdif      ! function in time between two epochs
 
 C Output:
 C     itrun, idurxt, and itucur are set in common

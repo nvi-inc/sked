@@ -190,10 +190,11 @@ C Output the lines which have numbers in them.
       write(cline,'(1(a11,1x,i5,1x))')
      > "FILL_OFF   ",ifill_off
       call wrt_param_line(cline,lutmp,ciin)
-
-      write(cline,'(4(a11,1x,i5,1x))')
-     > "MIDTP      ",imtptm, "MODULAR    ",imodtm,
-     > "MODSCAN    ",modscn,  "PARITY     ",ipartm
+     
+      write(cline,'(4(a11,1x,i5,1x))')    
+     > "MODULAR    ",imodtm,
+     > "MODSCAN    ",modscn 
+     
       call wrt_param_line(cline,lutmp,ciin)
 
       write(cline,'(4(a11,1x,i5,1x))')

@@ -40,6 +40,10 @@ C
        do while ((j.gt.0).and.(cbuf(j:j).eq.' '.or.
      . cbuf(j:j).eq.char(0)))
          j = j - 1
+         if(j .eq. 0) then
+           trimlen=j
+           return
+         endif 
        end do
        trimlen = j
        return

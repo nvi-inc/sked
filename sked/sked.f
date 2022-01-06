@@ -63,6 +63,7 @@ C               - Input string containing command and parameters.
 
 C
 C  History
+!   2022-01-03 JMG. Changed order where we would skip uknown command 
 !   2019Sep03  JMG.  Added implicit none
 !
 C    811125  MAH    BASELINE COMMAND ADDED
@@ -240,8 +241,9 @@ C  4. Open schedule file and read it in.
 
       IERRCM = 0
       INUMCM = 0
-      CALL SKOPN(cmdline,ierr)    
-    
+      CALL SKOPN(cmdline,ierr)         
+!      call init_snr_per_sec(jdstcm,utstcm,jdencm,utencm)
+      
 ! Do a quick check to make sure that things are setup at the stations.
       call check_stations(ierr)
       if(ierr .ne. 0) then
@@ -276,13 +278,15 @@ C  6. The main prompt
   
       CALL WRLOG(cmdline)
       if(cmdline(1:1) .eq. '*') goto 700 ! comment
-      ifunc = GTCMD(linestq,cmdcod)    
+      ifunc = GTCMD(linestq,cmdcod)   
+      if(ifunc .le.0) goto 700 
+      
       cmd=cmdlist(ifunc)
       icmdlen=linestq(1)         !get the length of the command.
 ! if there is no argument, set the rest of the line to blanks.
 !     Set the end of the command to blank.
       cmdline(icmdlen+1:ibufq_len*2) = ' '
-      if(ifunc .le.0) goto 700 
+
 C
 C********************************************************************
 C  7. We have a legal, recognized, unambiguous command.  Now decode
@@ -400,7 +404,7 @@ C     no parameters for this command.
       case("OPTIMIZATION") 
         call opcmd(linestq)
       case("PARAMETERS")
-        CALL PRCMD(linestq)
+        CALL PRset(linestq)
       case("PID")
         write(luscn,'("Process ID = ",a)') cpid   !Display Process ID
 !     CASE("PREVIOUS")        ! see ^  above
@@ -469,8 +473,7 @@ C     no parameters for this command.
         do i=1,nstatn
            write(*,'(a,1x,a2)') cstnna(i), lcblcur(i)
         end do
-    
-          
+   
       case("WHATSUP") 
         CALL NEXTC(linestq)
       case("WR")

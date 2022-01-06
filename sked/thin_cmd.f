@@ -27,7 +27,7 @@ C
       character*(*) cmdline
 
 ! Functions
-      integer isecdif        !Difference between two times in seconds
+      integer*4 isecdif        !Difference between two times in seconds
       integer trimlen        !non-blank length of string
       integer igetsrcnum     !get the source number 
       integer iwhere_in_int_list

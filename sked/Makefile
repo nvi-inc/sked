@@ -129,6 +129,7 @@ OBJ_FOR=   \
     invert_or_det_tri.o \
     isecdif.o \
     isup.o \
+    itime_to_down.o \
     keep_some_srcs.o \
     kfreq_cat.o \
     kfreq_match.o \
@@ -178,12 +179,11 @@ OBJ_FOR=   \
     pakup.o \
     parcmd.o \
     pixelation.o \
-    prcmd.o \
     prlis.o \
     prncm.o \
     prout.o \
-    printfr.o \
     prset.o \
+    printfr.o \
     param_read.o \
     print_slew_info_warning.o proc_out.o \
     ptobs.o \
@@ -226,7 +226,6 @@ OBJ_FOR=   \
     sky_cov.o \
     sky_cov_pix.o \
     slewt.o \
-    slew_time.o \
     snrac.o \
     snrcm.o \
     snrds.o \

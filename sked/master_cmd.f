@@ -52,7 +52,7 @@ C   LOCAL VARIABLES
       integer iyr_mst_end  ,ida_mst_end  ,ihr_mst_end  ,imin_mst_end  
 
       character*128 lstat_list
-      character*2  lstat_vec(2)
+      character*2  lstat_vec(64)
       equivalence (lstat_list,lstat_vec(1))
       character*2 cpo_master(Max_stn)            !abbreviated session code in master file
       character*10 cpiname_mst                    !Who is supposed to schedule it

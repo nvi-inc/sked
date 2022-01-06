@@ -58,6 +58,7 @@ C  Local:
 
 C
 ! Updates. Most reecent first. 
+! 2021-12-28 JMGipson. Got rid of some unused variables 
 ! 2021-01-05 JMG Replaced max_frq by max_code. (Max_frq was confusing and led to coding errors.)
 ! 2019-08-25 JMG Merged S/X and broadband.
 ! 2018-06-17 JMGipson. Got rid of extra space in output after return from vread.
@@ -313,11 +314,10 @@ C Not needed for VEX because they are read in when station is selected.
 C
       endif ! VEX/sked
 
-      isettm = 20
-      ipartm = 70
+      isettm = 0
       itaptm = 1
       isortm = 5
-      ihdtm = 6
+
       call drprrd(ivexnum)
 ! Added 2019Aug25 JMG
 ! Intiailze broadband stuff     

@@ -31,7 +31,6 @@
       character*8 cexper_master  
       integer ind 
       integer istat
-      logical kline_closed
       logical kintensive
     
       inquire(exist=kfound,file=cmaster_file)
@@ -42,7 +41,7 @@
       write(*,'("Checking ",a, $)')  trim(cmaster_file) 
       open(13,file=cmaster_file,err=500,iostat=istat)
  
-      kline_closed=.false. 
+  
 ! skip the header
       do i=1,10
         read(13,'(a)',err=200,end=200) line
@@ -52,22 +51,27 @@
         ind=index(line,"Last Updated")  
         if(ind .ne. 0)  then           
            if(.not. kintensive) ind=ind-4
-           write(*,'(2x,a,$)') line(ind:ind+50)        
-           
-           kline_closed=.true.
+           write(*,'(2x,a,$)') trim(line(ind:))                     
         endif 
+!                          123456789x            
+        if(line(1:10) .eq."----------") then      !Next line is start
+           goto 90
+        endif           
       end do   
-      write(*,*) " " 
+ 
 
 ! Parse a line that looks like:
 ! Spacing is arbitrary, but tokens separated by "|"
 !    1          2      3    4   5    6   7
 ! |IVS-R1309 |R1309 |JAN02|  2|17:00|24|FtKkNyShTcWfWz                           |NASA|BONN|08JAN23|3.0 | XA |NASA|  20 |2150|
+
+90    continue
+      write(*,*) " " 
     
 100   continue
 ! Now we are at the start of the sessions
-      read(13,'(a)',end=200,err=200) line 
- 
+      read(13,'(a)',end=200,err=200) line     
+!      write(*,*) trim(line) 
           
       if(line(1:1) .ne. "|") goto 100
  
@@ -88,8 +92,7 @@
        goto 100
 
 200    continue
-       kfound = .false.   
-       if(.not. kline_closed) write(*,*) " " 
+       kfound = .false.    
        close(13)      
        return
 

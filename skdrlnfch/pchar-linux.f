@@ -19,7 +19,7 @@
 *
       SUBROUTINE PCHAR(IAR,I,ICH)
       IMPLICIT NONE
-      INTEGER*2 IAR(1)
+      INTEGER*2 IAR(*)
       integer ich,i
 C
 C PCHAR: puts the character in the lower byte (DOS) of ICH into the

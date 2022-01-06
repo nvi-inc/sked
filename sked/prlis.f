@@ -1,4 +1,4 @@
-      SUBROUTINE PRLIS(linstq,ich)
+      SUBROUTINE PRLIS(linstq)
 C
 C PRLIS lists the values of the parameters used as defaults in
 C              the scheduling program.
@@ -194,43 +194,40 @@ C
      >"---------- Scan data parameters-------------------------------"
 
        write(ludsp,
-     > '(" VScan       ",a3," (Compute scan length)  ",$)')lyn(kvscan)
-       write(ludsp,
-     > '(" Duration    ",I3,"sec (default duration)  ")') idurde
+     > '(" VScan         ",a1," (Compute scan length)   ")')lyn(kvscan)
 
        write(ludsp,
-     > '(" Minslew     ",i3,"sec (min slew time)     ")') imintm
+     > '(" Duration     ",I3," sec (default duration for VSCAN=N)  ")')
+     &  idurde
+     
+        write(ludsp,
+     > '(" Modscan      ",i3," sec (scans are multiples of this) ")') 
+     >    modscn
+         
        write(ludsp,
-     > '(" Minscan     ",i4,"sec (min scan length)  ",$)') minscn
+     > '(" Minscan      ",i3," sec (min scan length) ",$)') minscn
        write(ludsp,
-     > '(" Maxscan     ",i4,"sec (max scan length)  ")') maxscn
+     > '(" Maxscan      ",i3," sec (max scan length)  ")') maxscn
+     
+        write(ludsp,
+     > '(" Setup        ",I3," sec (settle time)     ",$)') isettm
        write(ludsp,
-     > '(" Modscan     ",i4,"sec (mod scan time)    ",$)') modscn
- 
+     > '(" Early        ",i3," sec (start recording)   ")') itearl(1)
        write(ludsp,
-     > '(" Calibration ",I3,"sec (time before obs)   ",$)') icalde
+     > '(" Calibration  ",I3," sec (time before obs) ",$)') icalde 
+       write(ludsp,
+     > '(" Corsync      ",i3," sec (pad scan at end)   ")') itsync
+       write(ludsp,
+     > '(" Idle         ",I3," sec (idle after obs)    ")') idldef
+     
+       write(ludsp,
+     > '(" Minslew      ",i3," sec (min slew time)   ",$)') imintm     
+       write(ludsp,
+     > '(" Fill_off     ",I3," sec (fill cmd buff)     ")') ifill_off 
 
-       write(ludsp,
-     > '(" Early       ",i3,"sec (start recording)   ")')
-     > itearl(1)
-
-       write(ludsp,
-     > '(" Corsync     ",i3,"sec (pad scan at end)   ",$)') itsync
-
-
-       write(ludsp,
-     > '(" Idle        ",I3,"sec (idle after obs)    ")') idldef
-
-
-       write(ludsp,
-     > '(" Setup       ",I3,"sec (scan setup)        ",$)') isettm
-
-      write(ludsp,
-     > '(" Mark6_off   ",I3,"sec (buffer offset)     ")') imark6_off 
 
       write(ludsp,
-     > '(" Fill_off    ",I3,"sec (buffer offset)     ")') ifill_off 
-
+     > '(" Mark6_off    ",I3," sec (buffer offset)     ")') imark6_off 
       end if
 
 
@@ -249,9 +246,7 @@ C
 
         write(ludsp,'(A)')
      >"---------- Timing parameters ------------------------------"
-        write(ludsp,
-     >'(" Parity    ",I4,"sec (parity check time)  ",$ )') ipartm
-    
+     
        write(ludsp,
      > '(" SOURCE    ",I4,"sec (SOURCE time)        " )')
      > isortm

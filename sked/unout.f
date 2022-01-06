@@ -11,6 +11,7 @@ C 2004Jan27  JMG Got rid of filling with blanks before "Call READS" since READS 
 ! 2010Apr22  JMG. Changed so that Statwt, srcwt are not written out again. 
 ! 2012Nov19  JMG. Changed so that $CATALOG_USED is not written out again. 
 ! 2015Mar31  JMG.  Don't write out $PROCS section. This is done elsewhere. 
+! 2021-12-28 JMGipson. Don't write out $MAX_STAT_SCAN section
 
 C
 C   parameter file
@@ -25,6 +26,7 @@ C
 C LOCAL:
       integer ierr,ilchar
       integer il
+      character*30 lsection
 C
       IERR = 0
       WRITE(LUSCN,9100)
@@ -32,34 +34,37 @@ C
 C
       CALL READS(luskd,IERR,IBUF,IBLEN,ILCHAR,1)
       DO WHILE (ILCHAR.GE.0.AND.IERR.GE.0) !read original file
-        IF (cbuf(1:6)  .eq.'$EXPER'  .OR.   !These are always written out before here.
-     .      cbuf(1:6)  .eq.'$PARAM'  .OR.
-     >      cbuf(1:6)  .eq.'$ASTRO'  .OR.
-     >      cbuf(1:16) .eq.'$TWIN_TELESCOPES'  .OR.
-     >      cbuf(1:13) .eq. 'MAX_STAT_SCAN'    .or. 
-     >      cbuf(1:6)  .eq.'$GROUP'  .OR.
-     >      cbuf(1:7)  .eq.'$STATWT'  .OR.
-     >      cbuf(1:6)  .eq.'$SRCWT'  .OR.
-     >      cbuf(1:6)  .eq.'$MINOR'  .or.
-     >      cbuf(1:6)  .eq.'$MAJOR'  .or.
-     >      cbuf(1:9)  .eq.'$DOWNTIME' .or.
-     >      cbuf(1:3)  .eq.'$OP'     .or.
-     >      cbuf(1:14) .eq.'$CATALOGS_USED' .or.
-     >      cbuf(1:10) .eq.'$BROADBAND' .or.
-     >      cbuf(1:6)  .eq. '$PROCS' .or. 
-     .     (cbuf(1:7)  .eq.'$SOURCE' .AND.KNEWSO).OR.  !these may or may not be.
-     .     (cbuf(1:8)  .eq.'$STATION'.AND.(KNEWST.or.Knewfi)).OR.
-     .     (cbuf(1:6)  .eq.'$CODES'  .AND.KNEWFR).OR.
-     .     (cbuf(1:5)  .eq.'$VLBA'   .and.knewfr).OR.
-     .     (cbuf(1:5)  .eq.'$HEAD'   .and.knewfr).OR.
-     .     (cbuf(1:5)  .eq.'$SKED'   .AND.KNEWSK).or.
-     .     (cbuf(1:5)  .eq.'$FLUX'   .AND.KNEWFL)
+        read(cbuf,*) lsection
+        IF (lsection  .eq.'$EXPER'  .OR.   !These are always written out before here.
+     .      lsection  .eq.'$PARAM'  .OR.
+     >      lsection  .eq.'$ASTROMETRIC'  .OR.
+     >      lsection .eq.'$TWIN_TELESCOPES'  .OR.
+     >      lsection .eq.'$MAX_STAT_SCAN'    .or. 
+     >      lsection  .eq.'$GROUP'  .OR.
+     >      lsection  .eq.'$STATWT'  .OR.
+     >      lsection  .eq.'$SRCWT'  .OR.
+     >      lsection  .eq.'$MINOR'  .or.
+     >      lsection  .eq.'$MAJOR'  .or.
+     >      lsection  .eq.'$DOWNTIME' .or.
+     >      lsection  .eq.'$OP'     .or.
+     >      lsection .eq.'$CATALOGS_USED' .or.
+     >      lsection .eq.'$BROADBAND' .or.
+     >      lsection  .eq.'$PROCS' .or. 
+     .     (lsection  .eq.'$SOURCES' .AND.KNEWSO).OR.  !these may or may not be.
+     .     (lsection  .eq.'$STATIONS'.AND.(KNEWST.or.Knewfi)).OR.
+     .     (lsection  .eq.'$CODES'  .AND.KNEWFR).OR.
+     .     (lsection  .eq.'$VLBA'   .and.knewfr).OR.
+     .     (lsection  .eq.'$HEAD'   .and.knewfr).OR.
+     .     (lsection  .eq.'$SKED'   .AND.KNEWSK).or.
+     .     (lsection  .eq.'$FLUX'   .AND.KNEWFL)
      .                           ) THEN  !get next $ section
+!           write(*,*) "Skipping ", trim(cbuf) 
            CALL READS(luskd,IERR,IBUF,IBLEN,ILCHAR,1)
         ELSE  !copy this section
           if(ilchar .ne. 0) then         !skip blank lines
-            write(luscn,'(a)') cbuf(1:20)
+            write(luscn,'(a)') trim(cbuf) 
             write(lutmp,'(a)') cbuf(1:ilchar)
+            
           endif
           IF (IERR.NE.0) THEN
             WRITE(LUSCN,9110) IERR

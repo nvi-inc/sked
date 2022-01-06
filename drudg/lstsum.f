@@ -184,8 +184,7 @@ C Local:
       character*12 cscan_p
       character*128 ctmp_source_p       !buffer contianing source command
       character*6 cinfo_p               !
-      character*6 cinfo_store
-      
+      character*6 cinfo_store   
 
 ! flags
 ! Note: most of these flags get reset when we write out a line.
@@ -193,13 +192,13 @@ C Local:
       logical kdata_stop                !stoped taking data.
       logical ksource                   !found source command
       logical kmidtp                    !Found midtp command.    
+      logical kmk6_record_found        !indicate we have found mk6=record
   
       double precision speed_recorder   ! speed of recorder in this mode.
 
       LOGICAL   kexist                  !does a file exist 
       character*128 ctmp,ctmp_in
 
-    
       integer itemp
       integer i
 
@@ -208,7 +207,7 @@ C Local:
       character*2 ccode_tmp
    
       character*2 csize                 !what is paper orientation, font size
-                                         !values are ls,ll,ps,pl
+                                        !values are ls,ll,ps,pl
 
 C 1.0  Check existence of SNAP file.
       IC = TRIMLEN(CINNAME)
@@ -275,6 +274,7 @@ C 3. Initialize local variables
       inewp = 0
       cinfo = '    '
       cscan   = '     '
+      kmk6_record_found=.false.
 
 C 4. Set other variables by reading the .snp file or getting
 C    information from common.
@@ -340,11 +340,13 @@ C           Here is where we determine early start without the schedule
 C       Now get the source info for the new scan
           ctmp_source=ctmp
           ksource=.true.
-        else if (ctmp(1:5) .eq.'READY') then
+        else if (ctmp(1:5) .eq.'READY' .or. 
+     > ctmp(1:10) .eq.'MK6=RECORD' .and. .not. kmk6_record_found) then
           cinfo = 'Rec '   
           data_mbyte=0.d0         
+          kmk6_record_found=.true.
         else if (index(ctmp,'MIDOB').ne.0) then ! data start time
-! Print the PREVIOUS SCAN. Need to do this because sometimes get
+! Print the PREVIOUS SCAN. Need to do this because sometimes
 ! UNLOD command after a scan, but before the data starts. This allows to
 ! output tape unload correctly. 
           if (kdata_stop) then          
@@ -461,10 +463,10 @@ C           Update running time
       write(luprt, "()") ! skip line
       if(kdisk .or. cstrec_cap .eq. "NONE") then 
          data_mbyte=data_mbyte+idur*speed_recorder
-         write(luprt,   '("   Total",f8.1, " Gbytes")') data_mbyte/1000
-   
+         write(luprt,'("   Total  Gbytes: ",f8.1)') 
+     >     data_mbyte/1000   
       endif
-      write(luprt,   '("   Total number of scans: ",i5)')num_scans
+      write(luprt,   '("   Total # scans:    ",i5)')num_scans
 
       call luff(luprt)
       close(luprt)

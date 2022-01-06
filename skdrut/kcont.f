@@ -75,7 +75,8 @@ C     Find delta-az
 C     Check that AZ1+delAZ is on the same cable wrap
 C     Return KCONT = FALSE if the observation is not continuous
 C     If you don't have an AZ-EL antenna return immediately with KCONT=TRUE
-
+C
+C
       kcont=.TRUE.
       ierr=0
       IF (IAXIS(IST).EQ.3.or.iaxis(ist).eq.7.or.iaxis(ist).eq.6) then
@@ -92,6 +93,7 @@ C
 
         Az1=azwrap(az1,cwrap,stnlim(1,1,ist))
 
+C
         AZ2C = AZ1+DELAZ
 C  Check whether we cross into ambiguous section during observation
         IF (AZ2C.LE.STNLIM(2,1,IST).AND.AZ2C.GE.STNLIM(1,1,IST)+TWOPI

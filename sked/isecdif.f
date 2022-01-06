@@ -1,4 +1,4 @@
-      integer function isecdif(mjd1,ut1,mjd2,ut2)
+      integer*4 function isecdif(mjd1,ut1,mjd2,ut2)
 
 ! AEM 20050118 add implicit none
       implicit none
@@ -8,6 +8,7 @@ C  1 and time 2, in the sense of (time1 minus time2).
 
 C 970317 nrv New utility for sked.
 C 2003Jun20 JMGipson. Simplified.
+! 2022-01-05 JMGipson. made integer*4 
 
 C Input:
       integer mjd1,mjd2

@@ -412,8 +412,7 @@ C
       IMODTM = 1      !changed from 10 to 1
       ISETTM = 20
 C     For VLBA, allow 45s+2s/track. For 32 tracks this is 64+45=109.
-C     For FS 9.4 standard is 100 sec.
-      IPARTM = 100
+C     For FS 9.4 standard is 100 sec.  
       ITSYNC = 20
       MINSCN = 90
       MAXSCN = 784

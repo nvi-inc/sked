@@ -16,7 +16,7 @@ C   COMMON BLOCKS USED
       integer iwhere_in_string_list
 C
 C INPUT:
-      character*128 fname ! alternate source catalog name
+      character*(*) fname ! alternate source catalog name
       character*1 ccall ! who called us "J" for Java GUI, "S" for screen, r for reset.
 
 C     CALLING SUBROUTINES: SOCMD or CATCMD

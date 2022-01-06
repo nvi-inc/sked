@@ -4,7 +4,7 @@
 ! 2016Dec09. First production version.
 ! 2017Mar22. Set knewsk=.true. indicating schedule has been changed. This insures we capture changes in writing. 
 ! 2018Feb13. KLB Take into account downtime
-! 2019Mar16 JMG. Use kastro_src instead of checking rmin_astro, rmax_astro  
+! 2019Mar16  JMG. Use kastro_src instead of checking rmin_astro, rmax_astro  
 ! 2021-04-27 JMG replace (integer durscan) by (integer idurscan) and introduced (real*4 durscan)
 C
 C  FILLCMD checks a schedule for iddle time that can be used
@@ -31,12 +31,13 @@ C
       character*(*) cmdline
 
 ! Functions
-      integer isecdif        !Difference between two times in seconds
-      integer trimlen        !non-blank length of string
-      integer igetsrcnum     !get the source number 
-      integer iwhere_in_int_list
-      logical kcont          !check to see if source is continous 
-      logical kstatup        !check if station in downtime
+      integer*4 isecdif        !Difference between two times in seconds
+      integer trimlen          !non-blank length of string
+      integer igetsrcnum       !get the source number     
+
+      real*4 azwrap            !az position including wrap 
+      integer*4 itime_to_down    !How long to next down time 
+     
 C
 C  CALLING SUBROUTINES: SKED
 C  CALLED SUBROUTINES: splitntokens, gtdtr, wrerr, UNPAK, 
@@ -46,78 +47,83 @@ C
 C  LOCAL VARIABLES
 
 !     Variables used to calculate idle time
-      integer mjdtmp1,mjdtmp2,mjdtest,mjdtmp       ! MJD
-      double precision uttmp1,uttmp2,uttest,uttmp  ! UT
-      real tslew1,tslew2                           ! slewing times
-      integer idleTIME                             ! idle time between 
+! Note: Would like to say mjdcur etc but these are already used. 
+      integer mjdnow                               ! Current scan time
+      double precision utnow                       !
+      integer mjdprv                               ! Time of previous scan a station was in. 
+      double precision utprv                       !      
+      integer isrc_now, isrc_prv                   ! Current and previous source number. 
+      integer iprv_scan(max_stn)                   ! array containing previous scans. 
+      character*2 cwrap_now, cwrap_prv             ! Cable wrap current, previous 
+      integer idur_prv                             ! iduration of previous scan for some station.
+      integer idl_prv,ical_prv                     ! Idle and cal time previous 
+      integer iprv_scan_ptr                        ! Pointer to previous scan
+      
+      integer mjdtmp                               ! Temporary times
+      double precision uttmp       
+      
+      integer itime_dif                            ! difference between two epochs in seconds                              
+      integer idleTIME                             !idle time between end of prev scan after slewing and start of next.
+      integer idur2down                            !time from start of prev scan to next downtime.          
 
-      double precision RitimeDIFF                  ! time difference in double precision
-      integer ikey(max_stn)
-      logical found_idle                           ! loop to find appropriate idle time to add
+      integer ikey(max_stn)                        ! used in cleanup at the end to order durations within a scan. 
       integer idurscan                             ! new duration of the scan
-      integer idurscan_orig                        ! original scan duration 
-      real*4 durscan 
-
-      integer isetup_time
-      integer isrc_time                            ! local variables for when_at_next_source
-      integer ibuf_time                            ! local variable for when_at_next_source
+   
+      integer idur_max                             ! maximum duration we can do. 
+      integer idur_2max                            
+      integer istat_max_dur                        ! station which has the longest duration
+      integer istat_2max_dur                       ! station with second longest duration
+     
       integer ih1,im1,is1
-
-      logical found_stat                           ! logical to see if a station is from the selected list
-      logical found_src                            ! logical to check if the source was selected
-      logical found_time                           ! logical to check if selected time range
-
-      integer istn(max_stn)                        ! list of stations
+      
       integer i,ij,j                               ! indices for loops
       integer kerr                                 ! variable for unpak errors
-      character*2 cwrap_new
+      
+      integer iobs_beg_fill                         ! first scan that was modified
+      integer iobs_end_fill                         ! last scan that was modified 
+      
+      logical kdebug_fill
+      
+   
+! This is used to unpack stations in argument list to fillcmd. 
+      integer istn(max_stn)                        ! list of stations  in a scan.
+      integer nst                                  ! number of stations in a scan.
 
-! Managing downtime
-      integer idown
-      integer idur2down,idur2down_temp
-
-! Managing end of session
-      integer idurlast
-
-! Optimization: we stop looping through the observations at end time range + MAXSCN+iMaxSlewTime
-      integer jdenFI                               ! time (JD) when we finish to apply FILL
-      double precision utenFI                      ! time (UT) when we finish to apply FILL
-      integer diff_end                             ! time diff (sec) between current and
-                                                   !    end of time range to study + MAXSCN+iMaxSlewTime
-      logical found_end                            ! logical to check if we are at end time range+MAXSCN
-
+! these are the stations and sources that we consider for fillcmd. If not in this list don't try to fill the time. 
       logical ksource_do(1:max_sor)                ! logical on all sources
       logical kstat_do(1:max_stn)                  ! logical on all stations FALSE if station is all done
                                                    !                         TRUE if station still has to be processed
-      integer num_stat_to_do                       ! to keep track of the number of stations that need to be processed
-      logical time_test                            ! logical to compare current time with beg/end selected
- 
-! Local variables to get info from the command ( from licmd.f )
-      integer ich
-      integer*2 lkeywd(12)
-      character*22 ckeywd
-      equivalence (lkeywd(2),ckeywd) 
       
+! Local variables to get info from the command ( from licmd.f )     
       logical kdisplay         !print out the warning messages
       integer ierr             !some kind of error.
       integer istat            !station index
-      integer iobs             !obs counter
-      integer obsFIN           !last observation processed in the big while loop
-      integer*4 itemp          !temporary variable 
+      integer iobs             !obs counter     
 
-! Variables for functions when_at_next_source and cvpos
-      real*4 azbeg,elbeg,azend,elend,ha,dc,x30,y30,x85,y85   
+! Variables for use with cvpos    
+      real*4 ha,dec,x30,y30,x85,y85   
       logical kup
+      real*4  AZ1,EL1
+      real*4  AZ2,EL2
+! some variables used by when_at_next_source     
+      real tslew                                   ! slewing times        
+      integer isetup_time                           
+      integer isrc_time                             
+      integer ibuf_time                             
+      real*4  azbeg,elbeg,azend,elend              !starting az (at current source), ending az (at next source) 
 
 ! Variable dealing with tokens
       integer MaxToken
       integer NumToken, iToken
       parameter(MaxToken=4)
       character*(2*max_stn) ltoken(MaxToken)
-
-! ASTRO sources
-      integer iastro_save(max_sor)                 ! indices of the ASTRO sources of the schedule
-      integer num_save
+! Variables dealing with keywords. 
+! Note: lkeywd(1) contains length of keyword.
+!       lkeywd(2:) contians the rest of the keyword.      
+      integer ich
+      integer*2 lkeywd(max_stn+1)
+      character*(2*max_stn) ckeywd
+      equivalence (lkeywd(2),ckeywd)      
 
 ! Command list
       integer icmd_list_len,icmd
@@ -143,120 +149,122 @@ C  LOCAL VARIABLES
      >"Omitted arguments assume _ = ``all''      ",
      >"                                          "/
 
-! Used to store token information
-      integer*2 itemp_vec(10) 
-      character*30 ltemp
-      equivalence(ltemp,itemp_vec)     
-      integer nst    !number of stations 
-      integer iwhere   !number
+! Beginning of code. 
 
-C
-C    0. Parse command and parameters.
-C
-
-      knewsk=.true.
+! Some initializaition
+      knewsk=.true.                  
       kdisplay=.true.
+      kdebug_fill=.false. 
 
-! Some initialization
-      isorcm=0     ! all sources
-      nst=0        ! all stations 
+! Parse command line.  See above for valid arguments. 
 
-! Initialization of variables to process sources and stations
-      ksource_do=.true.      ! we process all sources
-      kstat_do=.false.       ! we process all stations in the session 
-      do i=1,nstatn          ! nstatn:common variable with stat nb in the schedule
-         kstat_do(i)=.true.
-!         write(*,*) cstnna(i)
-      enddo
-
+! "Fill ?"  means list the options  
       call splitNtokens(cmdline,ltoken,Maxtoken,NumToken)
-
-! If the command is called with no argument: FILL
-! decode the beg/end time of the session and put them in jdstcm / jdencm
-      if (NumToken.eq.0) then
-         ltoken(1)="BEG-END"
-         lkeywd(1)=trimlen(ltoken(1))
-         ltemp=ltoken(1)
-         do i=1,(lkeywd(1)+1)/2
-            lkeywd(1+i)=itemp_vec(i)
-         enddo
-         call gtdtr(lkeywd,ierrcm)
-         if (ierrcm.ne.0) then
-           call wrerr(ierrcm,inumcm)
-           ierr=1
-           return
-         endif
-      endif
-
 ! Help documentation for the command : FILL ?
       if (NumToken.eq.1 .and. ltoken(1).eq."?") then
          do icmd=1,icmd_list_len
             write(ludsp,'(a,1x,a)') lcmd_list(icmd),lhelp(icmd)
          enddo
          return
-      endif
-
+      endif       
+      
+      if(nobs .eq. 0) then
+        write(*,*) "fillcmd: Can't run on an empty schedule."
+        return
+      endif     
+      if(kdebug_fill)  write(*,*) "NOBS ", nobs 
+    
+! Default is process all stations, all sources for entire span of schedule.
+! This may be changed below. 
+      ksource_do=.true.      ! we process all sources
+      kstat_do  =.true.      ! we process all stations in the session 
+      iprv_scan = 0     
+       
 ! Decode the time: FILL TimeRange ...
-      if(NumToken.ge.1) then
-         lkeywd(1)=trimlen(ltoken(1))
-         ltemp=ltoken(1)
-         do i=1,(lkeywd(1)+1)/2
-            lkeywd(1+i)=itemp_vec(i)
-         enddo
+! if the command is called with no argument, then do the entire time span.'
+! If called with 1 argument which is not "?" then it is a time argument. 
+
+! decode the beg/end time of the session and put them in jdstcm / jdencm
+      if(NumToken.le.1) then
+         if(NumToken .eq. 0) ltoken(1)="BEG-END"     !set up default argument. 
+!stuff the first argument into ckeywd and decode it.          
+         ckeywd=ltoken(1)
+         lkeywd(1)=trimlen(ckeywd) 
          call gtdtr(lkeywd,ierrcm)
          if (ierrcm.ne.0) then
            call wrerr(ierrcm,inumcm)
            ierr=1
            return
          endif
-      endif
+      endif            
+      
+! Here we check that the fill window overlaps the observation window.
+      if(kdebug_fill) then 
+        write(*,*) "FILL_BEG ",jdstcm,utstcm
+        write(*,*) "FILL_END ",jdencm,utencm
+      endif   
 
-! Get the source number: FILL TimeRange Source ...
-      if(NumToken .ge. 2) then
-        ! unnecessary 3 lines
-        if(ltoken(2) .eq. "_") then
-           isorcm = 0         ! all sources
-           ksource_do=.true.
+! Unpak the first observation and see if it is after fill window.
+! Unpak the last  observatoin and see if it is before fill window. 
+      do i=1,2
+        if(i .eq. 1) then
+          iobs=1
         else
-           ksource_do=.false.
-           if ((ltoken(2).eq."ASTRO").or.(ltoken(2).eq."astro")
-     >                               .or.(ltoken(2).eq."Astro")) then
-             num_save=0
-             do i=1,nsourc
-                 if(kastro_src(i)) then 
-  !                      write(*,*) i,csorna(i)
-                      ksource_do(i)=.true.
-                      num_save=num_save+1
-                      iastro_save(num_save)=i
-                 endif
-             enddo
-             if (num_save.ge.1) then
-                 isorcm=-99
-             endif
-           else
-             isorcm=igetsrcnum(ltoken(2))
-             if(isorcm .eq. 0) then
-               write(ludsp,*) "fillcmd: Source name not found"
-               return
-             else if(isorcm .eq. -1) then
-               write(ludsp,*) "fillcmd: Ambiguous source name"
-               return
-             endif
-             ksource_do(isorcm)=.true.
+          iobs=nobs
+        endif 
+        cbuf=cskobs(iskrec(iobs))
+        call unpak(kerr,0)
+
+        istat=istcur(1)
+        mjdtmp=mjdcur(istat)
+        uttmp=utcur(istat) 
+        if(i .eq. 1) then
+         if(kdebug_fill) write(*,*) "SKED_BEG ", MJdtmp,UTtmp
+          if(isecdif(mjdtmp,UTtmp,jdencm,utencm).gt.0) then
+            write(*,*) "fillcmd:  Fill window after last observation "
+            return
+          endif
+        else
+          if(kdebug_fill) write(*,*) "SKED_END ", MJDtmp,uttmp
+          if(isecdif(mjdtmp,uttmp,jdstcm,utstcm).lt.0) then
+            write(*,*) "fillcmd:  Fill window before last observation "
+            return
+         endif
+        endif 
+      end do     
+       
+! Get the source number: FILL TimeRange Source ...
+! ltoken(2) .eq. "_" means all 
+      if(NumToken .ge. 2 .and. ltoken(2) .ne. "_") then 
+        ksource_do=.false.
+        call capitalize(ltoken(2)) 
+        if(ltoken(2) .eq. "ASTRO") then 
+          ksource_do=kastro_src
+          if(count(kstat_do.eqv..true.) .eq. 0) then
+            write(*,*) 
+     &        "fillcmd: Specified ASTRO but no astro sources. Returning"
+            return
+          endif  
+        else
+           isorcm=igetsrcnum(ltoken(2))
+           if(isorcm .eq. 0) then
+             write(ludsp,*) "fillcmd: Source name not found"
+             return
+           else if(isorcm .eq. -1) then
+             write(ludsp,*) "fillcmd: Ambiguous source name"
+             return
+           endif
+           ksource_do(isorcm)=.true.
 !          write(*,*) isorcm                ! source index
 !          write(*,*) csorna(isorcm)        ! source name
-           endif
-        endif 
+        endif
       endif
 
 ! Get the station list.
       if((NumToken .ge. 3).and.(ltoken(3).ne."_")) then
         kstat_do=.false.
-        lkeywd(1)=trimlen(ltoken(3))
-        ltemp=ltoken(3)
-        do i=1,(lkeywd(1)+1)/2
-          lkeywd(1+i)=itemp_vec(i)
-        enddo 
+        ckeywd=ltoken(3) 
+        lkeywd(1)=trimlen(ckeywd)  
         ich=1    !start at the first character
         CALL gtsti(lkeywd,ich,nst,istn,ierr,ludsp)
         if (ierr.ne.0) then
@@ -269,355 +277,287 @@ C
         end do
       endif
 
-      num_stat_to_do=count(kstat_do.eqv..true.)
-!      write(ludsp,*) "Start time: ",jdstcm, utstcm
-!      write(*,*) "End time:   ",jdencm, utencm   
-!      write(*,*) "Num src :   ",count(ksource_do.eqv..true.),csorna(14)
-!      write(ludsp,*) "Sources: ",ksource_do 
-!      write(ludsp,*) "Num_stat_to_do= ",num_stat_to_do
-!      write(ludsp,*) "Stations: ",kstat_do 
-
-C Debugging purposes
-!      do iobs=1,4 
-C      read observation iobs and put it in cbuf
-!       cbuf=cskobs(iskrec(iobs))
-!       write(*,*) iskrec(iobs)
-!       write(*,'(a90)') cbuf(1:90)
-C      unpak the record found in ibuf and puts data into the
-C      CUR variables
-!       call unpak(kerr, 0) 
-C      nstncur = number of stations
-!       write(*,*) "POF",iobs,nstncur
-C      istcur(1:nstncur) = station indices
-!       write(*,*) istcur(1:nstncur)
-C      cstnna = station names stored in station_state.ftni
-!       write(*,'(32(a,1x))') (cstnna(istcur(i)),i=1,nstncur)
-!       write(*,*) tim(iobs)
-!       write(*,*) (mjdcur(istcur(i)),i=1,nstncur) 
-!       write(*,*) (utcur(istcur(i)),i=1,nstncur) 
-!       write(*,*) (idurcur(istcur(i)),i=1,nstncur) 
-!       write(*,*) (idlcur(istcur(i)),i=1,nstncur)   
-!      end do 
-
-C
-C  1. Initialize all stations to no observations in previous scan
-C
-
-      do i=1,max_stn
-        iprevscan(i)=-1
-      end do
-
-C
-C  2. Read first obs 
-C
-
-      cbuf=cskobs(iskrec(1))
-      call unpak(kerr, 0)
-      do ij=1,nstncur
-            iprevscan(istcur(ij))=1
-      end do
-
-C
-C  3. Pre-loop to begin processing observations only if we passed the date of the
-C     "mother" scan which is later than (jdstcm,utstcm)
-C
-      iobs=2
-      time_test=.false.
-      do while ((iobs.le.nobs).and.(.not.time_test))
-        cbuf=cskobs(iskrec(iobs))
-        call unpak(kerr,0)
-        if (((mjdcur(istcur(1))-jdstcm)*86400+
-     >       (utcur(istcur(1))-utstcm)).gt.0) then
-            time_test=.true.
-        else
-            iobs=iobs+1
-        endif
-!        write(*,*)" test ",iobs,time_test
-      enddo
-!     At the end of this loop, the variable iobs has become the first observation in the
-!     selected time range that has to be processed
-      if (iobs.gt.nobs) then
-        write(ludsp,*) "fillcmd: The time range you entered is not valid 
-     > (not in session time range)"
-        return
-      endif
-C
-C  4. Loop on all observations
-C   
-      found_end=.false.
-! The loop is done until it is not needed : end of time range + MAXSCAN+iMaxSlewTime
-! However, it will loop a last observation for nothing to avoid another if / then / else 
-      write(ludsp, '("Filling in ",$)') 
-      do while (.not.found_end .and. iobs.le.nobs 
-     >             .and. num_stat_to_do.gt.0)
+! Below we loop through the observations putting.
+! The CUR scan is the current scan we are considering. 
+! The TST scan is the previous scan for a given station in the CUR scan.  
+ 
+! initialize the first and last scan modified. 
+! These will be updated below. 
+      iobs_beg_fill=nobs   
+      iobs_end_fill=1   
+      kdebug_fill=.false.
+! Default is to loop over all scans, but have an alternative exit if past filltime.      
+      write(ludsp,'(a,$)') "Starting fill_in: "  
+      do iobs=1, nobs               !loop over all the observations.     
+        write(ludsp,'(a,$)') "."    
+! put the current observation in the CUR variables.  
+        idurcur=0                   ! This makes debugging easier.     
         cbuf=cskobs(iskrec(iobs)) 
-!       put the info of iobs in TST variables
-!       => The TST variables correspond to the end of the scan we will study
-        call unpak(kerr,1)
-        write(ludsp,'(a,$)') "." 
- 
-        ! check if the observation investigated is after the selected end time + MAXSCN+iMaxSlewTime
-        call addsec2ut(jdencm,utencm,MAXSCN+iMaxSlewTime,
-     >                 mjdtest,uttest)
-        if (((mjdtst(isttst(1))-mjdtest)*86400+
-     >                       (uttst(isttst(1))-uttest)).gt.0) then
-            found_end=.true.
-        endif
+        call unpak(kerr,0)        
+        if(kdebug_fill) then      
+          write(*,*) "-----New Scan ------------------"    
+          write(*,*) "CUR --> ", trim(cbuf)       
+        endif         
+          
+        istat=istcur(1)                !This is used just to get time and source. 
+        mjdnow=mjdcur(istat)
+        utnow =utcur(istat) 
+        isrc_now=nsorcur(istat) 
+        cwrap_now=cwrap_cur(istat) 
+
+        if(kdebug_fill) then 
+          write(*,*) "CUR_TIME ", mjdnow,utnow               
+          write(*,'(15i4)') idurcur(1:11)
+         endif  
         
-        do i=1,nstntst
-            istat=isttst(i)
-!           Here, a station will observe
-!           a source even if it is alone --- it is corrected in phase 4
-            if (kstat_do(istat) .and. iprevscan(istat).ne.-1) then             
-            ! the station observed in a previous scan PLUS it is in the set of selected stations
-                cbuf=cskobs(iskrec(iprevscan(istat))) ! latest scan of the station
-                call unpak(kerr,0) ! unpak latest obs of the station in CUR variables
-    
-                ! check if observation is in window time selected
-                found_time=.false.
-                if (((mjdcur(istat).eq.jdstcm) .and. 
-     >                               (utcur(istat).ge.utstcm)) .or. 
-     >                               (mjdcur(istat).gt.jdstcm)) then
-                   if (((mjdcur(istat).eq.jdencm) .and. 
-     >                               (utcur(istat).le.utencm)) .or. 
-     >                               (mjdcur(istat).lt.jdencm)) then
-                     found_time=.true.
-                   endif
-                endif
+! Check to see if past where we should start. 
+        if(isecdif(mjdnow,utnow,jdstcm,utstcm) .lt. 0) cycle                         
+        
+! One consequence of cycling now is that iprv_scan does not get updated until AFTER we are in the time window. (which is what we want.)         
 
-!               give time tmp1 = time after observations + other time
-!                                constraints + slewing
-!                             => time when at next source
-                call when_at_next_source(kdisplay,ludsp,
-     >               istat,nsorcur(istat),nsortst(istat),
-     >               mjdcur(istat),utcur(istat),
-     >               idurcur(istat),idlcur(istat),icalcur(istat),
-     >               cwrap_cur(istat),cwrap_tst(istat),
-     >               mjdtmp1,uttmp1,azbeg,azend,elbeg,elend,tslew1,
-     >               isetup_time,isrc_time,ibuf_time,ierr)               
-         
-!               need information on the date at the end of the scan to check if we
-!               are still in the time window
-                mjdtmp=mjdtmp1
-                uttmp=uttmp1
-
-                if (ksource_do(nsorcur(istat)) .and. found_time) then 
-                ! we continue if the source is the one selected or if no source was selected
-                ! AND if we are in the selected time range
-!   SEARCHING FOR THE IDLE TIME
-
-! This is for debugging purposes to see positions of initial, final source. 
-!               CALL CVPOS(NSORcur(istat),istat,mjdtmp1,uttmp1,
-!     >                azbeg,elbeg,ha,  dc,x30,y30,x85,y85,kup)
-!               CALL CVPOS(NSORtst(istat),istat,mjdtmp1,uttmp1,
-!     >                azend,elend,ha,  dc,x30,y30,x85,y85,kup)
-
-!              IDLE TIME:
-! ifill_off is substracted from idleTIME to absorb differences between the slewing time model and the real slewing speed
-                  idleTIME=isecdif(mjdtst(istat),uttst(istat),
-     >                    mjdtmp1,uttmp1)-ifill_off
-
-!               => we take the "floor" of the idle time, meaning the lowest integer part
-!                  of the idle TIME
-!   ADDING THE IDLE TIME TO THE DURATION OF THE OBSERVATION, UNLESS THE TIME AT THE END
-!   OF THE SLEWING TIME no 2 IS LATER THAN THE TIME OF THE NEXT OBSERVATION
-!   ATTENTION: LENGTH OF SCAN MUST BE LOWER OR EQUAL TO MAXSCAN
-
-! Only do the loop if idletime >0. 
-                  if(idleTIME.gt.0) then
-! Set the new scan duration...
-                    idurscan_orig=idurcur(istat)
-! ATTENTION! If station is on downtime during the scan, idurscan should not exceed
-! the time of beginning downtime
-                ! check if station is in downtime during the window time selected
-                    idur2down=0
-                    do idown=1,num_down
-                      if (istat.eq.idown_stat(idown)) then
-                        idur2down_temp=isecdif(mjd_down_beg(idown),
-     >                     ut_down_beg(idown),mjdcur(istat),
-     >                     utcur(istat))
-                        ! if idur2down is negative, that means we passed the downtime for the station
-                        ! if idur2down is positive, that means we still have to manage the downtime
-                        ! ATTENTION! It can be several downtimes for the same station! we need to check the closest
-                        if (idur2down_temp.gt.0) then
-                          ! this downtime happens before the previous one we detected
-                          if ((idur2down.gt.0 
-     >                     .and. idur2down_temp.lt.idur2down)
-     >                     .or. (idur2down.eq.0)) then
-                              idur2down=idur2down_temp
-                          endif
-                        endif
-                      endif
-                    enddo
-                    ! we need to check the very last scans that are less than MASCAN seconds from the end of the session
-                    idurlast=isecdif(jdencm,utencm,
-     >                               mjdcur(istat),utcur(istat))
-                    if (idurlast.lt.MAXSCN) then
-                      if (idur2down.gt.0) then
-                        idurscan=min(idurlast,(min(idur2down,
-     >                            idurcur(istat)+idletime)))
-                      else
-                        idurscan=min(idurlast,idurcur(istat)+idletime)
-                      endif
-                    else
-                      if (idur2down.gt.0) then
-                        idurscan=min(min(MAXSCN,idur2down),
-     >                              idurcur(istat)+idletime)
-                      else
-                        idurscan=min(MAXSCN,idurcur(istat)+idletime)   
-                      endif
-                    endif
-                    found_idle=.false. 
-                    do while(idurscan .gt. idurscan_orig .and. 
-     >                                 .not. found_idle)  
-                      call when_at_next_source(kdisplay,ludsp,
-     >                  istat,nsorcur(istat),nsortst(istat),
-     >                  mjdcur(istat),utcur(istat),
-     >                  idurscan,idlcur(istat),icalcur(istat),
-     >                  cwrap_cur(istat),cwrap_tst(istat), 
-     >                  mjdtmp2,uttmp2,azbeg,azend,elbeg,elend,tslew2, 
-     >                  isetup_time,isrc_time,ibuf_time,ierr)
-             
-
-!                 call allday(mjdcur(istat),nsorcur(istat),istcur(istat))
-!!     >              tsris,tsset 
-
-! Check if source is still visible at the time + idle time (TMP4)
-                    call cvpos(nsorcur(istat),istat,mjdtmp2,uttmp2,
-     >                    azbeg,elbeg,ha,dc,x30,y30,x85,y85,kup)
+! Loop through all the stations in the current scan.
+        do i=1,nstncur
+          istat=istcur(i)         
+          iprv_scan_ptr=iprv_scan(istat)        ! do this way because we want to keep a copy before we update below
+          iprv_scan(istat)=iobs                 ! Update the previous scan to point to this one 
+          if(kdebug_fill) then 
+             write(*,*) ">>>>>>>Station ", cstnna(istat),iprv_scan_ptr                                                
+          endif 
+          if(iprv_scan_ptr .eq. 0) cycle         !CYCLE: Didn't observe previously (no previous scan.)                
+          
+          idurtst=0                             !Initialize. Don't really need to do this, but makes debugging easier.                 
+          cbuf=cskobs(iskrec(iprv_scan_ptr))    ! previous scan for this station.                                                 
+          call unpak(kerr,1)                    ! unpak latest obs of the station in TST variables     
+          if(kdebug_fill)  write(*,*) "PRV --> ", trim(cbuf)                   
+          
+          mjdprv    =mjdtst(istat)              !extract some variables 
+          utprv     =uttst(istat) 
+          isrc_prv  =nsortst(istat) 
+          cwrap_prv =cwrap_tst(istat)   
+          idur_prv  =idurtst(istat)
+          idl_prv   =idltst(istat)
+          ical_prv  =icaltst(istat) 
+          
+          if(kdebug_fill) then
+             write(*,*) "Doit ",ksource_do(isrc_prv),kstat_do(istat) 
+          endif 
+          
+          if(.not.ksource_do(isrc_prv)) cycle                          !CYCLE: Not a source that we do fill for. 
+          if(.not.kstat_do(istat))    cycle                            !CYCLE: not doing fill for this station. 
            
-                    RitimeDIFF=(mjdtst(istat)-mjdtmp2)*86400.+
-     >                                          (uttst(istat)-uttmp2)
+          if(kdebug_fill)  write(*,*) "PRV_TIME ", mjdprv,utprv            
  
-!               We consider the "real" time difference
-! Added in test for continuity of scan.   
-                    durscan=idurscan
-                    if (Ritimediff.ge.0 .and. kup   .and.
-     >                 kcont(MJDcur(istat),UTcur(istat),durscan,
-     >                 nsorcur(istat),istat,cwrap_cur(istat),ierr)) THEN
-                        idurcur(istat)=idurscan
-                        found_idle=.true.
-                        mjdtmp=mjdtmp2
-                        uttmp=uttmp2
-                     else
-                        idurscan=idurscan-1   
-                     endif  
-                   end do                  
-                  endif
+!  See how long it takes to get from previous source to current source. 
+          call when_at_next_source(kdisplay,ludsp,
+     >         istat, isrc_prv,isrc_now,mjdprv,utprv, 
+     >         idur_prv, idl_prv,ical_prv,
+     >         cwrap_prv,cwrap_now, 
+     >         mjdtmp,uttmp,azbeg,azend,elbeg,elend,tslew,
+     >         isetup_time,isrc_time,ibuf_time,ierr)           
+           if(kdebug_fill)   write(*,*) "FRE_TIME ", mjdtmp,uttmp       
+                
+  
+! The idle time is difference between when we arrive at current source (mjdtmp) and when the current scan starts. 
+          itime_dif=isecdif(mjdnow, utnow,mjdtmp,uttmp)      
+          if(kdebug_fill) then
+             write(*,'(a,2i5)') "idurtst, IDLETIME", idur_prv,itime_dif 
+          endif 
+ ! ifill_off is substracted from idleTIME to absorb differences between the slewing time model and the real slewing speed         
+          idleTime=itime_dif-ifill_off 
+          if(idleTime .le. 0) cycle                                      !CYCLE:  No time to add for this staiton. 
+ 
+! Find time to next downtime 
+          idur2down=itime_to_down(mjdprv,utprv,istat)
+! Find the maximum duration for this station in this scan.
 
-! DEBUGGING/PRINTING
-!               if(.true.) then   
-                 if(.false.) then   
-!                if (idleTIME.lt.0) then
-                  write(*,*) "Idle time negative: ",idleTIME
-                  write(*,"('Az El beg', 2f9.2)")
-     >             rad2deg*azbeg,rad2deg*elbeg
-                  write(*,"('Az El end', 2f9.2)")
-     >             rad2deg*azend,rad2deg*elend
-                  write(*,*) "WRAPS ", cwrap_cur(istat), cwrap_new
-!                if (cstnna(istat).eq.'NYALES20') then
-                  write(*,*) "Observation: ",iskrec(iobs)
-                  write(*,*) cstnna(istat)
-                  call seconds2hms(utcur(istat),ih1,im1,is1)
-                  write(*,*) "Beginning:  ",mjdcur(istat),
-     >                    utcur(istat), csorna(nsorcur(istat)),
-     >                    ih1,im1,is1
-                  write(*,*) "durcur:    ",idurcur(istat),idlcur(istat),
-     >                    icalcur(istat),isetup_time
-                  write(*,*) " Slewing: ",tslew1!,itslew1
-                  write(*,*) "Beg+dur+idle+sle1:",mjdtmp1,uttmp1
-                  write(*,*) "Idle time:  ",idleTIME 
-                  write(*,*) "Slewing2: ",tslew2!,itslew2
-                  write(*,*) "+slewing(2):",mjdtmp2,uttmp2
-                  write(*,*) "End:        ",mjdtst(istat),
-     >                    uttst(istat),csorna(nsortst(istat))
-                  write(*,*) "Diff of time between calculated and new: "
-     >                    ,RitimeDIFF!,itimeDIFF  
-                 end if
-! END DEBUGGING
+          idur_max=min(idur2down,Maxscn,idur_prv+idleTime)
+          if(kdebug_fill) then 
+            writE(*,'(a,4i8)') "idown,Maxscan,idurnew ",
+     &       idur2down,maxscn,idur_prv+idleTime,idur_max
+          endif 
+          if(idur_max .eq. idur_prv) cycle                         !CYCLE: No room to increase the scan length. 
 
-                  call pakup(kerr,0)
-                  cskobs(iskrec(iprevscan(istat)))=cbuf
-                endif
+! Find position at the start of the previous scan 
+          CALL CVPOS(isrc_prv, istat,MJDprv,UTprv,AZ1,EL1,
+     &       HA,DEC,X30,Y30,X85,Y85,KUP)
 
-! Check if the station previous scan will end before the end of the selected time
-! If not, that means the station does not need to be processed anymore
-                if (((mjdtmp-jdencm)*86400+(uttmp-utencm)).gt.0) then 
-                      kstat_do(istat)=.false.
-                      num_stat_to_do=num_stat_to_do-1
-                endif
+! Az-el type antennas. Correct az1 for cable wrap. 
+          IF (IAXIS(ISTat).EQ.3.or.iaxis(istat).eq.7.or.
+     &      iaxis(istat).eq.6) then
+            Az1=azwrap(az1,cwrap_prv,stnlim(1,1,istat))    
+          endif  
+
+! Find maximum duration by starting at current and increaseing to idur_max.
+! If we encounter problems along the way stop. 
+! Increase scan length by 1 second.  See if any problems.
+!    No problems, continue.     
+!    Yes problems, stop.   
+          do idurscan = idur_prv+1, idur_max 
+!            write(*,*) "Idurscan ", idurscan 
+            CALL CVPOS(isrc_prv,IStat,MJDNow,UTprv+idurscan,
+     &                 AZ2,EL2,HA,DEC,X30,Y30,X85,Y85,KUP)
+            if(.not.kup) then
+               if(kdebug_fill) write(*,*) "Not up at end "
+                exit                               !EXIT source is not up at the end of the scan.
             endif 
-            iprevscan(istat)=iobs
-        enddo
-        iobs=iobs+1
-      enddo
-!      write(ludsp,*)"Nb stations left to do: ",num_stat_to_do
-!      write(ludsp,*)"IOBS: ",iobs,nobs  
-!      write(*,'(20(a8,1x))') cstnna(1:nstatn)
-!      write(*,'(20(l8,1x))') kstat_do(1:nstatn)
-!      write(*,'(20(i8,1x))') iprevscan(1:nstatn) 
- 
-C  5. Processing of the stations that are not done yet
-C
-!       if(.true.) then 
-   
-       do i=1,nstatn
-!         ! we search for the stations that have not been processed totally
-        if(.false.) then   !debugging. 
-         write(*,*) i, cstnna(i),  kstat_do(i)
-         write(*,'(20(a8,1x))') cstnna(1:nstatn)
-         write(*,'(20(l8,1x))') kstat_do(1:nstatn)
-         write(*,'(20(i8,1x))') iprevscan(1:nstatn) 
-        endif 
-         if (kstat_do(i)) then
-! Found a station that has not been processed. Unpack the previous scan it was in. 
-            cbuf=cskobs(iskrec(iprevscan(i)))    
-            call unpak(kerr,1) ! observations in CUR variables
-!               write(*,*) "nstntst"
-! Now loop through all stations in this scan and pick out the ones that have not been done yet.
-            do j=1,nstntst
-               istat=isttst(j)   
-               if(kstat_do(istat) .and. 
-     >             iprevscan(i) .eq. iprevscan(istat)) then
-   
-! calculate time from start of scan to end time. This is one option for the duration. 
-                 itemp=(jdencm-mjdtst(istat))*86400 +utencm-uttst(istat)  
-! The actual duration is the minimum of itemp and MAXSCN
-! ifill_off is a safety feature to absorb possible differences between slewing time models and real values
-                 idurtst(istat)=min(MAXSCN,itemp)-ifill_off 
-! Set the station to found.                    
-                  kstat_do(istat)=.false.
-               endif 
-            end do 
-! Packup the scan and store it.     
-            call pakup(kerr,1)
-            cskobs(iskrec(iprevscan(i)))=cbuf       
-            num_stat_to_do=num_stat_to_do-1    
-         endif
-      enddo
-!      stop
-!      endif 
-!      stop 
+  
+! now check to see if there are problems with cable wrap.            
+            IF (IAXIS(ISTat).EQ.3.or.iaxis(istat).eq.7.or.
+     &         iaxis(istat).eq.6) then    
+               az2=azwrap(az2,cwrap_prv,stnlim(1,1,istat)) !Put this on the correct wrap.                                   
+! now both az1 and az2 are corrected  for cable wrap. 
+! Want the distance between them to be small. If not then either.
+!   1. Start at upper end of C-wrap and are trying to go to neutral.
+!   2. Start at lower end of W-wrap and are trying to go to neutral. 
+               if(abs(az2-az1) .gt. .1) then
+                   if(kdebug_fill) then
+                     write(*,*) "Cable wrap problem ",
+     &               azbeg*rad2deg,az1*rad2deg,az2*rad2deg, 
+     &               stnlim(1:2,1,istat)*rad2deg
+                   endif 
+                   exit              !Exit because a large difference. Indicates cable-wrap problem. (.1 ~ 5.7 deg)                
+                endif 
+            Endif   
+! Make sure we can still get to the next source in time from this position. 
+          call when_at_next_source(kdisplay,ludsp,
+     >         istat, isrc_prv,isrc_now,mjdprv,utprv, 
+     >         idurscan, idl_prv,ical_prv,
+     >         cwrap_prv,cwrap_now, 
+     >         mjdtmp,uttmp,azbeg,azend,elbeg,elend,tslew,
+     >         isetup_time,isrc_time,ibuf_time,ierr)           
+       
+            idleTIME=isecdif(mjdnow,utnow,mjdtmp,uttmp)-ifill_off         
+            if(idleTime .lt. 0) then
+               if(kdebug_fill) write(*,*) "idletime EXIT ", idletime
+               exit            
+             endif 
+          end do 
+! At this point idurscan is 1 larger than maximum good scan lenghth.
+          idurscan=idurscan-1
+          idurtst(istat)=idurscan
+          call pakup(kerr,1)
+          cskobs(iskrec(iprv_scan_ptr))=cbuf
+          if(kdebug_fill) then 
+            write(*,*) "Final duration ",idurscan      
+            write(*,'(15i4)') idurtst(1:11)         
+          endif 
+          iobs_beg_fill = min(iobs_beg_fill,iprv_scan_ptr) 
+          iobs_end_fill = max(iobs_beg_fill,iprv_scan_ptr) 
+! If mjdtmp,uttmp (time arrive at next source) after FILL window, then turn off 
+          if(isecdif(jdencm,utencm,mjdtmp,uttmp).le. 0) then 
+            if(kdebug_fill) then
+              write(*,*) "TMP_TIME ",mjdtmp,  uttmp 
+              write(*,*) "Turning off ",cstnna(istat)
+              write(*,*) "Secdif ", isecdif(jdencm,utencm,mjdtmp,uttmp)
+            endif 
+            kstat_do(istat)=.false.                                !Past the end of the time window. Turn off this station
+          endif 
+!          pause 
+        enddo       !loop over stations in scan.         
+!  check if the observation investigated is after the selected end time + MAXSCN+iMaxSlewTime 
+        if(isecdif(mjdnow,utnow,jdencm,utencm).gt.0) exit      !past the end of the time window.
+!     &       .ge. Maxscn+imaxslewTime     
+      enddo         !loop over observations. 
+     
+      iobs_end_fill=iobs 
+! 
+!  Processing of the stations that are not done yet (kstat_do(i) is TRUE) 
+!  this could happen because the previous scan it was in was a long time before the end of the FILL window. 
 
-!      write(ludsp,*) "Num stations left: ",num_stat_to_do
-C
-C  6. Loop on all stations/observations to remove extra time (2 stations at least observing)
+      if(kdebug_fill) then 
+        write(*,*) "Fixing up"       
+        do i=1,nstatn
+         write(*,*) i, cstnna(i),kstat_do(i), iprv_scan(i)
+        end do
+      endif 
+         
+      do i=1,nstatn
+        if(.not. kstat_do(i)) cycle          !CYCLE:  Previosly done. Don't need to do anything. 
+        iprv_scan_ptr=iprv_scan(i)
+! Found a station that has not been processed. Unpack the previous scan it was in. 
+        if(iprv_scan_ptr.eq. 0) then
+          kstat_do(istat)=.false.
+          cycle
+        endif
+         
+        idurtst=0           !Not necessary but makes debugging easier.          
+        cbuf=cskobs(iskrec(iprv_scan_ptr))   
+        call unpak(kerr,1) ! observations in TST variables
+        if(kdebug_fill) then
+          write(*,*) cstnna(i), iprv_scan_ptr
+          write(*,*) "----> ", trim(cbuf) 
+          write(*,'("Idur before ", 11i4)') idurtst(1:11) 
+        endif 
+     
+! Now loop through all stations in this scan and pick out the ones that have not been done yet.
+        do j=1,nstntst
+           istat=isttst(j)   
+           if(.not.kstat_do(istat)) cycle                  !CYCLE: This station has been processed.   
+           if(iprv_scan(istat) .ne. iprv_scan_ptr) cycle    !
+           if(kdebug_fill) write(*,*) cstnna(istat), iprv_scan(istat)  
+! calculate time from start of scan to end of fill window. This is one option for the duration. 
+           itime_dif=isecdif(jdencm,utencm,mjdtst(istat),uttst(istat))   
+! another option is until next downtime.                     
+           idur2down=itime_to_down(mjdtst(istat),uttst(istat),istat)           
+           idurscan=min(itime_dif,idur2down,Maxscn) 
+! NEVER reduce a scan.             
+           idurtst(istat)=max(idurscan,idurtst(istat))
+! Set the station to found.                    
+            kstat_do(istat)=.false.  
+         end do
+! Packup the scan and store it.     
+         call pakup(kerr,1)
+         cskobs(iskrec(iprv_scan_ptr))=cbuf      
+         iobs_beg_fill = min(iobs_beg_fill,iprv_scan_ptr) 
+         iobs_end_fill = max(iobs_beg_fill,iprv_scan_ptr) 
+         if(kdebug_fill) then
+           write(*,*) cstnna(i), iprv_scan_ptr
+           write(*,*) "----> ", trim(cbuf) 
+           write(*,'("Idur after ", 11i4)') idurtst(1:11) 
+         endif 
+      enddo
+      
+! Make sure no station observes alone          
+
+! Loop on all observations modified  to do some cleanup.
+!   Above we increased the duration so that each station arrived on source for next scan just in time.
+!   But this means that we can have the situation where one station is obsrerving alone. 
+!   In this case change the duration of the longest station to that of the second longest 
 C   
-      do iobs=1,nobs
-         cbuf=cskobs(iskrec(iobs))
-         call unpak(kerr, 0)
-!        order the duration times from smallest to biggest
-         call indexxint(nstncur,idurcur(istcur),ikey)
-!        give to the longest duration the second longest duration
-         if ((idurcur(istcur(ikey(nstncur)))) .ne.
-     >            (idurcur(istcur(ikey(nstncur-1))))) then
-             idurcur(istcur(ikey(nstncur)))=
-     >                        idurcur(istcur(ikey(nstncur-1)))
-         endif
-         call pakup(kerr, 0)
-         cskobs(iskrec(iobs))=cbuf
-!         write(ludsp,*) cbuf(1:34) 
+      ikey=0
+      do iobs=iobs_beg_fill, iobs_end_fill
+        cbuf=cskobs(iskrec(iobs))   
+!        write(*,*) "BEF ",trim(cbuf)                    
+        idurtst=0                    !This initializes and sets all values to 0. Need to do this for sorting.                                   
+        call unpak(kerr, 1)          !Unpak will update the durations of the stations in the scans, but other stations values are leftover. 
+!        write(*,'(11i4)') idurtst(1:11) 
+        
+! find the  station which has maximum and 2nd maximum duration         
+        istat_max_dur  =0
+        istat_2max_dur =0
+        idur_max       =0
+        idur_2max      =0   
+! First off find the longest duration              
+        do j=1,nstntst
+          istat=isttst(j)   
+! This duration is candidate for being longest          
+          if(idurtst(istat) .gt. idur_max) then
+            idur_2max=idur_max                       !set previous longest to second longest
+            istat_2max_dur=istat_max_Dur              
+            idur_max=idurtst(istat)                  !update the longest    
+            istat_max_dur =istat         
+          else if(idurtst(istat) .gt. idur_2max) then
+! This duration is not the longest, but it might be the second 
+            idur_2max=idurtst(istat)        
+            istat_2max_dur =istat
+          endif               
+        end do          
+        idurtst(istat_max_dur)=idurtst(istat_2max_dur)        
+        call pakup(kerr, 1)
+        cskobs(iskrec(iobs))=cbuf
+
       end do
+      write(ludsp,*) " " 
       write(ludsp,*) "End of FILL command."
 
       return

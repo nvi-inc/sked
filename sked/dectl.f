@@ -73,10 +73,10 @@ C
       call null_term(cprtpor)
       cprtlan='lj'
       call null_term(cprtlan)
-      cprttyp=''
-      call null_term(cprttyp)
-      cprport=''
-      call null_term(cprport)
+!      cprttyp=' '
+!      call null_term(cprttyp)
+!      cprport=' '
+!      call null_term(cprport)
 
       RETURN
       END

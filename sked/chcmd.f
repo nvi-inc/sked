@@ -22,7 +22,7 @@ C  INPUT VARIABLES:
 ! Functions
       logical kstatup        !is a station up?
       real speed             ! Speed of tape drive
-      integer isecdif        !Difference between two times in seconds
+      integer*4 isecdif        !Difference between two times in seconds
       integer maxdu 
 
 C
@@ -77,7 +77,7 @@ C         footage count, direction, code, and pass.
  
       integer istbad(max_stn)  ! =1 for source not up there
       integer ithres           ! Threshold 
-      integer itdif            !difference in time between two epochs
+      integer*4 itdif          !difference in seconds time between two epochs
 
       
 ! JMG variables.

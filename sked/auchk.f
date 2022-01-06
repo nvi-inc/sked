@@ -75,7 +75,7 @@ C 970406 nrv Add ITUPR to call
 
 ! functions
       logical kcont
-      integer isecdif
+      integer*4 isecdif                   !difference in time 
 
 C  INPUT VARIABLES:
       character*2 cmdcod                  !  Two letter command code.
@@ -119,7 +119,8 @@ C      - calculated UT for next observation
       DIMENSION MJDT(MAX_STN)
 C     - trial values for each station from AUTOT
       integer j,j2,i,ierr,n1,ichk
-      integer mjdnew,mjdt,iyrnew,idanew,itsec,itmin,itdiff
+      integer mjdnew,mjdt,iyrnew,idanew,itsec,itmin
+      integer*4 itdiff
       integer idum,itdif
    
       real toltime ! time tolerance for checking

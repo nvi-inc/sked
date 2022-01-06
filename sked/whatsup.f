@@ -39,7 +39,7 @@ C   COMMON BLOCKS USED
       integer istnvec(*)
       Integer IsrcVec(*)
       integer ielall(max_sor,max_stn)   !used for VLBA stations in special mode
-      integer MJDFree(max_stn) !Day part of when station is free
+      integer MJDFree(max_stn)          !Day part of when station is free
       double precision UtFree(Max_stn)  !seconds part
 
 
@@ -92,7 +92,7 @@ C   COMMON BLOCKS USED
       integer ispinDelay
       integer istat1, istat2
       integer iband                      !band 
-      
+  
       ispinDelay=0
 
       irs=0                                  !Reset the rise set array.
@@ -210,6 +210,9 @@ C
         IS=iSrcVec(I)
 ! Compute time since source last observed.
         j=istcur(1)
+! If we haven't scheduled anything then just set to first station              
+        if(j .eq. 0) j=1       
+        
         IF (MJPRSO(IS).eq.0) then
          TDIFF(is)=0d0
          else
@@ -245,7 +248,7 @@ C         in the past that it's now available again.
           endif 
           
 C   Compute SNR and duration for stations and baselines
-          if (kvscan)  then         
+          if (kvscan)  then      
               CALL SNROK(istnvec,NumStn,is,icod,-1,iokst,
      >                              mjdcur(j),utcur(j))
           endif 

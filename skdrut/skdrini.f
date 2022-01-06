@@ -74,11 +74,10 @@ C LOCAL
 C
 C  In skobs.ftni
       NOBS = 0
-      ISETTM=0
-      IPARTM=0
+      ISETTM=0  
       ITAPTM=0
       ISORTM=0
-      IHDTM=0
+    
       iyr_start=0
       ida_start=0
       ihr_start=0

@@ -64,6 +64,7 @@
       mjd_out=0
       ut_out=0 
       islew_info =0 
+      kup=.true. 
       ut_scan_end=ut+idur+idle
       call seconds2hms(ut_scan_end,ihr,imin,isec)
       if(cwrap(1:1) .eq. char(0)) cwrap="-"
@@ -72,8 +73,8 @@
      >     nsornew,istat,cwrap,cwrap_new,tslew,
      >     lookah,trise,tsris,st0cur,frac,knov,islew_info,
      >     aznow,elnow,aznew,elnew)
-           ierr=islew_info 
-           if(islew_info .eq. -4) then
+           ierr=islew_info      
+           if(islew_info .eq. -4) then     
               kup=.false.
            endif      
       ELSE  
@@ -88,16 +89,14 @@
         if(.not.kup .or. islew_info .eq. -4) then 
           if(kdisplay) then                              
              write(luout,
-     >      '("ERROR! when_at_next_source2: At ", 2(i2.2,":"),i2.2, $)') 
+     >      '("ERROR! when_at_next_source: At ", 2(i2.2,":"),i2.2, $)') 
      >        ihr,imin,isec
             write(luout,'(" source ",a8," not visible at ", a, 2f8.2 )') 
      >       csorna(nsornew), cstnna(istat), aznew*rad2deg,elnew*rad2deg
           endif 
         endif     
         return
-      endif 
-  
-      
+      endif         
 C     Determine procedure times to be added between runs
  
 C     Move setup procedure calculation after parity, so that ipar is defined.

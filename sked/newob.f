@@ -15,7 +15,7 @@
       logical kcont
       logical kyes_to_prompt            ! returns true if anser is "Y" or "Yes"
       integer  trimlen
-      integer isecdif                   !difference in time between two scans.
+      integer*4 isecdif                   !difference in time between two scans.
       real*4  sefdel                    !elevation dependent SEFD
  
 C  INPUT:
@@ -233,8 +233,7 @@ C    Initialize extra durations to zero for scheduling.
      >     idurcur(j),idle,ical, cwrap_now,cwrap(j),mjd_at(j),ut_at(j),
      >     az_now,el_now,az_new,el_new,tslew(j),
      >     isetup_time,isrc_time,ibuf_time, ierr)         
-   
-                       
+     
         if(ierr .ne. 0) then
            istn(i)=-istn(i)         !Remove stations that cannot participate. 
          endif  !got a later time           
@@ -245,17 +244,17 @@ C    Initialize extra durations to zero for scheduling.
       
 200   continue   
 ! Some stations might have been removed. 
-! Recalculate start time.         
-      mjd_beg=-1
+! Recalculate start time.          
 ! update start of scan time. This is latest of all the times.  
       do i=1,nstn
-        j=istn(i)
-        if(mjd_at(j) .gt. mjd_beg) then
+        j=istn(i)        
+        if(i .eq. 1) then
            mjd_beg=mjd_at(j)
-           ut_beg =ut_at(j) 
-        else
-           ut_beg=max(ut_at(j), ut_beg)
-        endif  
+           ut_beg=ut_at(j)
+        else if(isecdif(mjd_at(j),ut_at(j),mjd_beg,ut_beg).gt.0) then 
+           mjd_beg=mjd_at(j)
+           ut_beg =ut_at(j)      
+        endif   
       end do       
    
 ! If this is a manual scheduled scan AND we specified the time

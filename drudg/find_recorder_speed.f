@@ -43,18 +43,19 @@
       integer nchans_obs                !Number recorded
       integer ifan_fact                 !ifan_factor
       integer ipass
+     
     
       if(idata_mbps(istn) .ne. 0) then 
 ! this was set externally. Use it. 
 ! Generally means came from a sked file with $BROADBAND section
         spd_rec=idata_mbps(istn)/8    
-      else if(Km5disk .or. cstrec_cap .eq. "NONE") then
+      else if(Km5disk .or. km6disk .or. cstrec_cap .eq. "NONE") then
         if(kskd) then        
           ifan_fact=1
           ipass=1
           call find_num_chans_rec(ipass,istn,icode,
      >            ifan_fact,nchans_obs,ntracks_rec_mk5)   
-          spd_rec=ntracks_rec_mk5*samprate(istn,icode)/8    
+          spd_rec=ntracks_rec_mk5*samprate(istn,icode)/8   
         endif 
       endif
 

@@ -42,21 +42,19 @@
       write(luFile,'(a)') "proc_library"
       write(luFile,'(a)') "sched_initi"
 
-      if(kin2net_on .and. (km5A .or. km5a_piggy .or. km5B)) then
+      if(kin2net_on .and. (km5A .or. km5B)) then
          write(lufile,'("mk5=net_protocol=tcp:4194304:2097152;")')
       endif
 
-      if(km5A .or. km5A_piggy) then
+      if(km5A) then
         write(lufile,'(a)')   "mk5=dts_id?"
         write(lufile,'(a)')   "mk5=os_rev1?"
-
         write(lufile,'(a)')   "mk5=os_rev2?"
         write(lufile,'(a)')   "mk5=ss_rev1?"
         write(lufile,'(a)')   "mk5=ss_rev2?"
       else if(kflexbuff) then 
         write(lufile,'(a)')   "fb=dts_id?"
-        write(lufile,'(a)')   "fb=os_rev?"
-        write(lufile,'(a)')   "fb=ss_rev?" 
+        write(lufile,'(a)')   "fb=os_rev?" 
       else if(km5B.or. km5c) then 
         write(lufile,'(a)')   "mk5=dts_id?"
         write(lufile,'(a)')   "mk5=os_rev?"
@@ -64,7 +62,7 @@
       endif
       if(kflexbuff) then
         write(lufile,'(a)')   "fb_status"
-      else 
+      else if(km5a .or. km5b .or. km5c .or. km6disk) then
         write(lufile,'(a)')   "mk5_status"
       endif 
 

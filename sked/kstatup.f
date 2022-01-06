@@ -16,7 +16,7 @@
       integer idur         !duration of epoch (seconds)
 
 ! function 
-      integer isecdif
+      integer*4 isecdif
 
 ! See if there is any overlap between downtime and Scan
 !        |-----Downtime-----|

@@ -70,7 +70,7 @@ C     lines are probably there.
         if (ierr.ge.-4) cid1=' '
         if (ierr.ge.-5) cid='  '
       endif
-      ierr=0     
+      ierr=0
 
 C 4.2  Get axis type and station position
       if (kskd) then
