@@ -45,6 +45,19 @@
       NumObsSourceBaseline=0
       return
       end subroutine
+!******************************************************************************
+      subroutine clean_up_obs_scan_counters
+! get rid of stuff that was allocated.      
+      if(allocateD(NumObsSource))  deallocate(NumObsSource)
+      if(allocated(NumScanSource)) deallocate(NumScanSource)      
+      if(allocated(NumObsStat))    deallocate(NumObsStat)
+      if(allocated(NumScanStat))   deallocate(NumScanStat)
+      if(allocated(NumObsBaseline)) deallocate(NumObsBaseline)
+      if(allocated(NumObsSourceBaseline)) 
+     &  deallocate(NumObsSourceBaseline)
+
+      end subroutine 
+      
 !*****************************************************************************      
       subroutine update_obs_scan_counters(isor,istcur,nstncur)
       implicit none 

@@ -78,6 +78,7 @@
               kup=.false.
            endif      
       ELSE  
+        cwrap_new=cwrap
         tslew = 0.0 
         aznow=0.d0
         CALL CVPOS(NSORnew,istat,mjd,ut_scan_end,

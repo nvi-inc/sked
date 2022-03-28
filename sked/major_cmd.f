@@ -18,6 +18,7 @@ C History:
 ! 2017Feb14  Increased dimension of lyt_list from char*4 to char*5
 ! 2017Dec20  Added SplitTwins
 ! 2020Oct22  Added in El_noise
+! 2022-01-10 Fixed unitialized variable (ltoken) 
 C
 C   COMMON BLOCKS USED
       include '../skdrincl/skparm.ftni'
@@ -139,6 +140,9 @@ C   LOCAL VARIABLES
       parameter (iwt_list_len=2)
       character*10 lwt_list(iwt_list_len)
       data lwt_list/"SNRWT","EQUALWT"/ 
+      
+      
+      ltoken=" " 
 
       do i=1,icmd_list_len
          lcmd_caps(i)=lcmd_list(i)

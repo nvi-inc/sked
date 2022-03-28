@@ -60,6 +60,7 @@ C               - Input string containing command and parameters.
       integer NumToken
       parameter(MaxToken=4)
       character*82 ltoken(MaxToken)   !has to be long for station list.
+      logical krandom_scan 
 
 C
 C  History
@@ -241,7 +242,13 @@ C  4. Open schedule file and read it in.
 
       IERRCM = 0
       INUMCM = 0
-      CALL SKOPN(cmdline,ierr)         
+      CALL SKOPN(cmdline,ierr)    
+      
+      if(ierr .ne. 0 .or. ierrcm .ne. 0) then
+         write(*,'(a)') "Try again!"
+         nch=0
+         goto 210
+      endif     
 !      call init_snr_per_sec(jdstcm,utstcm,jdencm,utencm)
       
 ! Do a quick check to make sure that things are setup at the stations.
@@ -294,7 +301,7 @@ C     the rest of the line (if any), or do the function if there are
 C     no parameters for this command.
 
 750   continue   
-   
+      krandom_scan=.false.
       select case(cmdlist(ifunc))
       case("?","HELP")
         call Helpsk(linestq)
@@ -314,7 +321,7 @@ C     no parameters for this command.
  
       case("ASTROMETRIC") 
         call astro_cmd(cmdline)
-      case("AUTOSKED") 
+      case("AUTOSKED","RANDOM")
         call splitNtokens(cmdline,ltoken,Maxtoken,NumToken)
         if(NumToken .eq. 0) then
            cmdline=" _ NO START "
@@ -328,7 +335,8 @@ C     no parameters for this command.
           goto 700
         endif
         linestq(1)=trimlen(cmdline)
-        call nextc(linestq)
+        krandom_scan = cmdlist(ifunc) .eq."RANDOM"
+        call nextc(linestq,krandom_scan) 
 !     CASE("BACK")        ! see ^  above
       CASE("BESTSOURCE") 
         call bestsources(cmdline)
@@ -414,8 +422,8 @@ C     no parameters for this command.
         call delete_temp_files
         stop
 !     case("REMOVE")   !See ADD above  
-      case("RANDOM")   !Schedule random observation 
-         call random_cmd(cmdline)
+!      case("RANDOM")   !Schedule random observation 
+!         call random_cmd(cmdline)
       case("RESULT") 
         CALL RESULT(cmdline)
 !     case("REWRITE")  !See ADD above 
@@ -475,7 +483,7 @@ C     no parameters for this command.
         end do
    
       case("WHATSUP") 
-        CALL NEXTC(linestq)
+        CALL NEXTC(linestq,krandom_scan)
       case("WR")
         goto 810
       CASE("XNEW")

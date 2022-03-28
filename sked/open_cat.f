@@ -10,22 +10,19 @@
 !
       character*(*) cat_name
       integer ierr
-! function
-      integer trimlen
 
 ! local
-      integer nch
       ierr=0
       open(lucat,file=cat_name,status='old',iostat=ierr)
-      nch = trimlen(cat_name)
+
       if (ierr.ne.0) then
         write(luscn,"('open_cat: Error ',i5,' opening catalog ',a)")
-     >    ierr,cat_name(1:nch)
+     >    ierr,trim(cat_name)
         close(lucat)     
         return
       endif
       if(iverbose_level.ge.5)
-     >   write(luscn,'("Opening catalog: ",a)') cat_name(1:nch)
+     >   write(luscn,'("Opening catalog: ",a)') trim(cat_name)
       return
       end
 

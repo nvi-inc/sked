@@ -1,0 +1,11 @@
+
+! This is a list of the valid correlators.  Originally in prset.f but removed. 
+! 2022-03-18 JMGipson. First version. 
+! update as new correlators come on line 
+      integer num_corr
+      parameter (num_corr=21)
+      character*10 lcorr(num_corr)
+     >  /"ATNF","BONN","CRL","CRTN","GSI","DACH",
+     >   "HAYS","JPL","MITA","NICT","OSO","PENT",
+     >   "SHAO","TBD","TSUK","UTAS","VIEN",
+     >   "VLBA","WASH","WETZ","TBD"/

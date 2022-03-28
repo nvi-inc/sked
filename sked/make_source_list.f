@@ -61,7 +61,9 @@
       end if !unrecognized code
 
 100   continue
+      cat_src_grade="__"
+! Obsolete       
 ! Now get the grades
-      call grget(flux_comments,cdo,ierr)
+!      call grget(flux_comments,cdo,ierr)
       return
       end

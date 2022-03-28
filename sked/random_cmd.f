@@ -7,6 +7,11 @@
       include '../skdrincl/statn.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/skobs.ftni'          
+      
+! History
+!     
+! 2022-03-18  JMG. Don't schedule the same source twice in succession      
+! 2019-04-02  JMG. First version. Grand Canary islands.   Fun fact--no canaries in grand canary. Same is true of virgin islands    
           
 ! Schedule a random source between 1 and nsourc
       character*(*) cmdline_in
@@ -16,18 +21,17 @@
       integer JULDA
       double precision hms2seconds 
 
-
 ! Local
       character*80 cmdline
       integer isrc 
-!      character*60 cinstq
-!      integer*2    linstq(31)
-!      equivalence (cinstq, linstq(2)) 
+      integer isrc_old
+
 
       double precision TimeExpEnd
       double precision TimeRandEnd 
       double precision TimeEndCurObs
       double precision TimeStop
+      logical          kno_doubles      !don't schedule a source twice in a row!
       
       integer istn      !pointer to station 
       integer i         ! counter  
@@ -95,16 +99,18 @@
 
          TimeRandEnd=dble(JULDA(1,IDAY,IYR_end-1900))+
      >      hms2seconds(ihr,imin,isec)/SecPerDay    
-         TimeStop=min(TimeRandEnd,TimeExpEnd)  
-         write(*,*) "TimeRandEnd ", TimeRandEnd        
+         TimeStop=min(TimeRandEnd,TimeExpEnd)   
       endif       
       iter = 0 
   
-      nobs_old = nobs 
+      kno_doubles = .true.            !dont' schedule a source twice in a row.      
+      nobs_old = nobs      
+      isrc_old=-1
 100   continue 
       do while(.true.) 
         call random_number(rtemp)
         isrc=nsourc*rtemp+1  
+        if(kno_doubles .and. isrc .eq. isrc_old) cycle     !               
         iter=iter+1 
                   
         write(cmdline,'(i4," subnet ",a)') isrc,trim(lsubnet)    
@@ -113,6 +119,7 @@
           write(*,'(a, " fails ")') csorna(isrc) 
         endif 
         nobs_old=nobs
+        isrc_old=isrc
       
 ! Now check if exit based on time.          
         TimeEndCurObs=0.d0 
@@ -139,7 +146,8 @@
       write(*,*) "Syntax error "
 510   continue 
 !      write(*,*) "Random Subnet [#iter | stop time] "
-      write(*,*) "Random #iter (max=999)"
+      write(*,*) "Random  <#iter | stop_time>  [Optional subnet]"
+      write(*,*) "  if subnet specified set to '_' = all" 
 
       return
       end 

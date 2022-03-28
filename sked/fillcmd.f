@@ -155,6 +155,7 @@ C  LOCAL VARIABLES
       knewsk=.true.                  
       kdisplay=.true.
       kdebug_fill=.false. 
+      ltoken=" " 
 
 ! Parse command line.  See above for valid arguments. 
 

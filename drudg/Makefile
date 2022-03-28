@@ -90,6 +90,7 @@ FS_PC = 0
 LDFLAGS+= -lz -L/usr/lib/gcc-lib/i586-mandrake-linux-gnu/3.3.1 -D READ_LINE
 endif
 
+LDFLAGS += -lfl
 
 get_version.o: FFLAGS += -cpp -DVERSION=$(VERSION) -DSUBLEVEL=$(SUBLEVEL) -DPATCHLEVEL=$(PATCHLEVEL)
 

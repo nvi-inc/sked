@@ -61,8 +61,8 @@ C     respond with what is the current output device.
 C
       IF (LINSTQ(1).EQ.0) then
         if (ludsp.eq.lufil) then
-          write(luscn,9010) ctpfil
-9010      format('Output is the file 'A32)
+          write(luscn,9010) trim(ctpfil)
+9010      format('Output is the file ',a) 
         else if (ludsp.eq.luscn) then
           write(luscn,9020)
 9020      format('Output is the screen')
@@ -93,7 +93,7 @@ C
 
       if ((ckey.ne.'PR').and.(ckey.ne.'SC')) then
         call hol2char(linstq(2),ic1,ic2,ctpfil)  
-        call null_term(ctpfil)
+!        call null_term(ctpfil)
         it1 = 1
         it2 = 1
         do while (it2.ne.0)
@@ -104,8 +104,8 @@ C
         if (((LLT(tst,'a')).or.(LGT(tst,'z'))).and.(tst.ne.'/')) then
           if ((LLT(tst,'A')).or.(LGT(tst,'Z'))) then 
             if ((LLT(tst,'0')).or.LGT(tst,'9')) then
-              write(luscn,9025) ctpfil
-9025          format('Illegal file name 'A32)
+              write(luscn,9025) trim(ctpfil)
+9025          format('Illegal file name ',A)
               return
             endif
           end if
@@ -168,8 +168,8 @@ C
 
       if (ludsp.ne.luscn) then
         close(lufil)
-        write(luscn,9032) cfilename
-9032    format('Closing file ',A32)
+        write(luscn,9032) trim(cfilename)
+9032    format('Closing file ',a)
         ludsp = luscn
       end if 
  
@@ -193,19 +193,19 @@ C
      &      iostat=ierr)
        endif 
        if (ierr.ne.0) then
-            write(luscn,9070) ierr,ctpfil
-9070        format(' LUCMD - Error 'I5' opening file: ',A32)
+            write(luscn,9070) ierr,trim(ctpfil)
+9070        format(' LUCMD - Error 'I5' opening file: ',A)
             return
         end if
         if(ckey2 .eq. 'OV') then
-          write(*,"('Overwriting file: ', a32)") ctpfil
+          write(*,"('Overwriting file: ', a)") trim(ctpfil)
         else
-          write(*,"('Appending to file: ',a32)") ctpfil
+          write(*,"('Appending to file: ',a)") trim(ctpfil)
         endif 
 
       else
         if ((ctpfil.eq.cprfil).and.(ckey.ne.'PR')) then 
-          write(luscn,'("Cannot access the file ",a)')  ctpfil
+          write(luscn,'("Cannot access the file ",a)')  trim(ctpfil)
           return
         end if
         open(lufil,file=ctpfil,status='unknown',iostat=ierr)
@@ -213,7 +213,7 @@ C
           write(luscn,9070) ierr,ctpfil
           return
         else
-          write(luscn,'("Saving to ", a)')  ctpfil
+          write(luscn,'("Saving to ", a)')  trim(ctpfil)
         end if
       end if
       ludsp = lufil

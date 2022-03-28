@@ -27,6 +27,7 @@ C 880523  -written by P. Ryan
 C 960212 nrv Extend buffer
 C 000907 nrv Call IFILL with IBL instead of 80
 ! 2020Sep14 JMGipson. Cleanup, get rid of some obsolete stuff. 
+! 2022-03-19 JMGipson. Basically rewritten
 
 
 C  Input:
@@ -38,36 +39,42 @@ C  Output:
        integer il      ! number of characters read in
        integer*2 ibuf(*) !buffer that stuff is stored in. 
 
-
 C  Local:
-       character*1024 ch   ! character buffer for initial input
-       integer    trimlen  ! find number of character read in
-       integer*4 k         !ioerr 
+       character*1024 cbuf_in  ! character buffer for initial input
+       integer*2 ibuf_in(512)
+       equivalence (cbuf_in,ibuf_in) 
+       
+       integer    trimlen      ! find number of character read in
+       integer i               ! counter
        integer oblank
        data oblank /O'40'/
 
-!       inquire(iunit,exist=ex,opened=opn,name=nam)
-       read(iunit,'(a1024)',end=20,iostat=k) ch
-       kerr = k
-       il   = trimlen(ch)
-       if(il .gt. 0) then 
-         if(ch(il:il) .eq. char(13)) then
-           ch(il:il)=" "
-           il=trimlen(ch)
-         endif 
+! Fill the buffer with blanks   
+       il=-1                               !only true if somekind of error.     
+       call ifill(ibuf,1,ibl,oblank)
+       read(iunit,'(a1024)',end=20,iostat=kerr) cbuf_in
+       if(kerr .ne. 0) return                            !return on I/O error
+       
+       if(cbuf_in .eq. " ") then                         !retron if blank. 
+         il=0
+         return
+       endif 
+     
+       il   = trimlen(cbuf_in)                    
+!get rid of CR 
+       if(il .gt. 0 .and. cbuf_in(il:il) .eq. char(13)) then  !is the last character CR
+         cbuf_in(il:il)=" "
+         il=il-1 
+         if(il .eq. 0) return 
        endif
 
-       if (kerr .ne. 0) then
-         il = -1
-         return
-       else
-         call ifill(ibuf,1,ibl,oblank)
-         call char2hol (ch,ibuf,1,il)
-         il = (il+1)/2  ! changes to number of memory words
-         return
-       end if
-
-20     il = -1   !  EOF has been reached
+! Fill the output buffer.        
+       il=(il+1)/2
+       do i=1,il
+         ibuf(i)=ibuf_in(i)
+       end do 
+! EOF reached        
+20     continue  
        kerr = 0
        return
 

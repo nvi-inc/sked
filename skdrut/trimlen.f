@@ -17,9 +17,9 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
-C@TRIMLEN
-
        integer function trimlen (cbuf)
+! History
+! 2022-03-18  Fix bounds error if cbuf is blank "        
 C
 C  Trimlen returns the length of a
 C  character array.
@@ -34,17 +34,17 @@ C        - cbuf : character buffer
 
 C get total length of string
        j = len(cbuf)
+!       write(*,*) cbuf
+!       write(*,*) j 
 C
 C Read backwards down array, stopping at first non-blank character
 C
        do while ((j.gt.0).and.(cbuf(j:j).eq.' '.or.
      . cbuf(j:j).eq.char(0)))
          j = j - 1
-         if(j .eq. 0) then
-           trimlen=j
-           return
-         endif 
+         if(j .eq. 0) goto 10
        end do
+10     continue        
        trimlen = j
        return
        end

@@ -1,4 +1,4 @@
-      SUBROUTINE NEXTC(Linstq)           
+      SUBROUTINE NEXTC(Linstq,krandom_Scan)       
 C    NEXTC computes and displays sources available for observation
 C    ( WHATSUP command)
 C
@@ -32,6 +32,7 @@ C functions
       integer indx4
 C  INPUT:
       integer*2 Linstq(*)
+      logical krandom_Scan            !pick a random scan 
 
 C  LOCAL VARIABLES
       double precision dSecPerDay
@@ -57,6 +58,7 @@ C      - holder for footage count at end of current obs
     
       LOGICAL KMIN
       double precision temp1, temp2
+      real rtemp                          !temporary 
 
 C      - time of rise,set during lookahead
       Double precision UtFree(Max_Stn)       !Time last obs was done. (seconds part)
@@ -95,8 +97,7 @@ C added by JMGipson
       double precision TimeLast                 !And time of last station
       
       real  cpu_time_beg, cpu_time_end          !used for timing
-      
-
+   
       integer MJDExp
 
       character*1 cans
@@ -120,6 +121,9 @@ C added by JMGipson
 !  2010Mar19 JMG. Minor formatting changes. 
 !  2010Mar26 JMG. Changed stutcm ->utstcm, enutcm-utencm for consistency with jdstcm and jdencm
 
+
+      call random_seed()     !reset random number generator
+      
       IF  (NSOURC.EQ.0.OR.NStatn.EQ.0.or.ncodes.eq.0) THEN  !
         write(luscn,*)
      >      ' Select sources, stations, and frequencies first.'
@@ -462,9 +466,17 @@ C   Calculate all rising/setting times now.
           goto 1200
         endif
 
-        call find_best_scan(TimeFree,TimeLast,TimeExpEnd,
-     >  isrcvec,NSrcUse,
-     >  iStnAll,NumAll, iStnSub,NumSub,  NumTst,kfillobs,ibest)
+! Just pick a random scan from the allowable ones
+        if(krandom_scan) then
+          call random_number(rtemp)
+          ibest=NumTst*rtemp+1  
+!          write(*,*) "random ", ibest 
+        else
+          call find_best_scan(TimeFree,TimeLast,TimeExpEnd,
+     >      isrcvec,NSrcUse,
+     >      iStnAll,NumAll, iStnSub,NumSub,  NumTst,kfillobs,ibest)
+!          write(*,*) "find_best ", ibest 
+        endif 
 
         if(ibest .eq. -1) then
           if(.Not.kFillObs) then

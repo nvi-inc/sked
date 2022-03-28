@@ -1,12 +1,15 @@
       SUBROUTINE delete_temp_files 
+      use Obs_Scan_Counters
       implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
 
-! functions
-      integer trimlen
+! History
+!   2022-01-10  JMGipson. Added clean_up_obs_scan_counters     
+      
+      call clean_up_obs_scan_counters()
 
       if(kkeep_log) then
          write(*,*) "Keeping ",trim(clgfil)

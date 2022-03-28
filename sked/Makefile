@@ -1,13 +1,23 @@
 #####################################################################
 #
-#                      makefile for linux sked.
-# 2017Feb27  JMGipson.  
+#                      makefile for sked
 # 
-#  XXX
+# 
 #
 #####################################################################
 
 SRCDIR =..
+
+# Copied 
+
+.f90.o:
+	$(FC) -g -c -o $*.o $*.f90
+
+.f.o:
+	$(FC) -g -c -o $*.o $*.f	
+
+%.o : %.f90
+	$(FC) -g -c -o $@ $<
 
 PROGRAM =sked
 SK =$(SRCDIR)/sked/
@@ -18,7 +28,7 @@ OBJ_MOD = \
    obs_scan_counters.o \
    twin_mod.o \
    max_stat_scan.o
-
+   
 OBJ_FOR=   \
     sked.o  \
     $(READ_CMDLINE)  \
@@ -102,7 +112,6 @@ OBJ_FOR=   \
     frsel.o \
     frx.o \
     frec.o \
-    ggao_slew.o \
     getist.o  \
     get_cat_version.o \
     get_new_fluxes.o \
@@ -117,7 +126,6 @@ OBJ_FOR=   \
     gtdtr.o \
     gtrun.o \
     gtpre.o \
-    grget.o \
     helpsk.o \
     horpl.o \
     hwrst.o \
@@ -226,6 +234,8 @@ OBJ_FOR=   \
     sky_cov.o \
     sky_cov_pix.o \
     slewt.o \
+    slew_ggao.o \
+    slew_oe_ow.o \
     snrac.o \
     snrcm.o \
     snrds.o \
@@ -339,7 +349,7 @@ $(FLEX) \
 
 # NOTE: Use /lib/crt0 if you are NOT using the profiler.
 #       Use /lib/gcrt0 if you ARE using the profiler.
-(PROGRAM): $(OBJ_MOD) $(OBJ_FOR) $(OBJ_C) 
+(PROGRAM): $(OBJ_MOD) $(OBJ_FOR) $(OBJ_C)  $(OBJ_F90)
 	@echo Linking SKED...
 	$(LINK) -o  $(SK)$(PROGRAM) $(OBJ_MOD) $(OBJ_FOR) $(OBJ_C) $(LDFLAGS)
 	@echo done.

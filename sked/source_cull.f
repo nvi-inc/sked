@@ -31,6 +31,8 @@ C   COMMON BLOCKS USED
       integer ikpSrc(Max_sor)           !pointer to the ones to keep.
 
       integer ierr                      !error 
+      integer min_keep
+      min_keep=8
 
 ! This is total over astrometric sources which are removed      
       if(luout .le. 0) return
@@ -52,13 +54,14 @@ C   COMMON BLOCKS USED
            ikpsrc(NumKeep)=i
          endif     
        end do   
-       if(NumKeep .gt. 10) then 
+       if(NumKeep .ge. min_keep) then 
          write(*,*) "NumKeep ", NumKeep   
          call delete_all_obs()
          call keep_some_Srcs(ikpsrc,NumKeep,csofil,ierr)
          call rsini
        else
-         write(*,*) "Must keep at least 10 sources!"
+         write(*,*) "After cull would only have ",NumKeep
+         write(*,*) "Need at least ",min_keep
        endif 
 
       return

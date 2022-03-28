@@ -106,6 +106,7 @@ C 000611 nrv No setup or parity checks for AUTO allocation.
 ! 2012Oct11 JMG. If previous source is same as current source, skip slew calculation
 ! 2015Mar18 JMG. Added support for buffer time for Mark6
 ! 2015Apr23 JMG. Buffer time added to setup. Previously thought this could occur simultaneously with it. 
+! 2022-03-18 JMGipson.  Include elevation in timeline-listings. Previously just did az
 
 C
 C     1. Step through participating stations and calculate slew time from
@@ -144,16 +145,17 @@ C       KTMLIN = .TRUE.
           call seconds2hms(ut_at(j),ih2,im2,is2)
 
           cbuf1=
-     >  ' STN  PREV   Wraps  AzBeg  AzEnd  DUR  TAPE SRC  SLEW '
-     >  //'CAL   START   | '
+     >  ' STN  PREV   Wraps  AzBeg  AzEnd  Elbeg  Elend  DUR  TAPE'
+     > //' SRC  SLEW  CAL   START   | '
           nch1 = 69        
           if(cwrap(j) .eq. " ") cwrap(j)="- "
           if(cwrap_new(j) .eq. " ") cwrap_new(j)="- " 
  
           WRITE(cbuf2,9121) cpoCOD(J),IH1,IM1,IS1,
-     >       cwrap(j),cwrap_new(j),  aznow*rad2deg,aznew*rad2deg,
+     >        cwrap(j),cwrap_new(j),  aznow*rad2deg,aznew*rad2deg,
+     >        elnow*rad2deg,elnew*rad2deg,
      >       idur(j),ITAPTM,isrc_time,int(tslew+.99),ICAL,IH2,IM2,IS2 
-9121    FORMAT(1X,A2,1x,  2(I2.2,':'),I2.2,2(1x,a2), 2f7.1, 5I5,
+9121    FORMAT(1X,A2,1x,  2(I2.2,':'),I2.2,2(1x,a2), 4f7.1, 5I5,
      >     1X,2(I2.2,':'),I2.2,1x,"|")
           nch2 = 68
        

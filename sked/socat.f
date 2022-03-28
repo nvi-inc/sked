@@ -42,7 +42,7 @@ C   Output:
 
 ! local
       external display_src_item
-      integer icol_wid/20/       !width of display.
+      integer icol_wid/10/       !width of display.
       character*30 cname
       integer num_sel
       integer nsourctmp

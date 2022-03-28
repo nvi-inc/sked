@@ -16,6 +16,7 @@ C History:
 ! 2011Aug11 JMG. Modified error message. 
 ! 2012Oct26 JMG. ditto.
 ! 2014Apr23 JMG. Set correlator and scheduler from master file...
+! 2022-01-10 JMG. Previously had error if master_File not specified. Should have been master_dir 
 
 
 C   COMMON BLOCKS USED
@@ -103,9 +104,9 @@ C   LOCAL VARIABLES
 
       data cpo_vlba/"Br","Fd","Hn","Kp","La","Mk","Nl","Ov","Pt","Sc"/
 
-      if(cmaster_file.eq."NONE") then
-         write(luscn,*)
-     >     "master_cmd: You must specify a master file in skedf.ctl"
+      if(cmaster_dir.eq."NONE") then
+        write(luscn,*)
+     > "master_cmd: You must specify the master directory in skedf.ctl"
          return
       endif
      

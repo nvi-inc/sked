@@ -95,16 +95,8 @@ C     If we don't have an azel mount, delta-az=0 and return.
 
 !      if(cwrap_cur .eq. "-") then
 
-
-     
       if(cwrap_cur .eq.'C ' .and. 
-     &   az_cur+twopi .lt. stnlim(2,1,istn)) az_cur=az_cur+TwoPi
-      
-
-
-      if(cstnna(istn) .eq. "SVETLOE") then
-!          write(*,'("Input ",2f8.1)')  az_cur0*rad2deg, az_cur*rad2deg
-      endif 
+     &   az_cur+twopi .lt. stnlim(2,1,istn)) az_cur=az_cur+TwoPi     
 
       cablw= ABS(az_cur-az_new)
       select case(cwrap_new)

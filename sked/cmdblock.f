@@ -288,7 +288,7 @@ CMD: 21  -----------
      >"RA",
      >"RANDOM            ",
      >"Schedule Random sources",
-     >"<subnet> [#num scans | stop time]                              ",
+     >"<#num scans | stop time>    [subnet]                   ",
 !CMD:  7 ----------
      >"RM",
      >"REMOVE            ",

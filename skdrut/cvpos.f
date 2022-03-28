@@ -45,6 +45,7 @@ C   COMMON BLOCKS USED
 ! Function
       integer iwhere_in_range4
 
+
 C
 C     LOCAL VARIABLES:
       real*4 slat,clat,sha,cha,saz,sel,cel,azx,
@@ -128,9 +129,11 @@ C
         ALON=STNPOS(1,ISTN)
         ALAT=STNPOS(2,ISTN)
         CALL XAT(OINC,OECC,OPER,ONOD,OANM,OAXS,OMOT,IOEY,OEDY,
-     .                   MJD,UT,ALAT,ALON,HAD,DEC,RANGE) 
-      END IF  !      
-       
+     .                   MJD,UT,ALAT,ALON,HAD,DEC,RANGE)
+        CALL XAT(OINC,OECC,OPER,ONOD,OANM,OAXS,OMOT,IOEY,OEDY,
+     .                   MJD,UT,ALAT,ALON,HAD,DEC,RANGE)
+      END IF  !
+
       SDEC = DSIN(DEC)
       CDEC = DCOS(DEC)
       DC=SNGL(DEC)
@@ -300,12 +303,6 @@ C     Now check horizon mask for stations that have one.
         endif
         KUP=KUP.AND.EL.GE.eli
       ENDIF
-
-      if(.false.) then
-      write(*,'(a8,1x,a8,i8, f10.2, 2f8.2)') 
-     > csorna(nsor), cstnna(istn), mjd, ut, az*rad2deg,el*rad2deg
-      endif 
-      
 C
       RETURN
       END

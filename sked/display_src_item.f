@@ -6,7 +6,22 @@
       include 'cat_src.ftni'
       character*(*) cname
       integer iptr
+      
+       
+      if(iptr .eq. 0) then
+        cname="Source   "
+      else
+        if(cat_src_name(iptr) .ne. "$") then
+          cname=  cat_src_name(iptr)
+        else
+          cname=  cat_src_iau(iptr)
+        endif
+      endif
+      return      
+      return
+      
 
+! Below is previous when we displayed grades
       if(iptr .eq. 0) then
         cname="Source    Grade "
       else

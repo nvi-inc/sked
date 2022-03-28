@@ -1,4 +1,4 @@
-      real function ggao_slew(az1,el1,az2,el2,
+      real function slew_ggao(az1,el1,az2,el2,
      &  az_off,az_vel,az_acc, el_off,el_vel,el_acc,slew0,lkind)
       implicit none            
 ! compute slew time accouting for radar mask at GGAO
@@ -277,7 +277,7 @@
       endif 
 
 500   continue
-      ggao_slew=slewt 
+      slew_ggao=slewt 
       return   
       end
       

@@ -11,7 +11,7 @@
 ! output
 
 ! 2021-01-20 JMGipson. Changed test on elevations. Used to test on both iobs and iobs_in 
-!          
+! 2022-02-02 JMGipson.  Happy groundhogs day
    
 
 ! local
@@ -53,7 +53,7 @@
               endif
             endif
           end do
-          avg_pix_obs(iobs)=avg_pix_obs(iobs)/nsta
+          if(nsta .gt. 0) avg_pix_obs(iobs)=avg_pix_obs(iobs)/nsta
         endif
        end do
 

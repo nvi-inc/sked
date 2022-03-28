@@ -2,6 +2,9 @@
 C
 C   PRSET allows the user to set default values of parameters
 C
+!2022-03-18 Moved correlator list to a common block
+!2021-05-05 JMG Added "Beg" as synonym for start
+!2021-01-13 JMG Added Vien to correlator
 !2009Nov05 JMGipson.  changed lyt_list from char*4 to char*5
 !2010.06.15 JMGipson.  Better error message if didn't find frequency code
 !2012.10.11 JMGipson. Added VIE_SCHED_VERSION and VIE_SCHED_CREATE_DATE
@@ -10,8 +13,8 @@ C
 !2015Dec01  JMGipson. Added SHAO 
 !2017Oct07  KOL. Added conf_equip
 !2018Oct05  KOL. Added UTAS
-!2021-01-13 JMG Added Vien to correlator
-!2021-05-05 JMG Added "Beg" as synonym for start
+
+
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/statn.ftni'
@@ -20,6 +23,7 @@ C
       include '../skdrincl/freqs.ftni'
       include 'minor.ftni'
       include 'major.ftni'
+      include 'valid_correlator.ftni'
 
 C
 C     INPUT VARIABLES:
@@ -64,16 +68,9 @@ C               - Key word, longest is 22 characters
       character*22 listPr(MaxPr),cParam
       character*2  listPrShort(MaxPr)
 
-      character*6 ListAM(2),ListAS(2),listOnOff(2)
+      character*6 ListAM(2),ListAS(2),listOnOff(2)      
       
-      integer num_corr
-      parameter (num_corr=18)
-      character*10 lcorr(num_corr)
-     >  /"ATNF","BONN","CRL","CRTN","GSI",
-     >   "HAYS","JPL","MITA","NICT","PENT",
-     >   "SHAO","TBD","TSUK","UTAS","VIEN",
-     >   "VLBA","WASH","TBD"/
-
+ 
       integer iyt_list_len
       parameter (iyt_list_len=6)
       character*5 lyt_list(iyt_list_len)

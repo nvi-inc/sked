@@ -1,5 +1,7 @@
       SUBROUTINE ffreq(cfrq_name, c2code,crxname,nrx,cb,
      >   cpol,csky,csb,ichan,ibbc,cpcfr,csw,nfrq,ierr)
+     
+! 2022-01-10 JMGipson. Close lucat on error (previously closed lutmp
 ! 2005Oct07 JMGipson. Replaced hollerith, got rid of call to unpfreq
 ! 2006May11 JMGipson. Did not give error message if did not find frequency.
       include '../skdrincl/skparm.ftni'
@@ -42,7 +44,7 @@ C  1. Open the frequency catalog
  
       call open_cat(freq_cat,ierr)
       if (ierr.ne.0) then
-        close(lutmp)
+        close(lucat)
         return
       endif
 C  2.  Find each sub-code in the freq.cat file and save the frequency info.
@@ -117,5 +119,6 @@ C  2.  Find each sub-code in the freq.cat file and save the frequency info.
       else
         if(iverbose_level.ge.5) write(luscn,'()')
       endif
+      close(lucat) 
       return
       end

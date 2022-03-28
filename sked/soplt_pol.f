@@ -128,8 +128,8 @@ C     Today's sun position is marked with "S"
           write(lutmp,"(i3,2f9.2)") 46,xd,yd
         end do
       endif
-! Plot circle at dec=90
-      if(rlat .ne. piov2) then
+! Plot circle at dec=90  
+      if(rlat0 .ne. piov2) then
         rdec=piov2-0.0001
         do i=0,365,2
           rha=i

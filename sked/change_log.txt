@@ -1,4 +1,16 @@
  This file contains a brief description of the changes made to sked
+2022-03-28 source_cull.f:  Changed the lower limit on number of sources that must be kept from 10 to 8, and made a parameter. 
+2022-03-28 soplot_pol.f: Fixed uninitialized variable. 
+2022-03-18 autot.f:  Include elevation in slewing output. Previously just did az.  
+2022-03-18 New include: valid_correlator.ftni.  Update as new correlators come on line 
+2022-03-18 removed grget.f since we don't use grades any more. Modified make_source_list.f and display_src_item.f for thinner columns
+2022-03-18 random_cmd.f. Don't observe a source twice in a row.  cmdblock.f: updated rndom_cmd description to match reality.
+2022-03-18 when_at_next_source.f.  Previously if a source was observed twice in row cable-wrap was not being updated.
+2022-03-07 Added in slew model for Onsala. slew_oe_ow.f90
+2021-11-10 Modfied slewing algoritm
+2021-01-25 slewt.f.  Fixed bug in that it wasn't always choosing shortest cablewrap. 
+2021-01-24 proc.ftni  Increased buffer size to 1500 lines from 500
+2021-01-08 sked.f.  Fixed revision bug that got rid of error checing on reading input sked file
 2021-01-06 fillcmd.f  Essentially re-written from scratch.  Fixed some bugs and made it clearer. 
 2021-01-06 slewt.f. The part that deals with lookahead is not working. commented it out.
 2021-01-06 when_at_next_source.f.  Initiaize kup to true.

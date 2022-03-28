@@ -38,7 +38,8 @@ C     INPUT VARIABLES:
       integer ierr 
 ! Functions used.
       real cablw          !compute required az move.
-      real ggao_slew      !ggao slew time
+      real slew_ggao      !ggao slew time
+      double precision slew_oe_ow     !Slew time for Onsala twins . In double precision 
 
 C   COMMON BLOCKS USED
       include '../skdrincl/sourc.ftni'
@@ -77,6 +78,10 @@ C   LOCAL VARIABLES
       real el1,el2
       real az1,az2
       real slew0_ggao               !slewing at GGAO in absence of mask
+! Double precision       
+      double precision daz_beg, daz_end     !The onsala twins uses double precision 
+      double precision del_beg, del_end 
+      double precision daz_slew,del_slew    ! Individual slew times (w/o offset) 
 
       
       logical kfirst
@@ -141,10 +146,11 @@ C        been made.
 C
       islew_info=0
       kfirst=.true.
-      edge_tol=2.d0*deg2rad    !edge tolerance is .5degrees
-      tol_180 =2.d0*deg2rad     !2 degree.
+      edge_tol=1.d0*deg2rad    !edge tolerance is .5degrees
+      tol_180 =1.d0*deg2rad     !2 degree.
       move_test=185.d0*deg2rad
       kdebug=.false.
+      kdebug_slew=.false. 
       tslew=0.d0    !initilize to no slew 
       slew_tol=0.25   !convergence criteria 
 
@@ -161,7 +167,10 @@ C                    this calculates the current telescope position
       endif
       trise=-1.0
       TSLEWC = 0.0
-      kdebug_slew=.false. 
+ 
+      
+! This is passed to cablw below. If set to " ", then tries to use the quickest path      
+      cwrap_new=" " 
 
 100    continue 
       do iter=1,5  
@@ -243,9 +252,8 @@ C       Now we have the time to rising and position at rise (xxNEW).
       
       DELAZ = CABLW(ISTN,AZ1,cwrap1,AZ2,cwrap2)   !On exit AZ1, AZ2 are beg, ending AZ including cablewrap.             
       if(kdebug_slew) then
-          write(*,'("AZ1  AZ2 ", 2f8.2,2x,"wrap= ",a2)') 
-     &    az1*rad2deg, az2*rad2deg, cwrap2
-        write(*,'("AZ1  AZ2 ", 2f8.2)') az1*rad2deg, az2*rad2deg
+          write(*,'("AZ1  AZ2 ", 2f8.2,2x,"wrap= ",a2, " del ", f8.2)') 
+     &    az1*rad2deg, az2*rad2deg, cwrap2, delaz*rad2deg       
       endif     
       
       if(kdebug) then
@@ -262,11 +270,11 @@ C       Now we have the time to rising and position at rise (xxNEW).
           islew_info=3
           return
         endif
-      endif            
-           
+      endif                       
        
 C   Function to compute az move including cable wrap
 ! See if at edge. Only do for Az-el mounts.
+      
       IF (IAXIS(ISTN).EQ.3.or.iaxis(istn).eq.6.or.iaxis(istn).eq.7) then
          if(abs(abs(delaz)-pi) .lt. tol_180) then
            islew_info=2
@@ -284,6 +292,7 @@ C   Function to compute az move including cable wrap
            islew_info=7
          endif
       endif 
+      if(islew_info .ne. 0) return 
       
       select case (iaxis(istn))
         case(1,5)     
@@ -326,20 +335,24 @@ C
       end do 
       
       write(*,*) " "
-      write(*,*) "Slewt: Failed to converge at station ",cstnna(istn),
-     > " DelT ", tslewc, tslewp, abs(tslewc-tslewp), 
-     > " moving from ",csorna(nsnow), csorna(nsnew), 
-     >   aznow*rad2deg, elnow*rad2deg, aznew*rad2deg,elnew*rad2deg
+      write(*,'("Slewt: Failed to converge at station ",a )') 
+     &  cstnna(istn)
+      write(*,'("Slewing ", a, " to ", a)') csorna(nsnow), csorna(nsnew)
+      write(*,'(2f8.2,   " to ", 2f8.2)') 
+     &   aznow*rad2deg, elnow*rad2deg, aznew*rad2deg,elnew*rad2deg
+      write(*,'("T_old ", f8.2, " T_new", f8.2)') tslewp, tslewc     
+      
        if(kdebug_slew) then
           write(*,*) "Sleeping bug "
           write(*,*) "Please save the schedule that casued this and"
           write(*,*) "And send to John gipson"
-          write(*,*) "Togehter with what caused it to crash"
+          write(*,*) "Together with what caused it to crash"
           stop
        endif 
        kdebug_slew=.true.
        tslewc = 0.0
-!       goto 100 
+       tslewp = 0.0 
+       goto 100 
    
 C     We get here if the slew has converged OR we iterated 5 times.
 110   continue 
@@ -360,8 +373,10 @@ C       calculated using az,el at UT+trise).
       END IF  !
       aznow=az1
       aznew=az2
-! Special  fix becauses of GGAO mask
-      if(cstnna(istn) .eq. "GGAO12M") then
+! Some special cases
+      select case(cstnna(istn))
+         case("GGAO12M")        
+! Special  fix becauses of GGAO mask   
 ! convert from radians to degrees because this is what ggao_slew expects.  
          az1=az1*rad2deg     
          az2=az2*rad2deg
@@ -375,15 +390,22 @@ C       calculated using az,el at UT+trise).
          el_vel =Slew_vel(2,istn)*rad2deg
          el_acc =slew_acc(2,istn)*rad2deg          
 
-         tslew=ggao_slew(az1,el1,az2,el2,
+         tslew=slew_ggao(az1,el1,az2,el2,
      &     az_off,az_vel,az_acc,el_off,el_vel,el_acc,slew0_ggao,lkind)
 !          if(abs(tslew-slew0) .ge. 4) then 
 !             write(*,*) "Difference at GGAO",tslew-slew0
 !             write(*,'("At ",4f8.2)') az1,el1,az2,el2
 !          endif
-       endif
-!       write(*,*) "slewt 340 ",kup,islew_info
- 
+         case("ONSA13NE", "ONSA13SW") 
+! special fix because Onsala twins have different speeds in different regions.          
+           daz_beg=az1*rad2deg
+           daz_end=az2*rad2deg
+           del_beg=elnow*rad2deg
+           del_end=elnew*rad2deg
+           tslew=slew_oe_ow(daz_beg,del_beg,daz_end,del_end,
+     &                         daz_slew,del_slew) 
+       end select          
+     
 
 990   RETURN
       END

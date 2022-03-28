@@ -359,7 +359,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 17 "vex.y"
+#line 36 "vex.y"
 
 int                     ival;
 char                   *sval;
