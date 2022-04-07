@@ -6,6 +6,7 @@ C
 C   NEWPR decodes the observation command line and checks/sets
 C   all of the user's parameters for this obervation.
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include '../skdrincl/sourc.ftni'
@@ -81,6 +82,7 @@ C   LOCAL VARIABLES
 
 C
 C  HISTORY
+! 2022-04-06 JMG. Added 'implicit none'. 
 C     890428 NRV Created, removed from NEWOB
 C     930225 nrv implicit none
 C     940513 nrv Initialize VLBA cable to "V" for special slewing
@@ -104,7 +106,7 @@ C
       ICAL= ICALDE
       IDLE = IDLDEF
       ccable=" "
-
+  
       icod=0
       MJD=-1
       UT=0.D0
@@ -202,7 +204,7 @@ C         decode it via YDHMS, set defaults to CUR values.
           IERR = -1
         END IF  !
         MJD = JULDA(1,IDA,IYR-1900)
-        ut=hms2seconds(ihr,imin,isc)
+        ut=hms2seconds(ihr,imin,isc)    
 C
 C     5.  This is the time section.  The other specifications may be
 C         calibration, duration, idle time.

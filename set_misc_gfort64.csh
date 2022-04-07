@@ -1,17 +1,18 @@
- # Set compilers and libraries for linking sked 
+# Set compilers and libraries for linking sked 
 # History
 #  2008Mar21  JMGipson first version
 #  2009Mar03  JMGipson. Put in options so that it would be compatible with HP-UX.
 # 
 # Set the compilers and linkers:
-setenv FC "gfortran -fno-range-check -ffpe-trap=zero,invalid,overflow -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
+
+setenv FC "gfortran -fno-range-check -fcheck=all -ffpe-trap=zero,invalid,overflow,denormal -fpie -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
+#setenv FC "gfortran -fno-range-check -fallow-argument-mismatch -fallow-invalid-boz -ffpe-trap=zero,invalid,overflow,denormal -fpie -fno-underscoring -g -D READ_LINE -fdefault-integer-8 -finteger-4-integer-8"
+
 setenv LINK gfortran
 #setenv FC "/opt/intel/fc/bin/ifort -I skdrincl -c -fpp -nus -static -g -D READ_LINE"
 #setenv LINK "/opt/intel/fc/bin/ifort -D READ_LINE"
 setenv CC   "gcc -c -g -I/usr/include"
 #
-#  Following are for linux. Uncomment if appropriate.
-setenv SKED_HEAD sked_lnx.o
 # This is for 64 bit version of sked. 
 #setenv VEX_LIB "../vex/vex64.a"
 #Don't need separate versions. just need to remake vex.a
@@ -29,13 +30,14 @@ setenv READ_CMDLINE read_cmdline.o
 #->setenv BLAS_LIB  /opt/lib/libf77blas.a 
 #->setenv CURSES_LIB /usr/lib/libncurses.a
 setenv CURSES_LIB -lncurses
-setenv FLEX_LIB  -lfl
+#setenv FLEX_LIB  -lfl
+setenv FLEX_LIB  " "  
 setenv READLINE_LIB -lreadline
 setenv READLINE_LIB " "
 #
 # If you want to link to the mysql, include the following (or something similar)
 #
-setenv MYSQL_LIB /lib64/libmysqlclient.so
+setenv MYSQL_LIB /lib/x86_64-linux-gnu/libmysqlclient.so.21
 setenv MYSQL_INT mysql_int.o
 #
 # If you don't want to link uncomment the following

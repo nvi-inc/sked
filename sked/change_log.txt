@@ -1,4 +1,5 @@
  This file contains a brief description of the changes made to sked
+2022-04-07 newpr.f: Added in implicit none. newob.f:  Start time was not getting handled correctly. chcmd.f: Fixed unitialized variable
 2022-03-28 source_cull.f:  Changed the lower limit on number of sources that must be kept from 10 to 8, and made a parameter. 
 2022-03-28 soplot_pol.f: Fixed uninitialized variable. 
 2022-03-18 autot.f:  Include elevation in slewing output. Previously just did az.  

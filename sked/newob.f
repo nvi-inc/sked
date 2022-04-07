@@ -114,6 +114,7 @@ C               - Holders for decoded values
       equivalence (iwrap_now,cwrap_now)
 
 C  History
+! 2022-04-07 JMG  Wasn't handling start-time parameter correctly on manual scheduling
 ! 2021-02-19 JMG  slew now returns az_now,az_new 
 C   811125  MAH    CHECK FOR CONTINUITY OF OBS
 C                  NEW MSG FOR TSLEW=-2.0
@@ -222,8 +223,8 @@ C    Initialize rise/set times if needed.
 C    Initialize extra durations to zero for scheduling.
       do i=1,nstatn
         idurxt(i)=0
-      enddo
-      
+      enddo      
+       
 ! Find how long it would take the stations to get to the specified source. 
       DO  I=1,NSTN !get latest start time
          J = ISTN(I)   
@@ -255,24 +256,25 @@ C    Initialize extra durations to zero for scheduling.
            mjd_beg=mjd_at(j)
            ut_beg =ut_at(j)      
         endif   
-      end do       
-   
+      end do   
+    
 ! If this is a manual scheduled scan AND we specified the time
-!    then check to see if scheduled time  is AFTER begin time
-      if(mjd_cmd.ne.-1 .and. 
-     &   isecdif(mjd_cmd,ut_cmd, mjd_beg,ut_beg) .lt. 0) then     
-        do i=1,nstn
-          j=istn(i) 
-          IF (isecdif(mjd_cmd,ut_cmd,mjd_at(j),ut_at(j)).lt.0) then      
-            WRITE(LUSCN,
+!    then check to see if scheduled time  is AFTER begin time 
+      if(mjd_cmd.ne.-1) then 
+        if(isecdif(mjd_cmd,ut_cmd, mjd_beg,ut_beg) .lt. 0) then   !Can't get to the source for one of the antennas at specified time. 
+          do i=1,nstn
+            j=istn(i) 
+            IF (isecdif(mjd_cmd,ut_cmd,mjd_at(j),ut_at(j)).lt.0) then      
+              WRITE(LUSCN,
      >  '("ERROR (newob): At Station ",a," start time ",i6,1x,f8.1 )')
      >        cstnna(j), mjd_cmd, ut_cmd
-            write(luscn, '(29x,"before free time time ",i6,1x,f8.1)')
+             write(luscn, '(29x,"before free time time ",i6,1x,f8.1)')
      >       mjdcur(j),utcur(j)
              ierr=-1
-          endif                             
-        end do 
-        if(ierr .ne. 0) return 
+            endif                             
+          end do 
+          if(ierr .ne. 0) return 
+        endif
         mjd_beg=mjd_cmd
         ut_beg =ut_cmd 
       endif     
@@ -300,7 +302,7 @@ C    Initialize extra durations to zero for scheduling.
 ! Duration set in the command use it.       
         do i=1,nstn
            j=istn(i)
-           idurst(i)=idur
+           idurst(j)=idur
         end do  
         lu=luscn
         if (nsubc.gt.0) lu=-1
@@ -399,6 +401,7 @@ C    Initialize extra durations to zero for scheduling.
       endif 
   
 !     7.  Everything looks OK.  Write out info on screen.
+      write(*,*) "UT ", UT_beg  
       if(kdisplay) then       
         call display_scan_info(mjd_beg,ut_beg,mjd_at,ut_at,icod,
      >     nsor,nstn,istn, tslew)

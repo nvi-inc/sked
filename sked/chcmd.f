@@ -90,6 +90,7 @@ C         footage count, direction, code, and pass.
       real el_now, el_new  
 C
 C History
+! 2022-04-07 JMG Fixed unitilized variable that surfaced when tagging along a session. 
 ! 2021-02-19 JMG slewt now returns az_now,az_new
 ! 2020-06-08 JMG. Reference to new broadband.ftni. Include bb_off(istn) in calculation of time
 
@@ -282,7 +283,7 @@ C
      
         ierr_auchk=0 
         ierr_slew=0 
- 
+       j1=istcur(1)
 ! Check if station is "up" 
         if(.not. kstatup(istat,mjdcur(j1),utcur(j1),idurcur(j1))) then
           goto 110                          !this is fast exit to end of tag-along
