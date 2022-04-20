@@ -400,8 +400,7 @@ C    Initialize extra durations to zero for scheduling.
         goto 200
       endif 
   
-!     7.  Everything looks OK.  Write out info on screen.
-      write(*,*) "UT ", UT_beg  
+!     7.  Everything looks OK.  Write out info on screen. 
       if(kdisplay) then       
         call display_scan_info(mjd_beg,ut_beg,mjd_at,ut_at,icod,
      >     nsor,nstn,istn, tslew)

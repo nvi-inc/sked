@@ -9,13 +9,14 @@
 
       integer*2 num_est,num_opt,num_tri_est,num_src_est
       logical kcar                                 !optimize XYZ coords (true) or LAT-Lon-Ht
+      logical knorm_init                           !Have we initialized normal equation?  (Set diagonal to small values?) 
       logical lpara(max_dim_esti,2)
       double precision dnorm_tri(max_tri,0:MaxSubNet)   !holds normal matrix
       double precision dnorm_tmp(max_tri)          !holds temporary copy
       double precision dnorm_inv(max_tri)          !holds inverse of dnorm_tri(*,0)
 
       common /sk_covar/num_est,num_opt,num_tri_est,num_src_est,
-     >   kcar,lpara
+     >   kcar,knorm_init,lpara
       common /sk_covar_dbl/dnorm_tmp,dnorm_inv,dnorm_tri
 
       integer*2 ixref_est2all(max_par_esti)         !cross reference into all parameters
@@ -29,9 +30,7 @@
 ! info for trial scans.
 !  MaxTrial is in skparm.ftni 
       integer NumTrial                               !number of trial scans
-!      integer*2 ltrial_scan(ibuf_len,MaxSubNet)              !trail scan
       character*(ibuf_len*2) ctrial_scan(MaxSubNet)
-!      equivalence (ctrial_scan,ltrial_scan)                   !ASCII version of same.
       character*(ibuf_len*2) ctrial_vec(MaxSubNet,max_trial)   !array holding saved trial scans
       integer*2 nsub_trial_vec(max_trial)                      !subnets per scan
 

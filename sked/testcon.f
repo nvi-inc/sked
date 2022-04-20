@@ -50,10 +50,10 @@ C LOCAL:
 
       integer*2 job                !det or inverse?
       double precision rcond
-      double precision delta_t
+      double precision delta_t    
+      
     
       NumTrial=NumTrial+1
-   
       cbuf=ctrial_scan(iSubNet)   
 ! 1. Add contribution of this scan to normal equations.
 !****NOTE: this must be done first because it computes the array elev(i) which is used by coverage.
@@ -77,17 +77,24 @@ C LOCAL:
 ! if sky coverage option is turned on, exit now.
       covar_score=0.d0
       if(kOptBySky .or. nobs .eq. 0) goto 100 
-!     write(*,*) uttst(1), utcur(1),idurtst(1)  
-!      delta_t = uttst(1)-utcur(1)+idurst(1)    !Not quite correct
             
 ! Optimizing by covariance.
-! Compute contribution of this subnet to normal equations.
-      dnorm_tmp(1:num_tri_est)=dnorm_tri(1:num_tri_est,iSubNet)  !normal equations so far
+! Compute contribution of this subnet to normal equations.    
+!      write(*,*) "num_est, num_tri_est: ", num_est, num_tri_est 
+       
+      dnorm_tmp(1:num_tri_est)=dnorm_tri(1:num_tri_est,0)   !This is the normal equations upto now.
+      
+      write(*,*) dnorm_tmp(1:num_tri_est) 
+      do isub=1,iSubnet        
+        dnorm_tmp(1:num_tri_est)=dnorm_tmp(1:num_tri_est) + 
+     &                           dnorm_tri(1:num_tri_est,iSubNet)  !normal equations so far    
+      end do   
+   
       job=11                                                     !compute inverse
 !     write(*,*) dnorm_inv(1:2)," | ", dnorm_tmp(1:2) 
       call invert_and_con_tri(dnorm_tmp,rcond,num_est,job)
-    
-      
+      stop 
+          
 ! In this part the subconfiguration is tested due to an optimization criterion.
 ! 1. Compute relative (%) decrease of the diagonal elements for optimized parameters.
 ! 2. Compute sum of relative decrease as score. THis is the "goodness" of this scan.    

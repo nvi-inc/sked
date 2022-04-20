@@ -1,4 +1,5 @@
       SUBROUTINE SUMCM(LINSTQ)
+      implicit none 
 C
 C  SUMCM produces a summary of the schedule
 C
@@ -1411,6 +1412,7 @@ C       write(ludsp,9405) davgr,dminnob,dmaxnob,lstcod(njdmax),
 	write(ludsp,*) ""
 
 ! New 2013Apr12 JMGipson      
+       write(*,*) icodcur(1), nba, iband 
         call gtban(icodcur(1),nba,iband) 
         iwid=5
         do ib=1,nba

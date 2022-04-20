@@ -18,6 +18,7 @@ CHS iadd    1 for adding contribution, -1 for subtracting contribution
 CHS
 CHS+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 C
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/constants.ftni'
       include 'covar.ftni'
@@ -104,6 +105,10 @@ C      - holders for source, procedure names
       double precision rcond 
 C
 C  HISTORY
+! 2022-04-07 JMGipson. If radd_noise = 0.0 and ksnrwts =.false. then effectively use radd_noise=15ps.
+! 2021-05-29 JMGipson. Renamed some variables. Add in calculation for group delay uncertainty for VGOS. Hardware frequency sequence.
+! 2021-01-20 JMGipson. Don' try to invert normal equations if num_est=0
+
 C     880315 NRV DE-COMPC'D
 C     890502 NRV Added reading durations
 C     911026 NRV Added klist to list/not list observations
@@ -144,8 +149,7 @@ C 020904 nrv Only first 8 characters of source name were being unpacked.
 ! 2014Jul09 JMGipson.  Removed idur/2  from epoch. This makes it easier for comparison with other things and has minimal effect on formal error.
 ! 2016Oct31 LeBail.    Removed multiplication by sin(eps) on nutation partial to make consistent with calc. 
 ! 2020Apr15 JMGipson.  Fixed error in SIGN of atmsophere rate partial
-! 2021-01-20 JMGipson. Don' try to invert normal equations if num_est=0
-! 2021-05-29 JMGipson. Renamed some variables. Add in calculation for group delay uncertainty for VGOS. Hardware frequency sequence.
+
 
 
 C     1. For our first trick, we decode all of the entries in  the buffer.
@@ -276,10 +280,10 @@ C     ix_band is the band index for X-band
       endif
       call snrac(nst,istn,isor,icod,-1,mjd,ut,ierr)
 
-      if(dnorm_tri(1,0) .eq. 0) then
+      if(dnorm_tri(1,nsubc) .eq. 0) then
           do i1=1,num_est
            iptr=indx4(i1,i1)  
-           dnorm_tri(iptr,0)=small  !this keeps non-singular by adding small diagonal term
+           dnorm_tri(iptr,nsubc)=small  !this keeps non-singular by adding small diagonal term
          end do
       endif   
       if(nsubc .ne. 0) then 
@@ -391,7 +395,11 @@ C************ s-band sigma and iono
             endif ! valid/not SNR
           endif ! dual/single calculations
         else ! SNR wt mode.
-          wt=1./radd_noise
+          if(radd_noise .ge. 1) then 
+             wt=1./radd_noise
+          else
+             wt=1./15.d0
+          endif 
         endif ! kweq,kwbas,kwsnr
 
 ! Initialize Partials.

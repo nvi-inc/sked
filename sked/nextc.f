@@ -114,6 +114,7 @@ C added by JMGipson
       character*80 ldum 
 
 !  Date     Who   What
+!  2022-04-20 John Gipson.  Put in check to see if optimizing by covariance that we are actually estimating some parameters.
 !  2021-11-30 JMG Added more debugging informaiton. 
 !  2007Sep22 JMG  Broken into smaller pieces. Got rid of obsolescent code.
 !  2008Jun06 JMG  Got rid of some variables that were no longer used
@@ -172,6 +173,13 @@ C added by JMGipson
         endif
 
 ! Set some parameters for autosked.
+
+      if(.not.koptBySky .and. num_est .eq. 0) then
+         write(*,*) 
+     >   "Trying to optimize by covariance but no parameters estiamted."
+         write(*,*) "Changing to optimizing by sky."
+         koptbySky=.true. 
+      endif 
 
 ! Save everything that is reset in this routine
       kNumObsOld   = KNumObs

@@ -2,7 +2,9 @@
 ! Store the trial scans.
 ! Hisotry
 !   2005May24 JMGipson.  Completely rewritten.
-
+!   2022-04-20 JMGipson Fixed a bug. If we ran out space previously just inserted a new scan in the first place where we had a lower score. 
+!                       Now put it in the place that had the LOWEST score.  
+      implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
       include 'covar.ftni'
@@ -14,29 +16,34 @@
       real*8  covar_score                !sky coverage criterion
 ! local
 ! completely rewritten by JGipson
-      integer inext
-
+      integer imin_score 
+      integer itest
 
       if(itrial .le. max_trial) then
 ! Easy case--just store it in next slot.
-         inext=itrial
+         imin_score=itrial
       else
-! no room. See if something else has a worse score.
-        do inext=1,max_trial
-          if(kOptBySky) then
-             if(sky_trial_vec(inext) .lt. sky_score) goto 100
-          else 
-             if(covar_trial_vec(inext) .lt. covar_score) goto 100
-          endif        
-        end do
-        return
+! No room. Find scan with the lowest score. 
+        imin_score=1
+        if(kOptbySky) then
+          do itest=1,max_trial
+            if(sky_trial_vec(itest) .lt. sky_trial_vec(imin_score)) 
+     &         imin_score = itest 
+          end do 
+          if(sky_score .lt. sky_trial_vec(imin_score)) return           
+        else 
+          do itest=1,max_trial
+            if(covar_trial_vec(itest) .lt. covar_trial_vec(imin_score)) 
+     &       imin_score = itest 
+          end do
+          if(covar_score .lt. covar_trial_vec(imin_score)) return
+        endif       
       endif
-100   continue
-! found a place in the appropriate vector where the score was less. Stuff the results thre. 
-      nsub_trial_vec(inext)=nsubc
-      ctrial_vec(1:MaxSubNet,inext)=ctrial_scan(1:MaxSubNet)
-      sky_trial_vec(inext)  =sky_score
-      covar_trial_vec(inext)=covar_score 
+! At this point have found the previous trial scan with the LOWEST score and our score is higher.  Replace the previous scan.
+      nsub_trial_vec(imin_score)=nsubc
+      ctrial_vec(1:MaxSubNet,imin_score)=ctrial_scan(1:MaxSubNet)
+      sky_trial_vec(imin_score)  =sky_score
+      covar_trial_vec(imin_score)=covar_score 
 
       return
       end
