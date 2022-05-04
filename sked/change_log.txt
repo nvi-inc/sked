@@ -1,4 +1,5 @@
  This file contains a brief description of the changes made to sked
+2022-05-04 when_at_next_source.f:  Previously was not calculate cable wrap for AZ-el and first scan. 
 2022-04-20 make_scans.f. Changed way we construct convariance matrix if we have several subnets
 2022-04-20 nextc.f Put in check to see if optimizing by covariance that we are actually estimating some parameters.
 2022-04-20 store.f:  This routine inserts a new scan into the list of trial scans.  Fixed a bug in where it was inserting. 

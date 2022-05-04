@@ -4,6 +4,7 @@
      >  aznow,elnow,aznew,elnew,tslew, 
      >  isetup_time,isrc_time,ibuf_time,ierr) 
 
+! 2022-05-05 JMG. Calculate appropriate for first scan for az-el antennas. 
 ! 2021-02-19 JMG slewt2 replaced by slew
 ! 2020Jun08 JMG. include broadband.ftni. New parameter ibb_off 
 
@@ -37,6 +38,7 @@
       real     aznew, aznow    !starting ending positions.
       real     elnew, elnow   
       real     tslew           !time to slew
+      real     azwrap          !aznew including wrap. 
       
       integer isetup_time      !setup time
       integer isrc_time        !source time
@@ -68,6 +70,7 @@
       ut_scan_end=ut+idur+idle
       call seconds2hms(ut_scan_end,ihr,imin,isec)
       if(cwrap(1:1) .eq. char(0)) cwrap="-"
+      cwrap_new=cwrap                          !This is default. No change. 
       IF(nsor.GT.0 .and. nsor .ne. nsornew) then  
          CALL SLEWT(nsor,mjd,ut_scan_end,
      >     nsornew,istat,cwrap,cwrap_new,tslew,
@@ -78,12 +81,20 @@
               kup=.false.
            endif      
       ELSE  
-        cwrap_new=cwrap
         tslew = 0.0 
-        aznow=0.d0
+        aznow=0.d0     
         CALL CVPOS(NSORnew,istat,mjd,ut_scan_end,
      >      aznew,elnew,ha,  dc,x30,y30,x85,y85,kup)                  
-        if(.not.kup) ierr=-1  
+        if(.not.kup) ierr=-1     
+! If AZ-EL and first source, may need to adjust wrap.   
+        IF ((IAXIS(ISTat).EQ.3 .or. iaxis(istat).eq. 6 .or. 
+     &      iaxis(istat).eq.7) .and. nsor .eq. 0) then           
+! 1. calculate the Az including the wrap. 
+          azwrap=aznew
+          if(aznew .lt. stnlim(1,1,istat))  azwrap=azwrap+360.d0
+!2. If we are in the wrap reason, set the wrap to "W")          
+          if(azwrap .lt. stnlim(2,1,istat)) cwrap_new="W"                           
+        endif 
       ENDIF
   
       if(ierr .ne. 0) then
