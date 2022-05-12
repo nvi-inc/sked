@@ -152,7 +152,7 @@ C
       kdebug=.false.
       kdebug_slew=.false. 
       tslew=0.d0    !initilize to no slew 
-      slew_tol=0.25   !convergence criteria 
+      slew_tol=0.5   !convergence criteria  
 
       CALL CVPOS(NSNOW,ISTN,MJD,UT,
      >  AZNOW,ELNOW,HANOW,DECNOW,X30NOW,Y30NOW,X85NOW,Y85NOW,KUP)

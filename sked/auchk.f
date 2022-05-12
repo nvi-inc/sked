@@ -14,6 +14,7 @@ C
       include '../skdrincl/skobs.ftni'
 C
 C  MODIFICATIONS:
+! 2022-05-12 JMG Got rid of ichk which is not used. Also fixed handling of wrap for first scan for a station. 
 ! 2021-11-19 JMG Got rid of calculation of itol which was never  used. 
 ! 2021-02-19 JMG Now slew returns aznow, aznew, 
 ! 2019-05-15 JMG If doing 'ch' don't return on slew error messages. Just mush on. 
@@ -118,7 +119,9 @@ C      - calculated UT for next observation
       double precision UTT(MAX_STN)
       DIMENSION MJDT(MAX_STN)
 C     - trial values for each station from AUTOT
-      integer j,j2,i,ierr,n1,ichk
+      integer j,i,ierr
+      integer j1             !first station in scan 
+    
       integer mjdnew,mjdt,iyrnew,idanew,itsec,itmin
       integer*4 itdiff
       integer idum,itdif
@@ -148,17 +151,16 @@ C     character*128 tape_motion_new(max_stn)
       real*8 ut_test
 C
 C  INITIALIZED:                                                               
-      data toltime/5.0/ ! allow 10 seconds tolerance in timing and footages
-
-C     0. Check sun distance for this source.
-C
-     
+      data toltime/5.0/ ! allow 5 seconds tolerance in timing and footages
+    
       lq='"'
-      j2=0
+      cwrap_new=" " 
+     
+ !     0. Check sun distance for this source.    
       kdisplay=.true.
-      j=istcur(1)
-      call ChkSunDist(nsorcur(j),csorna(nsorcur(j)),mjdcur(j),
-     >    utcur(j), kdisplay,ludsp,rSunMinAngle,ierr)
+      j1=istcur(1)
+      call ChkSunDist(nsorcur(j1),csorna(nsorcur(j1)),mjdcur(j1),
+     >    utcur(j1), kdisplay,ludsp,rSunMinAngle,ierr)
       if(ierr .ne. 0 .and. kautim) then
         kerr=5
         RETURN
@@ -173,13 +175,25 @@ C
       TSLEW0=0.0
       KERR = 0
       kfirst_obs=.true. 
+! This loop calculates slewing time looping over all stations.
+! The slewing time is the maximum of all slew times.       
       DO  I=1,NSTNCUr !calculate slewing
         J = ISTCUR(I)
         cwrap_new(j)=cwrap_cur(j)
-        if(nspre(j) .gt. 0) kfirst_obs =.false.     
-        IF  (NSPRE(J).GT.0 .and. nspre(j) .ne. nsorcur(j)) then 
-      
-          CALL SLEWT(NSPRE(J),MJDPRE(J),UTPRE(J)+idurpre(j)+idlpre(j),
+        
+! Observing same source twice in a row. Slew is 0. Will not affect slew time.              
+        if(nspre(j) .eq. nsorcur(j)) cycle 
+        
+        if(nspre(j) .le. 0) then
+! No previous scan. Determine the cable wrap by position of source.  
+           call cabl1(j,nsorcur(j),mjdcur(j),utcur(j),  cwrap_cur(j))  
+           cwrap_new(j)=cwrap_cur(j)
+           cycle        
+        endif         
+        kfirst_obs=.false.
+                    
+!For this station not the first source and  not the same source twice in a row.              
+        CALL SLEWT(NSPRE(J),MJDPRE(J),UTPRE(J)+idurpre(j)+idlpre(j),
      >     NSORcur(J),J, cwrap_pre(J),cwrap_new(J),TSLEW,lookah,
      >     trise,tsris,st0cur,frac, knov, islew_info,
      >     az_now,el_now,az_new,el_new)
@@ -188,29 +202,23 @@ C
            writE(ludsp,*) i, cstnna(j)," ", lq//cwrap_pre(j)//lq, 
      >                 lq//cwrap_new(j)//lq, lq//cwrap_cur(j)//lq
         endif     
-         if(tslew .lt. 0) then
-             writE(*,*) "auchk: Inform J. Gipson about this!"
-         else if(islew_info .ne. 0) THEN !error messages
-             kerr=6      
+        if(tslew .lt. 0) then
+            writE(*,*) "auchk: Inform J. Gipson about this!"
+        else if(islew_info .ne. 0) THEN !error messages
+           kerr=6      
 ! All of the messages have similar formats. Generate the format.
-            if(islew_info .lt. 0) then 
-                lprefix='ERROR! (auchk): '
-            else
-                lprefix='WARNING! (auchk): '
-            endif  
-            call print_slew_info_warning(ludsp,lprefix,islew_info,j)                       
-
-          END IF  !error messages
-        ELSE
-          TSLEW=0.0
-        ENDIF     
-        TSLEW0=AMAX1(TSLEW0,TSLEW)
+          if(islew_info .lt. 0) then 
+              lprefix='ERROR! (auchk): '
+          else
+              lprefix='WARNING! (auchk): '
+          endif  
+          call print_slew_info_warning(ludsp,lprefix,islew_info,j)                               
+        endif
+       TSLEW0=AMAX1(TSLEW0,TSLEW)
       END DO !calculate slewing
 
+      if(cmdcod .eq. "TA" .and. kfirst_obs) return       
 
-      if(cmdcod .eq. "TA" .and. kfirst_obs) return 
-       
-C
       IF  (KERR.NE.0.and.kautim.and.
      >   (cmdcod.ne.'UT'.and. cmdcod .ne. "CH")) then
         return
@@ -231,15 +239,12 @@ C     1.3 Compute SNRs achieved.
 
 !     
 C     1.5 Calculate tape usage and a new start time.
-C
-      ICHK = 0
-      IF (cmdcod.eq.'CH') ICHK = 1
-      IF  (KERR.NE.0.and.kautim.and. cmdcod .ne. "CH") RETURN   
-         
-      N1 = ISTCUR(1)
+ 
+      IF  (KERR.NE.0.and.kautim.and. cmdcod .ne. "CH") RETURN                 
+  
       CALL AUTOT(cmdcod,MINIDL,MJDPRE,UTPRE,NSPRE,idurpre,idlpre,
-     >    icalcur(n1), ISTCUR,  NSTNCUR,cwrap_pre, nsorcur(n1),
-     >    MJDNEW, UTNEW,MJDT,UTT, cwrap_new, istbad)  !                  
+     >    icalcur(j1), ISTCUR,  NSTNCUR,cwrap_pre, nsorcur(j1),
+     >    MJDNEW, UTNEW,MJDT,UTT, cwrap_new, istbad)  !                   
 C
 C      2. Here we determine whether the observation needs a warning or
 C         editing.  Return code KERR=0 for do nothing, KERR=1 for edit
@@ -296,8 +301,7 @@ C
               call ptobs("RE", 0, kerr)
             END IF  !modify time variables
          END IF  !modify CUR
-        endif !initialized
-        
+        endif !initialized        
                                                                            
         IF (cmdcod.eq.'CH'.OR.cmdcod.eq.'TA'.OR.cmdcod.eq.'RM' .or.
      >      cmdcod.eq.'UT') THEN  ! check CUR

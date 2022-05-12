@@ -165,6 +165,8 @@ C 001011 nrv Check first source up or not.
 C
 C    1. Parse command and parameters.
 C
+      cwrap_pre="-"
+      cwrap_new="-"
       kdisplay=.true.
 
       CALL CHPAR(LINSTQ,cmdcod,JT,JNET,njnet,KAUTIM,MINIDL,IERR)
@@ -283,7 +285,7 @@ C
      
         ierr_auchk=0 
         ierr_slew=0 
-       j1=istcur(1)
+        j1=istcur(1)
 ! Check if station is "up" 
         if(.not. kstatup(istat,mjdcur(j1),utcur(j1),idurcur(j1))) then
           goto 110                          !this is fast exit to end of tag-along
@@ -304,7 +306,7 @@ C
           goto 110    !no match. quick exit to end of tag-along. 
         ENDIF
 
-50    continue    
+50      continue    
         istat=jT
         j1=istcur(1)
         isource=nsorcur(j1) 
@@ -405,14 +407,13 @@ C*************************************************************
  
 C         Calculate slewing just to get the cable wrap         
           IF (NSPRE(JT).eq. -1) THEN
-! No prior source. Use time of first station. 
+! No prior source. Use time of first station.    
             call cabl1(jt,nsorcur(j1),mjdcur(j1),utcur(j1),
      >            cwrap_cur(jt))
 ! Prior Obs
           ELSE     
 ! Used to be  
-!           cwrap_new=" "
-            cwrap_cur(jt)=" "       
+            cwrap_cur(jt)="-"       
             CALL SLEWT(NSPRE(JT),MJDPRe(jt),UTpre(jt),NSORcur(J1),JT,
      >         cwrap_pre(JT),cwrap_cur(jt),tslew,lookah,trise,tsris,
      >         st0cur,  frac,knov,islew_info,
@@ -620,10 +621,9 @@ C
       call GTPRE(nspre,cwrap_pre,icod_pre)  ! save pre variables and calculate utstart
       CALL GTOBS (KSTART,KRWND,KGOT,IERRCM) ! Get next observation into CUR variables
       IF (.NOT.KGOT) GOTO 990
-!      call gtrun(idirpr,nspre,cwrap_pre,iftpre,icod_pre,itupr) ! calculate running time
       KERR=0
     
-      if (cmdcod.eq."CH".or.cmdcod.eq."SH") Then      
+      if (cmdcod.eq."CH".or.cmdcod.eq."SH") Then          
           CALL AUCHK(cmdcod,MINIDL,NSPRE,MJDPRE,UTPRE,idurpre,idlpre,
      >       cwrap_pre,KAUTIM,ierr_auchk,istbad)      
       endif 
