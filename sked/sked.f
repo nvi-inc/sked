@@ -258,9 +258,10 @@ C  4. Open schedule file and read it in.
          stop        
       endif
       
-      call check_sources(ierr)
+      call check_sources(ierr)     
       if(ierr .ne. 0) then
          write(*,'(a)') "Fix problems with sources and try again."
+         write(*,*) "ierr ", ierr
          stop
       endif       
 

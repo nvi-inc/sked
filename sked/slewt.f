@@ -6,8 +6,7 @@ C   SLEWT calculates the slew time and the cable wrap
 C
       implicit none
       include '../skdrincl/skparm.ftni'
-      include '../skdrincl/constants.ftni'
-     
+      include '../skdrincl/constants.ftni'        
 C
 ! functions
 C     INPUT VARIABLES:
@@ -184,8 +183,10 @@ C                    this calculates the current telescope position
 C     This calculates the new source location:
       CALL CVPOS(NSNEW,ISTN,MJD,UT+TSLEWC,
      >  AZNEW,ELNEW,HANEW,DECNEW,X30NEW,Y30NEW,X85NEW,Y85NEW,KUP)
-!      write(*,*) csorna(nsnew), rad2deg*aznew,rad2deg*elnew, kup 
-      if(kdebug) then
+
+      if(kdebug_slew) then
+         write(*,*) csorna(nsnew), rad2deg*aznew,rad2deg*elnew, kup 
+         write(*,*) "Time ", MJD, UT, TSLEWC
          write(*,'("slewt 141: stat=",a, " aznew ",f8.2)')
      >      cstnna(istn), aznew*rad2deg
       endif 
@@ -194,7 +195,7 @@ C     This calculates the new source location:
         if (elnew.lt.0.0) elnew=1.0*deg2rad   ! 1 degree
       endif
       if (aznew.gt.100.or.aznew.lt.-100.d0) then
-        write(7,*) 'SLEWT 167:  bad aznew ',aznew*rad2deg
+        write(*,*) 'SLEWT 167:  bad aznew ',aznew*rad2deg
         stop
       endif
       
@@ -343,11 +344,13 @@ C
       write(*,'("T_old ", f8.2, " T_new", f8.2)') tslewp, tslewc     
       
        if(kdebug_slew) then
-          write(*,*) "Sleeping bug "
-          write(*,*) "Please save the schedule that casued this and"
-          write(*,*) "And send to John gipson"
-          write(*,*) "Together with what caused it to crash"
-          stop
+          write(*,*) "Warning: Possible minor bug "
+          write(*,*) 
+     &     "Please save the schedule that caused this and send it "
+          write(*,*) "together with what you were doing to John Gipson"
+          write(*,*) "Do 'param keep_log yes' and send log file"
+          tslewc=max(tslewc,tslewp)      
+          goto 110 
        endif 
        kdebug_slew=.true.
        tslewc = 0.0

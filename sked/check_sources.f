@@ -16,7 +16,7 @@
        do isrc=1,nceles
          do ib=1,2 
            if(nflux(ib,isrc) .le. 0) then 
-               write(lu,
+               write(*,
      >      "('check_sources: No flux information for ', 
      >        a,'-band for source ',a)")   cband(ib),csorna(isrc)
               ierr=-1 

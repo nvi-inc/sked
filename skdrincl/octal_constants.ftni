@@ -18,29 +18,23 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 ! History
+! 2022-08-10 JMGipson. Got rid of unused constants and rearranged 
 ! 2021-12-03 JMGipson. First version. Removed from skparm.ftni 
 ! Some octal constants used by some programs.
 ! Removed from skparm.ftni 
 !     Definitions for octal constants.
 
-      integer OBLANK,ODOLLAR,OZERO,OCOMMA,OMINUS,OPLUS,
-     .          ODOT,OLPAREN,OUNDERSCORE,OSTAR,OSLASH,OAND,
-     .          ORPAREN,OCOLON
-      parameter (OBLANK = O'40', ODOLLAR = O'44',
-     .OZERO = O'60', OCOMMA = O'54', OMINUS = O'55',
-     .OPLUS = O'53', ODOT = O'56', OLPAREN = O'50',
-     .ORPAREN = O'51',OUNDERSCORE = O'137', OSTAR = O'52',
-     .OSLASH = O'57', OAND = O'46', OCOLON = 58)
-      integer OCAPA,OCAPB,OCAPC,OCAPD,OCAPE,OCAPF,OCAPX,
-     .OCAPY,OCAPW,OSMALLE,OCAPL,OCAPT,OCAPN,ONINE,OCAPH,
-     .OCAPP,OONE,OCAPZ,OSMALLA,OSMALLZ,OCAPU,OCAPV,
-     .ocapi,ocapo
-      parameter (OCAPA = O'101', OCAPB = O'102',
-     .OCAPC = O'103', OCAPD = O'104', OCAPE = O'105',
-     .OCAPF = O'106', OCAPX = O'130', OCAPY = O'131',
-     .OCAPW = O'127', OCAPL = O'114', OCAPN = O'116',
-     .OSMALLE = O'145', OCAPT = O'124', ONINE = O'71',
-     .OCAPH = O'110', ocapi = o'111', ocapo = o'117', 
-     .OCAPP = O'120', OCAPZ = O'132',
-     .OONE = O'61', OSMALLZ = O'172', OSMALLA = O'141',
-     .OCAPU = O'125', OCAPV = O'126')
+      integer OBLANK,ODOLLAR,OLPAREN,ORPAREN,OSTAR,OMINUS,OUNDERSCORE
+    
+      parameter (OBLANK = O'40', ODOLLAR = O'44',OLPAREN = O'50',
+     > ORPAREN = O'51', OSTAR = O'52',OMINUS = O'55', 
+     > OUNDERSCORE = O'137')     
+     
+      integer OCAPA,OCAPB,OCAPC,OCAPD,
+     > OCAPH,OCAPI, OCAPL,OCAPN,ocapo,
+     > OCAPP,OCAPU,OCAPV,OCAPW,OCAPX
+    
+      parameter (OCAPA = O'101',OCAPB = O'102',
+     > OCAPC = O'103', OCAPD= O'104', ocaph = o'110', ocapi = o'111',   
+     > OCAPL = O'114', OCAPN = O'116',ocapo = o'117', OCAPP = O'120',   
+     > OCAPU = O'125', OCAPV = O'126',OCAPW = O'127', OCAPX = O'130')

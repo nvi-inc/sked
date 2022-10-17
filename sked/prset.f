@@ -488,6 +488,11 @@ C  4. String parameter section.
                 kdebug=kyesno
               else if(Cparam .eq. "KEEP_LOG") then
                 kkeep_log=kyesno
+                if(kyesno) then
+                  write(*,*) "Will keep "//trim(clgfil)//" on closing"
+                else
+                  write(*,*) "Will delete log file on closing "
+                endif 
               else if(Cparam .eq. "VERBOSE") then
                 iverbose_level=5
               else if(Cparam .eq. "CONF_EQUIP") then

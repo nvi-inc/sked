@@ -1,4 +1,9 @@
  This file contains a brief description of the changes made to sked
+2022-10-17 when_at_next_source.f:  Fixed  problem with cable wrap for first source
+2022-09-13 make_defnames.f:  Don't do nullterm on deffnames which we no longer setup (e.g.,barrel roll) 
+2022-08-29 prset.f:  keep_log--indicate which log file keeping, or that we are not keeping log file
+2022-08-29 slewt.f: Failure to converge. Better error message, and graceful handling. Use max time of last two iterations and exit routine.
+2022-06-18 when_at_next_source.f: Fixed error in finding cablewrap of first source. Was adding 360 when should have been twopi
 2022-05-12 slewt.f: Changed tolerance for convergence from .25 sec to 0.5 sec
 2022-05-12 Test for no previous source changed from ".eq. 0" to ".le. 0" 
 2022-05-12 cabl1.f: Changed default wrap to "-" from " "  

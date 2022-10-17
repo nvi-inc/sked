@@ -4,10 +4,12 @@
      >  aznow,elnow,aznew,elnew,tslew, 
      >  isetup_time,isrc_time,ibuf_time,ierr) 
 
+! 2022-10-17 JMG. Fixed probelm with cable wrap for first source
 ! 2022-05-12 JGipson Modified test for nsor=0 to nsor .le. 0
 ! 2022-05-05 JMG. Calculate appropriate for first scan for az-el antennas. 
 ! 2021-02-19 JMG slewt2 replaced by slew
 ! 2020Jun08 JMG. include broadband.ftni. New parameter ibb_off 
+
 
 
       implicit none 
@@ -71,6 +73,7 @@
       ut_scan_end=ut+idur+idle
       call seconds2hms(ut_scan_end,ihr,imin,isec)
       if(cwrap(1:1) .eq. char(0)) cwrap="-"
+      if(cwrap(1:1) .eq. " ") cwrap="-" 
       cwrap_new=cwrap                          !This is default. No change. 
       IF(nsor.GT.0 .and. nsor .ne. nsornew) then        
          CALL SLEWT(nsor,mjd,ut_scan_end,
@@ -83,18 +86,23 @@
            endif      
       ELSE     
         tslew = 0.0 
-        aznow=0.d0     
+        aznow=0.d0   
+      
         CALL CVPOS(NSORnew,istat,mjd,ut_scan_end,
-     >      aznew,elnew,ha,  dc,x30,y30,x85,y85,kup)                  
+     >      aznew,elnew,ha,  dc,x30,y30,x85,y85,kup)        
         if(.not.kup) ierr=-1     
 ! If AZ-EL and first source, may need to adjust wrap.   
         IF ((IAXIS(ISTat).EQ.3 .or. iaxis(istat).eq. 6 .or. 
      &      iaxis(istat).eq.7) .and. nsor .le. 0) then           
 ! 1. calculate the Az including the wrap. 
+! Set to neutral 
+          cwrap_new="-"
           azwrap=aznew
-          if(aznew .lt. stnlim(1,1,istat))  azwrap=azwrap+360.d0
+          if(aznew .lt. stnlim(1,1,istat))  azwrap=azwrap+twopi 
 !2. If we are in the wrap reason, set the wrap to "W")          
-          if(azwrap .lt. stnlim(2,1,istat)) cwrap_new="W"                       
+          if(azwrap .lt. (stnlim(2,1,istat)-twopi)) cwrap_new="W"  
+          if(azwrap .gt. stnlim(1,1,istat)+twopi)) cwrap_new = "C" 
+          write(*,*) cstnna(istat), cwrap_new                      
         endif 
       ENDIF
   

@@ -7,6 +7,7 @@ C writing subroutine use the same names.
 
 ! Start putting in new changes at the top....
 ! 2017Jun22  JMG. Added new rules for Mark5C and Flexbuff recorders (which record using VDIF format.)
+! 2022-09-13 J Gipson. Don't nullterm types 5,6, 7 which we no longer produce. 
 
 C 990921 nrv New.
 C 991110 nrv If the catalog mode is non-blank, use that name.
@@ -292,12 +293,7 @@ C  Mk3 mode (A,B,C,D,E) or recording a mode that starts with "M".
            endif
          case default
          end select 
-
-     
-C***********************************************************
-         refdef_name(itype,is,ic)= trim(cform)//'_format'  
-        
-
+         refdef_name(itype,is,ic)= trim(cform)//'_format'          
         endif ! this mode defined
         enddo ! stations
       enddo ! codes
@@ -305,6 +301,9 @@ C***********************************************************
       do ic=1,ncodes
       do is=1,nstatn
       do itype=1,9
+         if(itype .eq. 5 .or. itype .eq. 6 .or. itype .eq. 7) cycle    !these type are no longer defined. 
+         write(*,*) ncodes,nstatn, itype 
+         write(*,*) refdef_name(itype,is,ic) 
          call null_term(refdef_name(itype,is,ic))
       end do
       end do
