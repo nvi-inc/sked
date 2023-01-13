@@ -10,8 +10,6 @@
 ! 2021-02-19 JMG slewt2 replaced by slew
 ! 2020Jun08 JMG. include broadband.ftni. New parameter ibb_off 
 
-
-
       implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
@@ -100,8 +98,8 @@
           azwrap=aznew
           if(aznew .lt. stnlim(1,1,istat))  azwrap=azwrap+twopi 
 !2. If we are in the wrap reason, set the wrap to "W")          
-          if(azwrap .lt. (stnlim(2,1,istat)-twopi)) cwrap_new="W"  
-          if(azwrap .gt. stnlim(1,1,istat)+twopi)) cwrap_new = "C" 
+          if(azwrap .lt. stnlim(2,1,istat)-twopi) cwrap_new="W"  
+          if(azwrap .gt. stnlim(1,1,istat)+twopi) cwrap_new = "C" 
           write(*,*) cstnna(istat), cwrap_new                      
         endif 
       ENDIF

@@ -192,9 +192,7 @@ C
      >   csked, ctmpnam,cprtlan,cprtpor,cprttyp,cprport)
      ! 
       call scctl  !set up scratch file names
-     
-C
-
+ 
 C  3. Initialize and prompt for schedule file name.
 
 
@@ -259,10 +257,11 @@ C  4. Open schedule file and read it in.
       endif
       
       call check_sources(ierr)     
-      if(ierr .ne. 0) then
-         write(*,'(a)') "Fix problems with sources and try again."
-         write(*,*) "ierr ", ierr
-         stop
+      if(ierr .ne.0 ) then
+         write(*,'(a)') "Fixing problems with sources and try again."
+         cmdline="FIX"
+         linestq(1)=4
+         call flcmd(linestq)   
       endif       
 
       IF (IYRCUR(1).NE.-1) GOTO 700

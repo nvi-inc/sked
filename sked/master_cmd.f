@@ -17,6 +17,7 @@ C History:
 ! 2012Oct26 JMG. ditto.
 ! 2014Apr23 JMG. Set correlator and scheduler from master file...
 ! 2022-01-10 JMG. Previously had error if master_File not specified. Should have been master_dir 
+! 2022-12-15 JMG. Modified to use new master format.
 
 
 C   COMMON BLOCKS USED
@@ -28,6 +29,7 @@ C   COMMON BLOCKS USED
 
       include 'skcom.ftni'
       include 'cat_stat.ftni'
+      include 'master.i' 
 
 C Input
       character*(*) cmdline
@@ -87,15 +89,21 @@ C   LOCAL VARIABLES
       character*128 cmaster_file   !local copy of this.
       integer itmp                 !short term dummy variable
       integer iyear
+      integer iyear_beg
       logical kfound_line          !did we find the entry in the master file?
       integer j                    !counter 
-      character*8 lmaster_ext(2)/"-int.txt",".txt"/
+      character*1 ldelimiter/"|"/  !delimiter in masterfile. 
+   
+      logical knew_master
+      integer iyr_out    
+      integer imin_dur
+      integer itype 
 
 ! valid command list.
       integer ilist_len
       parameter (ilist_len=2)
       character*6 list(ilist_len)
-      character*40 lhelp(ilist_len)
+      character*40 lhelp(ilist_len)    
 
       data list/"CHECK", "GET"/
       data lhelp/
@@ -122,8 +130,7 @@ C   LOCAL VARIABLES
       endif
 
       if(NumToken .gt. 1) then
-         write(luscn,'(a)')
-     >      "master_cmd: Too many arguments!"
+         write(luscn,'(a)')   "master_cmd: Too many arguments!"
          return
       endif
 ! parse the token, see if it is valid.
@@ -140,30 +147,35 @@ C   LOCAL VARIABLES
 
 100   continue
       write(luscn,'(" Finding session ", a)') cexper
-! For compatibility with older versions of sked, see if cmaster_dir is really a file.
-      itmp=trimlen(cmaster_dir)
-      if(cmaster_dir(itmp-3:itmp) .eq. ".txt") then
-        call return_master_line(cmaster_dir,cexper,ldum,
-     >   iyr_mst_start,kfound_line)
-        if(kfound_line) goto 110
-        write(luscn,'("Master_cmd ERROR: file not found! ", a)') 
-     >     cmaster_dir(1:itmp)
-        return
-      endif
 
 ! Assume that we specified a directory.
       call add_slash_if_needed(cmaster_dir)
-      itmp=trimlen(cmaster_dir)
-
+   
 ! Get the current year. 
       call date_and_time_sked(itime_vec)
-      iyear=itime_vec(1)+1  -2000 ! sometimes we schedule for next year.
-!      write(*,*) "Starting with year ", itime_vec(1)+1
-        
-      do i=iyear,0, -1
-        do j=1,2       
-           write(cmaster_file,'(a,"master",i2.2, a)')
-     >       cmaster_dir(1:itmp),i,lmaster_ext(j)
+      iyear_beg=itime_vec(1)+1             ! sometimes we schedule for next year.
+
+
+      do iyear=iyear_beg, 2000, -1         ! start with checking next year, and then work backwards to first masterfile. 
+        do itype=1,num_master_type 
+           if(iyear .lt. imaster_year_beg(itype) .or. 
+     >        iyear .gt. imaster_year_end(itype)) cycle 
+           if(iyear .ge. 2023) then
+             write(cmaster_file,'(a,"master",i4, a)') 
+     >          trim(cmaster_dir),iyear,lmaster_type(itype) 
+           else
+! Convert year to 2-digit year           
+              if(iyear .ge. 2000) then 
+                 itmp=iyear-2000
+              else
+                 itmp=iyear-1900 
+              endif                             
+              write(cmaster_file,'(a,"master",i2.2, a)')
+     >          trim(cmaster_dir),itmp,lmaster_type(itype) 
+           endif
+           inquire(file=cmaster_file,exist=kexist) 
+           if(.not. kexist) cycle            !if file is not found, then don't check.    
+! Read this masterfile to see if we found the experiment code.                       
             call return_master_line(cmaster_file,cexper,ldum,
      >         iyr_mst_start, kfound_line)   
             if(kfound_line) goto 110
@@ -173,14 +185,36 @@ C   LOCAL VARIABLES
       return     
 
 
-! Begin parsing the line.
+! Begin parsing the line.  This looks like:
+! OLD FORMAT
+! Spacing is arbitrary, but tokens separated by "|"
+!    1          2      3    4   5    6   7                                          8  9     10 
+! |IVS-R1309 |R1309 |JAN02|  2|17:00|24|FtKkNyShTcWfWz                           |NASA|BONN|08JAN23|3.0 | XA |NASA|  20 |2150|
+! -----OR----
+! NEW FORMAT
+!   1             2        3           4   5    6     7                                                8  9     
+! |IVS-R1      |20230103|r11084      |  3|17:00|24:00|AgHbHtIsKeKkKvMaNsNy -OnWzYg                    |NASA|BONN|        | XA |NASA| -48|
+
+
 110   continue  
       call splitNtokens(ldum,ltoken,Maxtoken,NumToken)
 ! get the start time
       read(ltoken(4),'(i3)') ida_mst_start
       read(ltoken(5),"(i2,1x,i2)") ihr_mst_start,imin_mst_start
 ! get the length, and calculate the end time.
-      read(ltoken(6),*) rhours_long
+! Note: Two formats for the length.
+!     24.0, 1.0, 2.3
+! OR  24:00,  00:06
+! 
+      ind=index(ltoken(6),":") 
+      if(ind .eq. 0) then 
+         read(ltoken(6),*) rhours_long
+      else
+         read(ltoken(6)(1:ind-1),*) rhours_long
+         read(ltoken(6)(ind+1:),*)  imin_dur
+         rhours_long=rhours_long+float(imin_dur)/60.d0
+      endif    
+  
       iyr_mst_end  =iyr_mst_start
       ida_mst_end  =ida_mst_start
       
@@ -195,7 +229,7 @@ C   LOCAL VARIABLES
          ihr_mst_end = ihr_mst_end-24
          ida_mst_end = ida_mst_start+1
       endif
-! handles everything except leap year.
+! handles everything except leap year and experiment on December 31. 
       if(ida_mst_end .gt. 365) then
          ida_mst_end =1
          iyr_mst_end =iyr_mst_end+1
@@ -218,6 +252,7 @@ C   LOCAL VARIABLES
        endif
       end do
      
+!This handles case that some stations have been removed (Station list looks like AbCdEf -GgHh, so have extra token)      
       if(ltoken(8)(1:1) .eq. "-") then
         cpiname_mst=ltoken(9)
         ccorname_mst=ltoken(10)

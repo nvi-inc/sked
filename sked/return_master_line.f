@@ -7,9 +7,7 @@
 ! Passed
       character*(*) cmaster_file    !master file
       character*(*) cexper          !experiment code
-! returned
-  
-
+! returned  
       character*(*) line            !line corresponding to exper
       integer iyr_mst_start   
       logical kfound                ! if true, then found. If false,not found.    
@@ -20,21 +18,30 @@
 !  2007Nov20. First version. 
 !  2015Oct23. Print update date of master file. 
 !  2020Nov04. Print error message if we can't open the file. 
+! 2022-12-15  JMGipson. Modified to handle new masterfile format
+! 2023-01-13  JMGipson capitalize internal copy of cexper and check against capitalized masterfile version. 
 
 ! local
+      character*20 cexper_cap              !capitalized version of cexper
 ! used to  extract tokens
       integer MaxToken
       integer NumToken, iToken
       parameter(MaxToken=10)
       character*20 ltoken(MaxToken) 
       integer i   !count 
-      character*8 cexper_master  
+      character*20 cexper_master  
+ 
       integer ind 
       integer istat
       logical kintensive
     
       inquire(exist=kfound,file=cmaster_file)
       if(.not.kfound) return        !master file does not exist. That's a bummer.   
+      
+      cexper_cap=cexper
+      call capitalize(cexper_cap)   !capitalize the experiment. This  makes checking easier below. 
+!      write(*,*) cexper_cap
+     
 
       kintensive = index(cmaster_file,"-int") .ne. 0
 ! Open the master file. Extract the station list, start & end times
@@ -61,9 +68,14 @@
  
 
 ! Parse a line that looks like:
+! OLD FORMAT
 ! Spacing is arbitrary, but tokens separated by "|"
 !    1          2      3    4   5    6   7
 ! |IVS-R1309 |R1309 |JAN02|  2|17:00|24|FtKkNyShTcWfWz                           |NASA|BONN|08JAN23|3.0 | XA |NASA|  20 |2150|
+! -----OR----
+! NEW FORMAT
+!   1             2        3           4   5    6     7 
+! |IVS-R1      |20230103|r11084      |  3|17:00|24:00|AgHbHtIsKeKkKvMaNsNyOnWzYg                    |NASA|BONN|        | XA |NASA| -48|
 
 90    continue
       write(*,*) " " 
@@ -83,8 +95,14 @@
       end do
 
       call splitNtokens(line,ltoken,Maxtoken,NumToken)
-      cexper_master=ltoken(2)
-      if(cexper .eq. cexper_master) then
+      if(iyr_mst_start .ge. 2023) then
+        cexper_master=ltoken(3) 
+      else
+        cexper_master=ltoken(2)
+      endif 
+      call capitalize(cexper_master) 
+  
+      if(cexper_cap .eq. cexper_master) then
          kfound=.true.
           close(13)
          return

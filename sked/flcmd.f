@@ -1,7 +1,7 @@
       SUBROUTINE FLCMD(LINSTQ)
 C
 C   FLCMD determines the function requested in the FLUX command,
-C              and then callsthe appropriate subroutine to do it.
+C              and then calls the appropriate subroutine to do it.
 C
       include '../skdrincl/skparm.ftni'
       include '../skdrincl/sourc.ftni'
@@ -53,6 +53,7 @@ C 951017 nrv Fix gtfld call to remove linstq
 !                Set flag indicating fluxes have changed so that they will be written out correctly.
 ! 2010Mar24 JMG. Wasn't correctly copying fluxes from one band to the other with flux fix. 
 ! 2013Jul24 JMG. Still a problem with flux fix. Wasn't copying all of the flux model values
+! 2022-11-03 JGipson.  Minor fix on informative message. 
 C
 C
 C     1. First call the function IGTKY to decode the input string which
@@ -102,8 +103,8 @@ C
         do is=1,nsourc
           if(nflux(2,is) .eq. 0 .and. nflux(1,is) .eq. 0) then
           if(kfirst) then
-             write(luscn,'(a)') 
-     >         "WARNING!  Following sources have missing fluxes:"
+             write(luscn,'(a)') "WARNING! No flux for following. "//
+     >             "Default value of 0.25 used."
               write(luscn,'(a)')  "Source    Band"
                kfirst=.false.
             endif

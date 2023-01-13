@@ -248,6 +248,7 @@ C 021002 nrv Write comments about geo/astro VEX/standard schedule.
 ! 2016Jul28 JMG.      Now also set cfirstrec_def in 'equipment override'
 ! 2018Jun17 JMG.      Removed debugging statement whichr wrote out first recorder
 ! 2021-01-27 JMG      Renamed: SORP50-->sorp2000  RA50, DEC50-->SORP1950
+! 2022-11-16 JMG.     Increased limit of session code from 6 to 16. 
 ! Get the version
       include 'fdrudg_date.ftni'
       call get_version(iverMajor_FS,iverMinor_FS,iverPatch_FS,crel_FS)
@@ -461,7 +462,7 @@ C       Opening message
           enddo
           cexpna=lskdfi(ixp:) ! exp name is root of file name
           IX = INDEX(cexpna,'.')-1
-          if (ix.gt.6) then ! too many letters
+          if (ix.gt.16) then ! too many letters
             write(luscn,'(a)')
      >      " ERROR: Schedule name is too long. Please rename the file "
             write(luscn,'(a)')
