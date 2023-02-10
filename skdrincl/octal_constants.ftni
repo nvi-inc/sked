@@ -18,23 +18,53 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 ! History
-! 2022-08-10 JMGipson. Got rid of unused constants and rearranged 
 ! 2021-12-03 JMGipson. First version. Removed from skparm.ftni 
 ! Some octal constants used by some programs.
 ! Removed from skparm.ftni 
 !     Definitions for octal constants.
 
-      integer OBLANK,ODOLLAR,OLPAREN,ORPAREN,OSTAR,OMINUS,OUNDERSCORE
-    
-      parameter (OBLANK = O'40', ODOLLAR = O'44',OLPAREN = O'50',
-     > ORPAREN = O'51', OSTAR = O'52',OMINUS = O'55', 
-     > OUNDERSCORE = O'137')     
-     
-      integer OCAPA,OCAPB,OCAPC,OCAPD,
-     > OCAPH,OCAPI, OCAPL,OCAPN,ocapo,
-     > OCAPP,OCAPU,OCAPV,OCAPW,OCAPX
-    
-      parameter (OCAPA = O'101',OCAPB = O'102',
-     > OCAPC = O'103', OCAPD= O'104', ocaph = o'110', ocapi = o'111',   
-     > OCAPL = O'114', OCAPN = O'116',ocapo = o'117', OCAPP = O'120',   
-     > OCAPU = O'125', OCAPV = O'126',OCAPW = O'127', OCAPX = O'130')
+      integer OBLANK,ODOLLAR,OZERO,OCOMMA,OMINUS,OPLUS,
+     .          ODOT,OLPAREN,OUNDERSCORE,OSTAR,OSLASH,OAND,
+     .          ORPAREN,OCOLON
+      parameter (OBLANK = int(O'40'))
+      parameter (ODOLLAR = int(O'44'))
+      parameter (OZERO = int(O'60'))
+      parameter (OCOMMA = int(O'54'))
+      parameter (OMINUS = int(O'55'))
+      parameter (OPLUS = int(O'53'))
+      parameter (ODOT = int(O'56'))
+      parameter (OLPAREN = int(O'50'))
+      parameter (ORPAREN = int(O'51'))
+      parameter (OUNDERSCORE = int(O'137'))
+      parameter (OSTAR = int(O'52'))
+      parameter (OSLASH = int(O'57'))
+      parameter (OAND = int(O'46'))
+      parameter (OCOLON = 58)
+      integer OCAPA,OCAPB,OCAPC,OCAPD,OCAPE,OCAPF,OCAPX,
+     .OCAPY,OCAPW,OSMALLE,OCAPL,OCAPT,OCAPN,ONINE,OCAPH,
+     .OCAPP,OONE,OCAPZ,OSMALLA,OSMALLZ,OCAPU,OCAPV,
+     .ocapi,ocapo
+      parameter (OCAPA = int(O'101'))
+      parameter (OCAPB = int(O'102'))
+      parameter (OCAPC = int(O'103'))
+      parameter (OCAPD = int(O'104'))
+      parameter (OCAPE = int(O'105'))
+      parameter (OCAPF = int(O'106'))
+      parameter (OCAPX = int(O'130'))
+      parameter (OCAPY = int(O'131'))
+      parameter (OCAPW = int(O'127'))
+      parameter (OCAPL = int(O'114'))
+      parameter (OCAPN = int(O'116'))
+      parameter (OSMALLE = int(O'145'))
+      parameter (OCAPT = int(O'124'))
+      parameter (ONINE = int(O'71'))
+      parameter (OCAPH = int(O'110'))
+      parameter (ocapi = int(o'111'))
+      parameter (ocapo = int(o'117'))
+      parameter (OCAPP = int(O'120'))
+      parameter (OCAPZ = int(O'132'))
+      parameter (OONE = int(O'61'))
+      parameter (OSMALLZ = int(O'172'))
+      parameter (OSMALLA = int(O'141'))
+      parameter (OCAPU = int(O'125'))
+      parameter (OCAPV = int(O'126'))

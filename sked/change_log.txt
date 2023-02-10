@@ -1,4 +1,8 @@
  This file contains a brief description of the changes made to sked
+2023-02-08 when_at_next_source.f: Removed debugging info.
+2023-02-08 prset.f:  Made mininimum schedule lenght a parameter. Set min time to 5 miutes. 
+2023-02-08 adjustendtime.f:  Renamed some variables. Minor cleanup. If schedule lenght is
+2023-02-08   shorter than min, andjust time. (Schedule link is ibegtime-iendtime) 
 2023-01-13 Added in master.i which contians list of valid masterfile types.
 2023-01-13 When checking experiment code in masterfile, make check case insensitive. 
 2022-12-15 return_master_line.f, master_cmd.f:  Modified to handle new format of master file for dates 2023 and onward

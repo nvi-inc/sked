@@ -2,6 +2,7 @@
 C
 C   PRSET allows the user to set default values of parameters
 C
+!2023-02-08 JMG.  Set mininum schedule time to 5 minutes and made a parameter. 
 !2022-03-18 Moved correlator list to a common block
 !2021-05-05 JMG Added "Beg" as synonym for start
 !2021-01-13 JMG Added Vien to correlator
@@ -69,6 +70,8 @@ C               - Key word, longest is 22 characters
       character*2  listPrShort(MaxPr)
 
       character*6 ListAM(2),ListAS(2),listOnOff(2)      
+      integer imin_sked_len                   !shortest time for a schedule.
+      data imin_sked_len/300/                 !Set to 5 minutes
       
  
       integer iyt_list_len
@@ -562,6 +565,7 @@ C  Time parameters section
         ckeywd=" "
         IDUMMY = ICHMV(lkeywd,1,LINSTQ(2),IC1,nc)
         CALL YDHMS(cKEYWD,IERR,IYR,IDA,IHR,iMIN,ISC)
+!        write(*,*) "ym...", iyr,ida,ihr,imin,isc
         IF  (IERR.NE.0) THEN 
           write(luscn,'(a)')
      >      'PRSET21 - Nominal start/end must be of form YYDDDHHMMSS.'
@@ -597,7 +601,8 @@ C  Time parameters section
           imin_end = imin
           isc_end = isc
         endif ! start/end
-        call AdjustEndTime(itimestart,itimeend,3600)
+        
+        call AdjustEndTime(itimestart,itimeend,imin_sked_len)
 C  SUBNET section
       else if (ckey.eq.'SU') then
         CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)

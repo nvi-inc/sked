@@ -1,5 +1,5 @@
 *
-* Copyright (c) 2020 NVI, Inc.
+* Copyright (c) 2022 NVI, Inc.
 *
 * This file is part of VLBI Field System
 * (see http://github.com/nvi-inc/fs).
@@ -34,13 +34,11 @@ C        - cbuf : character buffer
 
 C get total length of string
        j = len(cbuf)
-!       write(*,*) cbuf
-!       write(*,*) j 
-C
+
 C Read backwards down array, stopping at first non-blank character
 C
        do while ((j.gt.0).and.(cbuf(j:j).eq.' '.or.
-     . cbuf(j:j).eq.char(0)))
+     &  cbuf(j:j).eq.char(0)))
          j = j - 1
          if(j .eq. 0) goto 10
        end do

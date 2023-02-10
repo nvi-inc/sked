@@ -4,6 +4,7 @@
      >  aznow,elnow,aznew,elnew,tslew, 
      >  isetup_time,isrc_time,ibuf_time,ierr) 
 
+! 2023-02-08 JMG. Removed debugging info
 ! 2022-10-17 JMG. Fixed probelm with cable wrap for first source
 ! 2022-05-12 JGipson Modified test for nsor=0 to nsor .le. 0
 ! 2022-05-05 JMG. Calculate appropriate for first scan for az-el antennas. 
@@ -100,7 +101,7 @@
 !2. If we are in the wrap reason, set the wrap to "W")          
           if(azwrap .lt. stnlim(2,1,istat)-twopi) cwrap_new="W"  
           if(azwrap .gt. stnlim(1,1,istat)+twopi) cwrap_new = "C" 
-          write(*,*) cstnna(istat), cwrap_new                      
+!          write(*,*) cstnna(istat), cwrap_new                      
         endif 
       ENDIF
   
