@@ -30,6 +30,7 @@ C COMMON BLOCKS USED
 ! 2016Dec08 KOL. Added Fill_off
 ! 2017Oct06 KLB. Add kconf_equip
 ! 2021-05-04 JMG got rid of 'modular' (unitilaized variable) and added implicit none 
+! 2023-04-27 JMG. Initialized ich before call to gtfld
 ! 
 C
 C CALLING SUBROUTINES: PRCMD (the command decoder for parameter
@@ -154,7 +155,7 @@ C
          ckey="AL"
          goto 100
       endif
-
+      ich=1
       call gtfld(linstq(2),ich,nc,ic1,ic2)
       if (ic1.gt.0) then
         nc = ic2-ic1+1

@@ -247,6 +247,7 @@ C 2. Interactive input
         endif ! rec1 specified
       endif ! batch/interactive
 
+      if(irack .eq. 0 .and. irec1 .eq. 0 .and. irec2 .eq. 0) return 
 C 3. Modify rack type
 
 C Now modify the common variables and send warnings.
@@ -308,7 +309,7 @@ C formatter because they can't record V modes.
         endif
 
 C 4. Modify rec 1
-
+      if(irec1 .ne. 0) then 
       if((irec1.ge.1.and.irec1.le.max_rec_local) .and.
      >     (cstrec(istn,1) .ne. crec_type(irec1))) then
          if(crec_type(irec1) .eq. "unknown") then
@@ -320,9 +321,11 @@ C 4. Modify rec 1
            cstrec(istn,1)=crec_type(irec1)
          endif
       endif
+      endif 
 
 C 5. Modify rec 2
 C    If rec 1 is K4, S2 or Mk3 then can't have rec 2
+      if(irec2 .ne. 0) then 
       if((irec2.ge.1.and.irec2.le.max_rec2_local) .and.
      >    (cstrec(istn,2) .ne. crec_type(irec2))) then
         write(luscn,909) cantna(istn),cstrec(istn,2),crec_type(irec2)
@@ -340,6 +343,7 @@ C    If rec 1 is K4, S2 or Mk3 then can't have rec 2
           nrecst(istn)=1
         endif
       endif ! modify rec2
+      endif 
 
 C 6. Modify first recorder
 

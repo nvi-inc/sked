@@ -194,6 +194,7 @@ C 27Aug2003 JMG  If a source is near cable wrap limits, reject it.
 ! 2011Feb08 JMGipon.  If previous scan was further than 10 minutes away for an antenna, don't do slewing
 !                     calculation.  Assume the antenna can do it!
 ! 2014May02 JMG. Removed ipas,idir, ift from call to set_scan_param. No longer used. 
+! 2023-04-27 JMG. In chksrcup4scan replaced lcable (int*2) by cwrap (char) 
 
       kdisplay=nsubc .eq. 0 .or. kdebug 
 !      kdisplay = kdebug
@@ -387,7 +388,7 @@ C    Initialize extra durations to zero for scheduling.
       DO I = 1,NSTN !Check source is up at start of scan. If not, kick station out.
          j=istn(i)
          call ChkSrcUp4Scan(j,Nsor,mjd_beg,ut_beg,
-     >        Idurst(j),lcable(j),luscn,kdisplay,ierr)  
+     >        Idurst(j),cwrap(j),luscn,kdisplay,ierr)  
          if(ierr .ne. 0) then
             Kok=.false.
             istn(i)=-iabs(istn(i))

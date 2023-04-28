@@ -1,4 +1,6 @@
  This file contains a brief description of the changes made to sked
+2023-04-27 prlis.f:  Initialized ich before call to gtfld
+2023-04-27 newob.f: In call to chksrcup4scan replaced lcable-->cwrap.  
 2023-02-08 when_at_next_source.f: Removed debugging info.
 2023-02-08 prset.f:  Made mininimum schedule lenght a parameter. Set min time to 5 miutes. 
 2023-02-08 adjustendtime.f:  Renamed some variables. Minor cleanup. If schedule lenght is
