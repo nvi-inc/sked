@@ -5,7 +5,7 @@
      >  isetup_time,isrc_time,ibuf_time,ierr) 
 
 ! 2023-02-08 JMG. Removed debugging info
-! 2022-10-17 JMG. Fixed probelm with cable wrap for first source
+! 2022-10-17 JMG. Fixed problem with cable wrap for first source
 ! 2022-05-12 JGipson Modified test for nsor=0 to nsor .le. 0
 ! 2022-05-05 JMG. Calculate appropriate for first scan for az-el antennas. 
 ! 2021-02-19 JMG slewt2 replaced by slew
@@ -132,7 +132,10 @@ C       For start&stop, do setup on all scans if flag is set.
         endif
   
         ibuf_time=0.0    !extra time to record the data. 
-        if(cstrec(istat,1) .eq. "Mark6" .or.idata_mbps(istat).gt.0) then
+! Changed        
+        if(cstrec(istat,1) .eq. "Mark6" .and. 
+     &    idata_mbps(istat) .gt. 0) then 
+!        if(cstrec(istat,1) .eq. "Mark6" .or.idata_mbps(istat).gt.0) then
            if(isink_mbps(istat) .eq. 0) then 
              write(*,*) "isink_mbps is 0 for station ", cstnna(istat)
              stop

@@ -16,7 +16,7 @@
       integer MaxToken
       integer NumToken
       parameter(MaxToken=20)
-      character*12 ltoken(MaxToken)
+      character*20 ltoken(MaxToken)
 ! Used to hold equip.cat info in memory.
       integer num_equip,max_equip
       parameter (max_equip=300)
@@ -28,13 +28,16 @@
 ! Other miscellaneous
       integer istat
       logical keof
-      character*8 ltemp
+! 2023-11-17  ltemp (char*8--Char*20)      
+      character*20 ltemp          
       integer iwhere
 
+! 2023-11-17 JMGipson. Increased ltemp, ltoken to char*20 to accomodate longer rack names. 
+! 2019-09-03 JMGipson implicit none. 
 !  2005Jun02 JMGipson   First version.
 !  2006Jul27 JMGipson.  Also process & store terminal ID from Equipment catalog.
 !  2008Dec23 JMGipson.  Check recorder type
-! 2019Sep03 JMG.  Added implicit none 
+
 
       if(kcat_stat) return                  !Already read.
       call open_Cat(antenna_cat,ierr)
@@ -83,7 +86,7 @@
       num_equip=num_equip+1
       lequip_stat(num_equip)=ltoken(1)
       lequip_term(num_equip)=ltoken(2)
-
+    
 ! Get the bands.
       ltemp=ltoken(6)(1:1)//ltoken(8)(1:1)
       iwhere=iwhere_in_string_list(cat_equip_band,num_equip_band,ltemp)
@@ -99,7 +102,7 @@
 ! they won't match.
       ltemp=ltoken(NumToken-1)
       call capitalize(ltemp)
-!      write(*,*) "RACK ", ltemp 
+!       write(*,*) "RACK ", ltemp 
       if(ltemp .eq. 'DBBC') ltemp='DBBC_DDC'
  
       iwhere=iwhere_in_string_list(crack_type_cap,max_rack_type,ltemp)      
@@ -115,6 +118,7 @@
       call capitalize(ltemp) 
 !      call check_rec_type(ltemp) 
       iwhere=iwhere_in_string_list(crec_type_cap,max_rec_type,ltemp)
+!      write(*,*) ltemp, iwhere 
     
       if(iwhere.eq.0) then
         iwhere=max_rec_type
@@ -138,6 +142,7 @@
       goto 200
 
 290   continue
+!      stop
       close(lucat)
 
 ! Now we do a match between antenna.cat and equip.cat.

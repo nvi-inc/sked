@@ -111,7 +111,7 @@ C         this can't happen
      >        ptr_ch('0'//char(0)),  ptr_ch('min'//char(0)),
      >        ptr_ch('10'//char(0)), ptr_ch('sec'//char(0)))    
       endif     
-
+     
 C  8. Write the defs and IDs for each Mk/VLBA rack.
       do is=1,nstatn ! IDs    
       if(.not.kvlba_station(cpocod(is))) then 
@@ -124,8 +124,9 @@ C recording_system_id
         call null_term(cter)
         call fcreate_recording_system_id(ptr_ch(cter))
 C electronics_rack_name
-        cter=cterna(is)
-        call null_term(cter)
+! 2023-09-19 Writing this out was never implemented.
+!        cter=cterna(is)
+!        call null_term(cter)        
       endif 
 C NOTE: these should exist in next version
 C       call fcreate_electronics_rack_name(ptr_ch(cter))

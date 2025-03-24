@@ -1,7 +1,9 @@
       SUBROUTINE PRset(LINSTQ)
+      implicit none 
 C
 C   PRSET allows the user to set default values of parameters
 C
+!2023-10-23 JMG. Fixed call to prlis. Previously argument was 'linsqt' (which is not a variable) instead of linstq. 
 !2023-02-08 JMG.  Set mininum schedule time to 5 minutes and made a parameter. 
 !2022-03-18 Moved correlator list to a common block
 !2021-05-05 JMG Added "Beg" as synonym for start
@@ -187,7 +189,7 @@ C
       ilen = linstq(1)
 ! list command       
       if(ilen .eq. 0) then
-         call prlis(lintsq)
+         call prlis(linstq)
          return
       endif      
       
@@ -221,7 +223,7 @@ C
       endif 
       
       if(listpr(ikey) .eq. "LIST") then
-         call prlis(lintsq)
+         call prlis(linstq)
          return
       endif 
       
@@ -421,8 +423,8 @@ C  4. String parameter section.
         CALL GTFLD(LINSTQ(2),ICH,i2long(LINSTQ(1)),IC1,IC2)
         nc=ic2-ic1+1
         if (ic1.eq.0) then
-          write(luscn,'(a)') "PRSET12 - You must enter something "//
-     >      "for the parameter value."
+          write(luscn,'(a)') 
+     &     "PRSET12 - You must enter something for the parameter value."
           return
         end if
 

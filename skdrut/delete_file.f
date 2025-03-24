@@ -29,9 +29,13 @@
       logical kexist
       integer trimlen,nch
 
-      inquire(file=lfilnam,exist=kexist)
-      if(.not. kexist) return
 
+      inquire(file=lfilnam,exist=kexist)
+      if(.not. kexist) then         
+        return
+      endif 
+      write(*,*) "Deleting file: ", trim(lfilnam) 
+      
       OPEN (lutmp,  file=lfilnam,iostat=ierr)
       IF (ierr.NE.0) then
          nch=max(1,trimlen(lfilnam))
@@ -46,7 +50,6 @@
          WRITE(*,"('delete_file: I/O error ',i3, ' purging file ',a)")
      >    ierr,lfilnam(:nch)
       endif
-
 
       return
       end

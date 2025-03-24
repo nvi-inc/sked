@@ -1,0 +1,187 @@
+*
+* Copyright (c) 2021 NVI, Inc.
+*
+* This file is part of VLBI Field System
+* (see http://github.com/nvi-inc/fs).
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+C  Common Block statement for DRUDG
+! Newer changes now at top
+! 2021-12-20  JMG Added max_gap_time, ipre_time. Removed ITCTM, ICRTY6
+! 2021-01-31  JMG Changed most prompts to char*6 so that "IGNORE" is now an option 
+! 2021-01-25  JMG Removed RA50, DEC50. Moved to skdrincl/source.ftni sorp1950
+! 2021-01-25  JMG Added vdif_thread 
+! 2020-12-30  JMG Added in setup_proc
+! 2020-06-30  JMG Got rid of kmissing (see if pass information is absent)
+! 2019-08-25  JMG Added imark6_off to support broadband
+! 2019-08-21  JMG Got rid of iperm which whas not used
+C
+C  MWH 890518 Changed file names to character
+C             Added Fmp call declarations
+C  NRV 890613 ADDED PARITY AND SETUP TIME (READ FROM SCHEDULE)
+C             AND SOURCE AND TAPE TIME
+C  NRV 900413 Added printer orientation strings from control file
+C  NRV 901018 Add printer type variables
+C  NRV 901121 Combine IDCB and IBUF sizes into IBUF
+C  NRV 910306 Added IHDTM, ITEARL
+C  NRV 910524 Added buffers for BBSYN commands
+C  NRV 910702 This is the PC version
+C  nrv 930407 implicit none
+C  nrv 930708 Add nchanr
+C  nrv 940622 Add kbatch for non-interactive mode
+C 951214 nrv Add LBARREL
+C 951218 nrv Replace LB with the name LBNAME, remove LPASS.
+C 960119 nrv Add kmissing
+C 960215 nrv Add perm = permissions o'0666'
+C 960226 nrv Add cprtlab
+C 960709 nrv Remove LBARREL, moved to freqs.ftni
+C 970207 nrv Add cepoch. Add kparity.
+C 970228 nrv Add rlabsize, clabtyp, labname, fileptr
+C 970301 nrv Add cpapersize
+C 970304 nrv Add coption
+C 970603 nrv Add IRECCV for coverletter rec# and kdrg_infile
+C 970827 nrv Add ilabcol to remember the position on the page between
+C            schedules, and inewpage 
+C 971209 nrv Add kprepass
+C 980916 nrv Add ctextname
+C 990326 nrv Add cversion
+C 990401 nrv Add iVerMajor_FS, iVerMinor_FS, iVerPatch_FS
+C 991102 nrv Add kdr_type
+C 020304 nrv Add kmk5_piggyback
+C 020508 nrv Add tpid_prompt,itpid_period,tpid_parm
+C 020713 nrv Add kgeo
+C 021010 nrv Add kpostpass
+C 2003Jul11 JMG added itctim
+! 2004Nov12 JMGipson. Removed iwidth, csize
+!                     Replaced with  cpaper_size
+! 2006Jun13.  JMG. Removed ldisk2file stuff and put in ../skdrincl/data_xfer.ftni.
+! 2006Oct16. JMGipson. added klabel_ps flag to indicate postscript printer.
+! 2007Jul10  JMG. Removed lbname.
+! 2007Jul20  JMG. Added ksked_proc flag. Put all logical in same common.
+!                 Got rid of stuff that is no longer used.
+! 2008Aug19 JMG. Added cbbcbuf which is equivalenced to ibbcbuf.
+! 2013Sep19 JMG. Added klo_config, ktarget_time
+! 2015Jan30 JMG. Added kignore_bad_mask 
+! 2015Jul17 JMG. Added  cont_calPolarity
+! 2016Sep08 JMG. Added lvsi_prompt
+! 2016Dec23 JMG. Added ical_time_staggered, kcont_cal
+! 2018Jul20 JMG. removed cversion and put in drver_com.ftni 
+c
+      logical klab,kvex,KSPINT,KFLG,kbatch,kparity,kdrg_infile,
+     .          kprepass,kdr_type,kgeo,kpostpass
+      logical klabel_ps  !is the label printer Postscript?
+      logical ksked_proc
+
+      logical klo_config, ktarget_time
+      logical kignore_Mark5B_bad_mask 
+      logical kcont_cal
+
+      common/drcom_logical/
+     .       kvex,klab,KSPINT,KFLG(4),kbatch,kparity,
+     .       kdrg_infile,kprepass,kdr_type,kgeo,
+     .       kpostpass,klabel_ps,ksked_proc,
+     >       klo_config,ktarget_time,kignore_Mark5b_bad_mask,
+     >       kcont_cal 
+
+! Rearranged so that definitiona and common block statments in the same order. 
+
+
+      CHARACTER*128 LSKDFI,SNPNAME,CINNAME,COUTNAME,
+     .  lstname,tmpname,pntname,ctmpnam,prcname,cprtlan,cprtpor,
+     .  cprttyp,cprport,cprtlab,clabtyp,labname,ctextname
+
+      character*2 cpaper_size
+      character*2 coption(3)
+      character*6 cpid
+      character*4 cepoch
+
+      character*6 lsetup_proc_orig                    !value of SETUP_proc in skedf.ctl (if not set then "IGNORE")
+      character*6 lsetup_proc                         !value used.  
+
+      character*6 lvdif_thread_orig                   !Value of lvdif_thread in skedf.ctl. 
+      character*6 lvdif_thread                        !value used in program. 
+      character*6 tpid_prompt,lvsi_align_prompt
+      character*6 cont_cal_prompt,cont_cal_Polarity
+      
+
+
+      character*12 lmode_cmd     !bit_streams, fb_mode, mk5b_mode etc..   
+      character*6  lext_vdif     !used in DBBC, DBBC3
+
+      integer*2 IBUF(500)
+      character*(1000) cbuf
+      equivalence (cbuf,ibuf)
+     
+      COMMON/DRCOM_CH/LSKDFI,SNPNAME,CINNAME,COUTNAME,
+     >    lstname,tmpname,pntname,ctmpnam,prcname,cprtlan,cprtpor,
+     >    cprttyp,cprport,cprtlab,clabtyp,labname,ctextname,
+     >    cpaper_size,coption,cpid,cepoch,
+     >    lsetup_proc_orig, lsetup_proc,
+     >    lvdif_thread_orig, lvdif_thread,
+     >    tpid_prompt,lvsi_align_prompt,
+     >    cont_cal_prompt,cont_cal_Polarity,
+     >    lmode_cmd,lext_vdif,cbuf  
+
+      real rlabsize(6)
+      common /drcom_real/rlabsize
+c
+     
+      INTEGER ireccv,IRECSK,IRECST,IRECEL,isklen,luusr,
+     .  lu_infile,istn,
+     .  nlab,nllab,
+     .  ilabrow,ilabcol,inewpage,
+     .  nchanr,fileptr,itpid_period
+
+      integer lu_outfile,luprt,luscn
+C
+      integer*2 ibbcbuf(40,2,3)
+      character*80 cbbcbuf(2,3)
+      equivalence (ibbcbuf,cbbcbuf)
+      integer ibbclen(2,3)
+      integer nbbcbuf(2)
+
+      integer ical_time_staggered           !override time for the calibration.
+      integer imark6_off
+      integer max_gap_time                  !maximium gap between scans
+      integer ipre_time                     !Buffer time before issuing first 'scan=' after resuming 
+
+      COMMON/DRCOM_int/
+     .       ISKLEN,LUUSR,
+     .       LU_INFILE, LU_OUTFILE,LUPRT,
+     >       ISTN,
+     .       NLAB,NLLAB,
+     .       ireccv,IRECSK,IRECST,IRECEL,
+     .       ilabrow,ilabcol,inewpage,
+     .       luscn,itpid_period,
+     .       nchanr,fileptr,
+     .       ibbcbuf,ibbclen,nbbcbuf,ical_time_staggered,
+     >       imark6_off, max_gap_time,ipre_time 
+
+
+  
+C  IBUF   - buffer for file reads, writes
+C  ISKLEN - length of schedule file records
+C  LUUSR  - user's terminal
+C  LUPRT  - printer LU
+C  LUOUT  - output LU for pointing
+C  ISTN   - current station being processed
+C  NLAB   - number of labels across a page, max 5
+C  NLLAB  - number of lines per label, min 4
+C  KSPINT - true if we are to spin blank tape at stations
+C           which are not scheduled to participate in the
+C           current observation
+
+C  cprport - printer port for pc
+C  kbrk - true if ifbrk() was true

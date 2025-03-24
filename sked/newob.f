@@ -88,8 +88,7 @@ C               - Holders for decoded values
       integer itersnr            ! 1 for first iteration, add 1 for subsequent      
       integer itemp              ! temporary variablel            
         
-      character*80 lerr_msg 
-      character*20 lfrnt_msg
+      character*80 lerr_msg     
       integer istat1             ! first station in subnet.
      
       integer i,nsor,iyrcmd,idaycmd,ihr,imin,isc,mjd_cmd
@@ -112,7 +111,7 @@ C               - Holders for decoded values
       character*2 cwrap_new,cwrap_now
       integer*2 iwrap_now
       equivalence (iwrap_now,cwrap_now)
-
+    
 C  History
 ! 2022-04-07 JMG  Wasn't handling start-time parameter correctly on manual scheduling
 ! 2021-02-19 JMG  slew now returns az_now,az_new 
@@ -195,6 +194,7 @@ C 27Aug2003 JMG  If a source is near cable wrap limits, reject it.
 !                     calculation.  Assume the antenna can do it!
 ! 2014May02 JMG. Removed ipas,idir, ift from call to set_scan_param. No longer used. 
 ! 2023-04-27 JMG. In chksrcup4scan replaced lcable (int*2) by cwrap (char) 
+! 2025-03-21 JMGipson.  More and better error message if verbose level is set. 
 
       kdisplay=nsubc .eq. 0 .or. kdebug 
 !      kdisplay = kdebug
@@ -226,6 +226,7 @@ C    Initialize extra durations to zero for scheduling.
         idurxt(i)=0
       enddo      
        
+      lerr_msg=" has slewing error ="
 ! Find how long it would take the stations to get to the specified source. 
       DO  I=1,NSTN !get latest start time
          J = ISTN(I)   
@@ -235,9 +236,13 @@ C    Initialize extra durations to zero for scheduling.
      >     idurcur(j),idle,ical, cwrap_now,cwrap(j),mjd_at(j),ut_at(j),
      >     az_now,el_now,az_new,el_new,tslew(j),
      >     isetup_time,isrc_time,ibuf_time, ierr)         
-     
+         
         if(ierr .ne. 0) then
            istn(i)=-istn(i)         !Remove stations that cannot participate. 
+           if(iverbose_level .ge. 1) then 
+            write(luscn,'("Station ", a,a,i4)')
+     >         cstnna(j),trim(lerr_msg),ierr    
+           endif       
          endif  !got a later time           
       end do 
 ! Remove stations that can't observe      
@@ -360,18 +365,18 @@ C    Initialize extra durations to zero for scheduling.
         call destn(nstn,istn) 
         if(nstn .lt. 2) goto 900    !Common exit on two few stations.   
         goto 200
-      endif 
+      endif  
      
 ! Now check for downtime. 
       lproblem= "DOWN" 
+      lerr_msg=" can not particapate because of downtime" 
       DO  I = 1,NSTN !Check source is visible for all observations.
         j=istn(i)
 !  Now turn off station if station is not up for scan. (Becase of downtime.
         if(.not.(kstatup(j,mjd_beg,ut_beg,idurst(j)))) then 
           if(iverbose_level .ge. 1) then 
-             write(luscn,
-     >     '("Station ",a, " can not participate because of downtime")')
-     >             cstnna(j)                
+             write(luscn,'("Station ", a,a,i4)') 
+     >           cstnna(j), trim(lerr_msg)    
           endif 
           kok=.false.
           istn(i)=-iabs(istn(i))
@@ -381,9 +386,10 @@ C    Initialize extra durations to zero for scheduling.
         call destn(nstn,istn) 
         if(nstn .lt. 2) goto 900    !Common exit on two few stations.   
         goto 200
-      endif 
+      endif  
          
-! Check to make sure that the source will be up for the entire scan.    
+! Check to make sure that the source will be up for the entire scan.   
+      lerr_msg=" is not up for entire scan. Error: " 
       KOK =.true. 
       DO I = 1,NSTN !Check source is up at start of scan. If not, kick station out.
          j=istn(i)
@@ -392,6 +398,10 @@ C    Initialize extra durations to zero for scheduling.
          if(ierr .ne. 0) then
             Kok=.false.
             istn(i)=-iabs(istn(i))
+            if(iverbose_level .ge. 1) then 
+              write(luscn,'("Station ", a,a,i4)') 
+     >           cstnna(j), trim(lerr_msg),ierr    
+           endif                      
          endif
       END DO  !make sure we can observe at this time
  ! Remove stations where we had problems.     
@@ -399,7 +409,7 @@ C    Initialize extra durations to zero for scheduling.
         call destn(nstn,istn) 
         if(nstn .lt. 2) goto 900    !Common exit on too few stations.   
         goto 200
-      endif 
+      endif   
   
 !     7.  Everything looks OK.  Write out info on screen. 
       if(kdisplay) then       

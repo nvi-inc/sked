@@ -22,63 +22,59 @@
 
 C   DRPRRD reads the lines in the $PARAM section needed by drudg.
       include '../skdrincl/skparm.ftni'
+      include '../skdrincl/skobs.ftni'
       include 'drcom.ftni'
       include '../skdrincl/statn.ftni'
 C History
-
+! 2023-10-02 JMG. Cleaned up and rearranged.  Made reading the line from VEX/SKD a subroutine.  
 ! 2021-02-04 JMG Also explicitly check that we have a $PARAM section. Previously  assumed this was at the top of the file. 
 ! 2021-02-02 JMG when reading a VEX files stop reading $PARAM we get to the end. 
 !  
 C 020713 nrv copied from sked
 
    
-
 C Input
       integer ivexnum
 ! functions
       integer ichmv,i2long
-      integer fget_literal,iret,ptr_ch,fget_all_lowl
+      integer fget_literal,ptr_ch,fget_all_lowl
 
-C Local
+C Local   
       integer nch,ilen,ic1,ic2,ich,idummy,ierr
       integer*2 ibufq(100)
-      character*198 cbufq
-      equivalence(ibufq(2), cbufq)
-      logical kmore
+  
+      
+! Initialize these things which are found in $PARAM secion      
+      isettm = 0
+      itaptm = 1
+      isortm = 5    
+      icalde = 10   !default  
 
-      if (.not.kvex) then ! find $PARAM section
-        rewind(lu_infile)
-        ibufq(1) = 0
-        DO WHILE (ibufq(1).ne.-1.and.cbuf(1:6).ne.'$PARAM')
-          CALL READS(lu_infile,ierr,IBUF,isklen,ilen,2) ! get next line
-          ibufq(1) = ilen
-        enddo
+! Initialize location in file. 
+      if (.not.kvex) then !
+        rewind(lu_infile)        
       else ! find SCHEDULING_PARAMS literal
-        iret=fget_all_lowl(ptr_ch(char(0)),ptr_ch(char(0)),
+        ilen=fget_all_lowl(ptr_ch(char(0)),ptr_ch(char(0)),
      .  ptr_ch('literals'//char(0)),
      .  ptr_ch('SCHEDULING_PARAMS'//char(0)),ivexnum)
-        if (iret.lt.0) return
+        if (ilen.lt.0) return
         kgeo = .true.
       endif ! $PARAM or SCHEDULING_PARAMS
-
-C  Get the initial line of parameters
-      if (.not.kvex) then ! read sk file first line
-        CALL READS(lu_infile,ierr,IBUF,isklen,ilen,2)
-        ibufq(1) = ilen
-      else ! get first literal line
-        do while(cbuf(1:6) .ne. "$PARAM") 
-          iret=fget_literal(ibuf) ! first fget is null
-          if(iret .lt. 0) return
-          ibufq(1) = iret
-        end do 
-      endif ! sk/vex
-      kmore = .true.
-    
+      
+! This reads a line  from the sked file, or from the $SCHEDULING_PARAMS section of the VEX file.      
+      cbuf(1:6) = "$foo"
+      do while(cbuf(1:6) .ne. "$PARAM") 
+        call read_sked_vex_line(ilen)
+        if(ilen .lt. 0) return      !EOF            
+      end do     
+! now read the next line       
+      call read_sked_vex_line(ilen)
+     
 C  Loop on parameter section lines
-      DO WHILE (kmore) !decode an entry
+      DO WHILE (cbuf(1:1) .ne. "$") 
         ICH=1
         CALL GTFLD(IBUF,ICH,i2long(IBUFQ(1)),IC1,IC2)
-        nch=ibufq(1)-ic2
+        nch=ibufq(1)-ic2  
         IF  (    cbuf(1:6).eq. 'SUBNET') THEN  !SUB line
         ELSE IF (cbuf(1:4).eq. 'SCAN') THEN !SCAN line
         ELSE IF (cbuf(1:5).eq. 'WEIGHT') THEN
@@ -102,18 +98,13 @@ C  Loop on parameter section lines
           CALL SEARL(IBUFQ,luscn,luscn)
         else if(cbuf(1:3) .eq. 'SNR') then !SNR or SNR_1
         ELSE
+! Some other parameter         
           idummy=ichmv(ibufq(2),1,ibuf,1,i2long(ibufq(1)))
-          CALL drSET(IBUFQ)
+          CALL drSET(IBUFQ) 
         ENDIF
-        if (.not.kvex) then ! read sk file first line
-          CALL READS(lu_infile,ierr,IBUF,isklen,ilen,2)
-          ibufq(1) = ilen
-          kmore = cbuf(1:1) .ne. "$" .and. ibufQ(1).NE.-1
-        else ! get first literal line
-          iret=fget_literal(ibuf)
-          ibufq(1) = iret
-          kmore = iret.gt.0 .and. cbuf(1:1) .ne. "$" 
-        endif ! sk/vex
+        call read_sked_vex_line(ilen)   
+        if(ilen .le. 0) return             !EOF 
+        ibufq(1)=ilen              
       enddo
 
       return

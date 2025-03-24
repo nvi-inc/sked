@@ -30,7 +30,6 @@ C COMMON BLOCKS USED
 ! 2016Dec08 KOL. Added Fill_off
 ! 2017Oct06 KLB. Add kconf_equip
 ! 2021-05-04 JMG got rid of 'modular' (unitilaized variable) and added implicit none 
-! 2023-04-27 JMG. Initialized ich before call to gtfld
 ! 
 C
 C CALLING SUBROUTINES: PRCMD (the command decoder for parameter
@@ -68,6 +67,9 @@ C               - Convert GSTCUR to seconds
 
 C
 C  History
+! latest now at top
+! 2023-10-23 JMGipson. Was not getting second argument correctly.
+!
 C     880310 NRV DE-COMPC'D
 C     880803 PMR changed format for file name                             param
 C     890110 GAG added SUNDIS
@@ -155,12 +157,21 @@ C
          ckey="AL"
          goto 100
       endif
-      ich=1
+
+      ich=1 
       call gtfld(linstq(2),ich,nc,ic1,ic2)
       if (ic1.gt.0) then
+        call gtfld(linstq(2),ic2+1,nc,ic1,ic2)    
+        if(ic1 .eq. 0) then
+          kall=.true.
+          ckey="AL"
+          goto 100
+        endif 
+      
         nc = ic2-ic1+1
         ckeywd=" "
         idummy = ichmv(lkeywd,3,linstq(2),ic1,nc)
+    
         ikey=istringMinMatch(list,ilist_len,ckeywd)
         if (ikey.eq.0) then
           write(luscn,9110) ckeywd

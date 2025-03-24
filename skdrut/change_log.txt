@@ -1,0 +1,8 @@
+! Change log for skdrut programs
+! 2025-03-24 delete_files.f   Write message indicating which files are deleted
+! 2023-10-18 readf_asc.f Fixed problem with reading in blank lines that caused fortran index error. 
+! 2023-10-02 newscan.f.  Removed hard-coding icalde.  
+! 2023-09-29 JMGipson. frinit.f: 
+!           Changed initialization of freqpcal(*) from -1 to 1. This is not used by sked, but !is used by drudg.
+!           Added initializaiton of npctone(*) to 1, cpol(*) to "r".
+!           All this is done to make drudg treat SKD and VEX files derived from SKD the same.

@@ -20,7 +20,9 @@ OBJECTS=  double_2_string.o real_2_string.o  \
 b3of9.o bar1.o bbbuf.o bbsyn.o bcode.o blabl.o \
 cazel.o cband_char.o cbinf.o checkmk5xlat.o check_csb_list.o check_dbbc_setup.o chkgrpandwrite.o ckobs.o clist.o \
 copen.o copy_time.o counter_init.o crelease.o \
-delete_comma_and_write.o drchmod.o drprrd.o drset.o drudg.o drudg_rdctl.o drudg_write.o dsnout.o \
+delete_comma_and_write.o drchmod.o\
+drprrd.o \
+drset.o drudg.o drudg_rdctl.o drudg_write.o dsnout.o \
 drudg_write_comment.o \
 equip_type.o fakesum.o fdrudg.o find_num_chans_rec.o find_recorder_speed.o \
 get_version.o getqual.o  getstr.o gtsnp.o \
@@ -35,6 +37,7 @@ proc_dbbc_pfb_tracks.o proc_dbbc3_ddc_tracks.o  proc_tracks.o proc_trkf.o \
 proc_vc_cmd.o proc_vracks_bbc.o proc_lba_ifp.o proc_mracks_vc.o proc_dbbc_bbc.o proc_dbbc3_bbc.o \
 proc_thread.o proc_track_mask_lines.o \
 proc_write_define.o procintr.o procs.o \
+read_sked_vex_line.o \
 prtmp.o prtxt.o psbar.o read_snap1.o read_snap6.o \
 setprint.o setup_name.o setup_printer.o skdshft.o \
  snap.o \

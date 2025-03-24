@@ -3,6 +3,9 @@ C
 C  This routine writes out the VEX $TRACKS section.
 C
 C   HISTORY:
+! New at top
+! 2023-09-29 JMG. Added RDBE, DBBC3_DDC
+
 C 990611 nrv New. 
 C 990922 nrv Use VEX utilities
 C 990929 nrv Add track_frame_format
@@ -37,6 +40,7 @@ C  LOCAL
       character*36 csubpass
       logical km3,km4,kv,km3mode
       logical km5b_rec               !Mark5B  recorder 
+      logical km6_rec
       logical kvdif                  !Vdif recorder    
       integer ptr_ch,trimlen
       character*28 cp,ctr,cbit,chd,cit,cfr
@@ -48,20 +52,21 @@ C  LOCAL
 C  1. TRACKS
 
       call fcreate_block(ptr_ch("TRACKS"//char(0)))
-      write(luscn,'("TRACKS: xxx")')
+      write(luscn,'("TRACKS:")')
 
 C  2. Write each fanout_def line.
 
       itype=4 ! FREQ, BBC, IFD, TRACKS, HEAD_POS, PASS_ORDER
       do ic=1,ncodes ! codes
-        call getist(ic,itype,ist,ipr,npx)
+! Note:  subroutine getist writes out refdefname and stations.         
+        call getist(ic,itype,ist,ipr,npx)  
         do ipx=1,npx ! each group
           isp=ipr(ipx) ! station index to use to write out this group
 
 C def
           call fcreate_def(ptr_ch(refdef_name(itype,isp,ic)))
           il=trimlen(refdef_name(itype,isp,ic))
-          write(luscn,'(a," ",$)') refdef_name(itype,isp,ic)(1:il)
+!          write(luscn,'(a," <> ",$)') refdef_name(itype,isp,ic)(1:il)
 
 ! Don't have to put out track commands for VDIF
           ind=index(refdef_name(itype,isp,ic),"VDIF")
@@ -127,7 +132,9 @@ C ... and add the track list
             enddo ! ihd headstacks
           enddo ! ipass subpasses
         enddo ! each group
-      enddo ! codes    
+      enddo ! codes   
+      
+      write(*,*) "Line 137"  
    
       itype=9
       do ic=1,ncodes ! codes
@@ -140,10 +147,10 @@ C ... and add the track list
 C def
 !          call fcreate_def(ptr_ch(refdef_name(itype,isp,ic)))
 !          il=trimlen(refdef_name(itype,isp,ic))
-          write(luscn,'(a," ",$)') trim(refdef_name(itype,isp,ic))
+!          write(luscn,'(a," j  ",$)') trim(refdef_name(itype,isp,ic))
        end do 
       end do      
-      write(*,*) " " 
+!      write(*,*) " " 
 
 C 3. Write track_frame_format for each type in this schedule.
 
@@ -152,6 +159,7 @@ C 3. Write track_frame_format for each type in this schedule.
       kv=.false.
       km3mode=.false.
       km5b_rec =.false. 
+      km6_rec=.false. 
       kvdif =.false. 
       do is=1,nstatn
         cstrack_tmp=cstrack(is)
@@ -168,11 +176,14 @@ C 3. Write track_frame_format for each type in this schedule.
           km4=.true.
         case("VLBA4","VLBA5","K4-1","K4-2","K4-1/K3","K4-2/K3",
      >       "K4-1/M4","K4-2/M4","MARK5", "DBBC","NONE",
-     >   "DBBC_DDC", "DBBC_PFB","DBBC_DDC/FILA10G","DDC_PFB/FILA10G")  
+     >   "DBBC_DDC", "DBBC_PFB","DBBC_DDC/FILA10G","DDC_PFB/FILA10G",
+     >   "DBBC3_DDC", "RDBE" )  
 ! Now look at the kind of recorder...
           select case(cstrec_tmp)
           case("MARK5B")
              km5b_rec=.true.
+          case("MARK6")
+             km6_rec=.true. 
           case("K5")
              if(kvlba_corr) then
                 km4=.true.
@@ -206,11 +217,19 @@ C 3. Write track_frame_format for each type in this schedule.
         call fcreate_track_frame_format(ptr_ch(cfr))
       endif
       if (km5b_rec) then
+        write(*,*) "MK5b rec" 
         call fcreate_def(ptr_ch('Mark5B_format'//char(0)))
         cfr = 'Mark5B'
         call null_term(cfr)
         call fcreate_track_frame_format(ptr_ch(cfr))
       endif
+      if (km6_rec) then
+        write(*,*) "HERE " 
+        call fcreate_def(ptr_ch('Mark6_format'//char(0)))
+        cfr = 'Mark6'
+        call null_term(cfr)
+        call fcreate_track_frame_format(ptr_ch(cfr))
+      endif      
 
       if (kvdif) then
         call fcreate_def(ptr_ch('VDIF_format'//char(0)))
@@ -240,6 +259,6 @@ C 3. Write track_frame_format for each type in this schedule.
         call fcreate_data_modulation(ptr_ch(cfr))
       endif
 
-      write(luscn,'()')
+!      write(luscn,'()')
       RETURN
       END

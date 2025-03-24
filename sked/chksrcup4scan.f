@@ -44,6 +44,7 @@
 !    2009Jan09 JMGipson.  Changed error message from "too low" to "not visible"
 !    2021-12-06 JMGipson. Removed call to kup which reproduces many of the calculations here.
 !    2023-04-27 JMGipson. Initialize ierr. 
+!    2025-03-21 JMGipson.  Only set error code on first loop if actually an error. 
 !         
 !      write(*,'(2(a,1x),2(i2.2, ":"),i2.2)')csorna,cstnna,ihr,imin,isec
       ierr=0 
@@ -51,16 +52,18 @@
       el=0.d0    
       do i=1,2  
         if(i.eq.1) then
-          ut_test=ut
-          ierr=1    
+          ut_test=ut   
         else
-          ut_test=ut+idur
-          ierr=2       
-        endif
+          ut_test=ut+idur    
+        endif        
         CALL CVPOS(isource,istat,MJD,UT_test,
      >       AZ(i),EL(i),HA,DEC,X30,Y30,X85,Y85,KUP) ! start of obs
-        if(.not.kup) goto 500  ! Exit with an error.                       
-      end do   
+        if(.not.kup)  then
+          ierr=i          
+          goto 500  ! Exit with an error.                       
+        endif          
+      end do  
+   
 ! at this point know that source was visible both at start and end. 
 ! Now make sure that it doesn't cross wrap limit boundaries. 
 ! The bottom checks if  AZ-el antennas. If not then we can skip. 

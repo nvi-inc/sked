@@ -9,6 +9,7 @@
 ! The string 24OCT12 is the version.
 ! Histry
 ! 2012Oct10  JMGipson first version.
+! 2025-03-19 JMG.  Fixed bug: Was trimming off the first two characters of the version 
 !
       character*(*) cat_name
       integer ierr       
@@ -19,6 +20,7 @@
 
 ! local
       character*80 ldum_in,ldum_cap
+      character*10 ltmp
       integer ind 
       integer i 
       logical kexist
@@ -46,11 +48,12 @@
         read(lucat,'(a)',end=100,err=100) ldum_in   
         ldum_cap=ldum_in
         call capitalizE(ldum_cap)
+           
         ind=index(ldum_cap,"VERSION") 
         if(ind .ne. 0) then
-           ind=ind+9
+           ind=ind+7        
            ldum_in(1:ind)=" "
-           ind=ifirst_non_blank(ldum_in)             
+           ind=ifirst_non_blank(ldum_in)            
            if(ldum_in(ind:) .ne. " ") then         
               read(ldum_in(ind:),'(a)',err=100,end=100) lversion
            endif
@@ -59,8 +62,7 @@
         endif 
       end do 
 
-100   continue    
-!      write(*,*) lversion 
+100   continue     
       close(lucat)
       return
       end 

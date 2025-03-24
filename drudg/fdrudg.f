@@ -40,7 +40,7 @@ C  Common blocks:
 
 
 C Subroutine interface:
-C     Called by: drudg (C routine)
+C     Called by: drudg
 
 C Input:
       character*(*) cfile   ! file name
@@ -85,6 +85,10 @@ C LOCAL:
 C
 C  DATE   WHO CHANGES
 ! 2022-02-09 JMGipson. Fixed bug in logic of using equip_override.  Added parens
+! 2021-01-27 JMG      Renamed: SORP50-->sorp2000  RA50, DEC50-->SORP1950
+! 2023-02-10 JMG.     Increased limit of scheudle name from 6 to 16 chars.
+
+!
 ! 2019Aug21 JMG.  Got rid of iperm
 !
 C  830427 NRV ADDED TYPE-6 CARTRIDGE TO IRP CALLS
@@ -247,8 +251,7 @@ C 021002 nrv Write comments about geo/astro VEX/standard schedule.
 ! 2016May07 WEH.      Increased size of crack_type_def, crack_tmp_cap from Char*12-->char*20
 ! 2016Jul28 JMG.      Now also set cfirstrec_def in 'equipment override'
 ! 2018Jun17 JMG.      Removed debugging statement whichr wrote out first recorder
-! 2021-01-27 JMG      Renamed: SORP50-->sorp2000  RA50, DEC50-->SORP1950
-! 2023-02-10 JMG.     Increased limit of scheudle name from 6 to 16 chars. 
+ 
 ! Get the version
       include 'fdrudg_date.ftni'
       call get_version(iverMajor_FS,iverMinor_FS,iverPatch_FS,crel_FS)
@@ -390,7 +393,7 @@ C       Opening message
           if (nch.eq.0.or.ifunc.eq.8.or.ierr.ne.0) then ! prompt for file name
             if (kbatch) goto 990
             write(luscn,'(a,$)')
-     >" Enter schedule file name (.skd, .vex or .drg default <return> "
+     >" Enter schedule file name (.skd or .vex <return> "
             write(luscn,
      >          '("if using a .snp file, :: to quit) ?",$)')
             read(luusr,'(a)') cbuf
@@ -484,7 +487,6 @@ C     3. Read the schedule file sections.
 C
       kvex = .false.
       kgeo = .true.
-      kpostpass = .false.
       if (.not.kskd) goto 500
         ix=trimlen(cexpna)
         IC=TRIMLEN(LSKDFI)

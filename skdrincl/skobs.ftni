@@ -27,11 +27,12 @@ C 991118 nrv Add nominal start,end.
 C 000616 nrv Add scan names.
 C 001109 nrv Change scan names to character.
 ! 2021-12-28 JMGipson got rid of ipartm, ihdtm, imtptm which are no longer used 
+! 2023-10-02 JMGison. Added icalde. Previously in ../sked/skparm.ftni 
 
       integer nobs,iskrec
 C nobs - number of observations in this schedule (really: scans)
 C iskrec - time-ordered index of observation records
-      integer isettm,itaptm,isortm
+      integer isettm,itaptm,isortm,icalde
       integer iyr_start,ida_start,ihr_start,imin_start,isc_start
       integer iyr_end,  ida_end,ihr_end,imin_end,isc_end
       integer itimestart(5),itimeend(5)
@@ -59,7 +60,7 @@ C *_end - nominal end time
 
       COMMON/SKOBS/
      .nobs,
-     .isettm,itaptm,isortm,
+     .isettm,itaptm,isortm,icalde, 
      .iyr_start,ida_start,ihr_start,imin_start,isc_start,
      .iyr_end,ida_end,ihr_end,imin_end,isc_end,
      .ISKREC(MAX_OBS),

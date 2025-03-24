@@ -6,6 +6,7 @@ C  it out in the working file.
 C
 C   HISTORY:
 C     WHO   WHEN   WHAT
+!  2023-11-17 JMG.  Increased ltoken, ltemp to char*20 to accomadate longer rack names 
 C     gag   900110 created
 C     nrv   930225 implicit none
 C 000124 nrv Pick only the first terminal found in the catalog, in case
@@ -44,8 +45,8 @@ C  LOCAL VARIABLES
       integer MaxToken
       integer NumToken
       parameter(MaxToken=20)
-      character*12 ltoken(MaxToken)
-      character*8 ltemp      
+      character*20 ltoken(MaxToken)
+      character*20 ltemp      
 
       character*125 ldum   !input buffer
 

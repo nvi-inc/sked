@@ -23,6 +23,9 @@
 C  FRINIT initializes arrays in freqs.ftni before reading from a schedule file.
 
 !Updates
+! 2023-09-29 JMGipson. Changed initialization of freqpcal(*) from -1 to 1. This is not used by sked, but is used by drudg.
+!                      Added initializaiton of npctone(*) to 1, cpol(*) to "r".
+!                      All this is done to make drudg treat SKD and VEX files derived from SKD the same.
 ! 2020-12-30 JMG Removed unused variables
 ! 2020-10-02  JMG. Removed all references to S2
 C 960610 nrv New.
@@ -69,13 +72,14 @@ C Local
 
       call init_itras()
 
-  
       do i=1,nco
         do j=1,nst
           do k=1,max_chan
-            freqpcal(k,j,i) = -1.d0
+            cpol(k,j,i)       ="r"
+            cifinp(k,j,i)     ="  "
+            freqpcal(k,j,i)   = 1.d0
             freqpcal_base(k,j,i) = -1.d0
-            cifinp(k,j,i)="  "
+            npctone(k,j,i)=1            
           enddo
         enddo
       enddo

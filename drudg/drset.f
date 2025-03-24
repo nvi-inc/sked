@@ -45,11 +45,11 @@ C   LOCAL VARIABLES
       equivalence (lvalue,cvalue)
       
       integer MaxPr
-      parameter (MaxPr=6)
+      parameter (MaxPr=7)
       character*15 listPr(MaxPr)
     
-      data listPr/"CORRELATOR","EARLY", "MARK6_OFF", "SOURCE","SETUP",
-     & "TAPE"/  
+      data listPr/"CALIBRATION","CORRELATOR","EARLY", "MARK6_OFF", 
+     & "SOURCE","SETUP", "TAPE"/  
 
 C  History
 C 970401 nrv New. Copied from sked's PRSET, leaving only those
@@ -104,7 +104,9 @@ C  Numerical values
      & '("DRSET04 - Invalid parameter ",i6, " value for ", a)') 
      &     inum, ckeywd    
         END IF
-        IF (ckeywd.eq.'SETUP') THEN
+        if(ckeywd .eq. 'CALIBRATION') then
+         icalde = inum 
+        else IF (ckeywd.eq.'SETUP') THEN
           ISETTM = INUM
         else if(ckeywd  .eq. 'MARK6_OFF') then
           imark6_off=inum

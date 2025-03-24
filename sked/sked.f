@@ -18,10 +18,12 @@ C
       include '../skdrincl/statn.ftni'
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/skobs.ftni'
+      include '../skdrincl/broadband.ftni'
       include 'mysql_common.i'      
       include 'cat_name_version.ftni' 
       include 'cat_mode.ftni'
       include 'cat_freq.ftni'
+ 
 
 C   Functions
       integer ifunc,gtcmd! function
@@ -240,8 +242,8 @@ C  4. Open schedule file and read it in.
 
       IERRCM = 0
       INUMCM = 0
-      CALL SKOPN(cmdline,ierr)    
-      
+      CALL SKOPN(cmdline,ierr)   
+           
       if(ierr .ne. 0 .or. ierrcm .ne. 0) then
          write(*,'(a)') "Try again!"
          nch=0
@@ -273,8 +275,8 @@ C  6. The main prompt
 !      write(*,*) "fsked 700:   kcat_freq ", kcat_freq
       cmdline=" "
       linestq(1) = 0
-      call read_cmdline(luscn,luusr,cmdline)     
-
+      call read_cmdline(luscn,luusr,cmdline)   
+    
       if(cmdline .eq. "!!") then    ! repeat last command
         cmdline=cmdline_old
       endif   
@@ -503,7 +505,8 @@ C     no parameters for this command.
       CALL SKCLS(cmdcod,linestq,KERR)
       nch=0
       if(cmdcod .eq. 'AB'.and.KERR .eq. 0) then
-         goto 200
+         call delete_temp_files
+         stop 
       endif
 
       IF (KERR.NE.0.OR.cmdcod.EQ.'WR'.OR.cmdcod.EQ.'WC'

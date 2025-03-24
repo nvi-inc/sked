@@ -101,6 +101,7 @@ C               - current,new values of az,wrap
 
 C
 C  History
+! 2023-10-18 JMGipson. Handle case when starting source is not up.  
 ! 2022-01-06 JMGipson. Removed unused cwrap2_pre. Made do loop more standard. 
 !                      Reduced convergence to .5 secionds.  Write message if fails. 
 ! 2021-11-10 JMGipson  Modified slewing algorithms. 
@@ -155,6 +156,12 @@ C
 
       CALL CVPOS(NSNOW,ISTN,MJD,UT,
      >  AZNOW,ELNOW,HANOW,DECNOW,X30NOW,Y30NOW,X85NOW,Y85NOW,KUP)
+!     
+! If the starting source is not up, must have happened a long time ago.  Exit with slew time 0. 
+      if(.not. kup) then 
+        return 
+      endif 
+     
       if(kdebug) then
          write(*,'("slewt 123: stat=",a, " AZNOW ",f8.2,1x,a2)')
      >      cstnna(istn), aznow*rad2deg,cwrap_cur

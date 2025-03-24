@@ -9,6 +9,7 @@ C
       implicit none 
       include '../skdrincl/skparm.ftni'
       include 'skcom.ftni'
+      include '../skdrincl/skobs.ftni' 
       include '../skdrincl/sourc.ftni'
       include '../skdrincl/statn.ftni'
       include '../skdrincl/freqs.ftni'

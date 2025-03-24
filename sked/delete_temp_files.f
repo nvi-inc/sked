@@ -9,7 +9,7 @@
 ! History
 !   2022-01-10  JMGipson. Added clean_up_obs_scan_counters     
       
-      call clean_up_obs_scan_counters()
+      call clean_up_obs_scan_counters()  
 
       if(kkeep_log) then
          write(*,*) "Keeping ",trim(clgfil)
@@ -28,5 +28,6 @@
       call delete_file(cplfil,lutmp)
       call delete_file(cskselect_file,lutmp)
       call delete_file(cskcontrol_file,lutmp)
-      call delete_file(cskcat_file,lutmp)
+      call delete_file(cskcat_file,lutmp) 
+      
       END

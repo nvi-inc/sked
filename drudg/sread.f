@@ -314,26 +314,11 @@ C Not needed for VEX because they are read in when station is selected.
 C
       endif ! VEX/sked
 
-      isettm = 0
-      itaptm = 1
-      isortm = 5
-
+! Read in additional stuff from SKED file, or from SCHEDULING_PARAM part of vex file.  
       call drprrd(ivexnum)
-! Added 2019Aug25 JMG
-! Intiailze broadband stuff     
-      do istat=1,nstatn
-         bb_bw(istat) =0.0       !set these all to 0. 
-         idata_mbps(istat)=0
-         isink_mbps(istat)=0
-         ibb_off(istat)=0 
-      end do 
-
-      if(.not.kvex) then
-        call read_broadband_section
-      endif
-      if (.not.kgeo) kpostpass=.true.
-C      if (.not.kgeo) kpostpass=.false.
-C
+      call read_broadband_section(ivexnum)  
+  
+  
 C Close the schedule file.
       close(lu_infile)
 

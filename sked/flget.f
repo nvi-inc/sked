@@ -20,7 +20,7 @@ C
       integer trimlen
 C  LOCAL VARIABLES
       character*128 ccat
-      integer lc,ib,is,j,ierr,ilen
+      integer ib,is,j,ierr,ilen
 ! AEM 20041207 add new templorary variable lucat_a and initialize it
       integer lucat_a
       lucat_a = 55
@@ -34,14 +34,14 @@ C  930224 nrv implicit none
 C  940216 nrv Make specified name simply the file, do not prepend a path to it.
 ! 2007Jul02  JMG  Added flux.ftni
 ! 2012Oct10 JMG. Modified to update version, catalog name info. 
+! 2023-10-18 JMGipson. Simplified reading in catalog. 
 
 C
 C
 C    1. Set bands to X/S if none selected yet.
 C
       if (nsourc.le.0) then
-        write(luscn,9101)
-9101    format('FLGET - Select sources first.')
+        write(luscn,'(a)' ) 'FLGET - Select sources first.'
         return
       endif
 C
@@ -60,16 +60,13 @@ C
       else !standard catalog
         ccat = FLUX_CAT
       endif !alternate/standard
-!      OPEN(lucat,file=ccat,status='old',iostat=IERRCM)
-! AEM 20071207 lucat->lucat_a
-      OPEN(lucat_a,file=ccat,status='old',iostat=IERRCM)
-      lc = trimlen(ccat)
+
+      OPEN(lucat_a,file=ccat,status='old',iostat=IERRCM)     
       IF  (IERRCM.NE.0) THEN
-        write(luscn,'("Error ",i5," opening file ",a)')
-     >  ierrcm,ccat(1:lc)
-        RETURN
+       write(luscn,'("Error ",i5," opening file ",a)') ierrcm,trim(ccat)
+       RETURN
       else
-        write(luscn,'("Getting fluxes from file ",a)') ccat(1:lc)
+        write(luscn,'("Getting fluxes from file ",a)') trim(ccat) 
       END IF  !
 C
 
@@ -98,32 +95,21 @@ C
 
 ! Now read in the fluxes.
       cbuf="*"
-      do while (cbuf(1:1) .eq. "*" .or. ilen .eq. 0)  !skip blank lines, or lines that start with *
-!        CALL READF_ASC(lucat,IERR,IBUF,IBLEN,ILEN)
-! AEM 20071207 lucat->lucat_a
-        CALL READF_ASC(lucat_a,IERR,IBUF,IBLEN,ILEN)
-      enddo
-      DO WHILE (IERR.GE.0.AND.ILEN.GE.0) !read each source record
-        CALL FLINP(cBUF,luscn,ierrcm)
-        IF  (IERRCM.NE.0) THEN
-!          CLOSE(lucat)
-! AEM 20071207 lucat->lucat_a
-          CLOSE(lucat_a)
-          RETURN
-        END IF  !
+
+
+! read in the file a line at a time.      
+      do while(.true.) 
+! skip blank lines and comments. if we reach the EOF exit
         cbuf="*"
-        ilen = 0
-        do while (cbuf(1:1) .eq. "*" .or. ilen .eq. 0)  !skip blank lines, or lines that start with *
-          cbuf=" "
-!          CALL READF_ASC(lucat,IERR,IBUF,IBLEN,ILEN)
-! AEM 20071207 lucat->lucat_a
-        CALL READF_ASC(lucat_a,IERR,IBUF,IBLEN,ILEN)
-        enddo
+        do while(cbuf(1:1) .eq. "*" .or. cbuf .eq. " ") 
+          read(lucat_a, '(a)',end=100) cbuf 
+        end do 
+!        write(*,*) trim(cbuf)
+        CALL FLINP(cBUF,luscn,ierrcm)
+        IF  (IERRCM.NE.0) goto 100 
       END DO  !read each source record
 
-C
-!      CLOSE(lucat)
-! AEM 20071207 lucat->lucat_a
+100   continue 
       CLOSE(lucat_a)
       knewfl=.true.
 

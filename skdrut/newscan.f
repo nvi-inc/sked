@@ -33,6 +33,7 @@ C   format for the observation.
 
 C Called by: VOBINP, VOB1INP
 C History
+! 2023-10-03 JMG. Calibration time is no longer hard coded. 
 ! 2021-12-03 JMGipson. Got rid of some calls to ib2as. Was causing problems in some compilers.
 C 960527 nrv New.
 C 970114 nrv change 8 to max_sorlen
@@ -65,7 +66,7 @@ C Local
       character*(2*ibuf_len) cbuf
       equivalence (ibuf,cbuf)
 
-      integer ical,nch,idl,iyr
+      integer nch,idl,iyr
       integer ichmv,ichmv_ch,ib2as
 
 C Initialized for leading zeros, left justified
@@ -74,9 +75,7 @@ C     First clear out the entire buffer
       cbuf=csorna(isor)
       nch=trimlen(cbuf)+1
 
-C     Cal time. Define as 10 for now
-      ical = 10
-      nch = nch + 1 + IB2AS(ICAL,IBUF,NCH+1,3)
+      nch = nch + 1 + IB2AS(ICALde,IBUF,NCH+1,3)
 C     Freq code
       NCH = ICHMV(IBUF,NCH+1,LCODE(ICOD),1,2)
 C     Preob

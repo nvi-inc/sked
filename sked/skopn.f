@@ -27,6 +27,7 @@ C  COMMON BLOCKS:
       include '../skdrincl/statn.ftni'
       include '../skdrincl/freqs.ftni'
       include '../skdrincl/skobs.ftni'
+      include '../skdrincl/broadband.ftni'
       include 'minor.ftni'
       include 'major.ftni'
       include 'astro.ftni'

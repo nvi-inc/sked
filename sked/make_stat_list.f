@@ -1,6 +1,7 @@
       subroutine make_stat_list(cdo,ierr)
 ! Read in antenna catalog, and find matches in current schedule.
 ! history Now put in reverse order.
+! 2023-11-17 John Gipson.  changed 'a8' to a to accomadate longer rack and recorder names. 
 !  2017Dec04  JMGipson. Fixed buf if a) equipment mis-match and b) more than one set of equip for station in catalog
 !  2005Aug10 JMGipson. First version.  removed from stcat.
 !  2005Sep14 JMGipson.  Be more forgiving if cstrec and strack.
@@ -80,10 +81,10 @@
      >        '("MAKE_STAT_LIST: Warning! For station ",a,$)')
      >             cantna(istat)
             write(luscn,*) " Slight mismatch in equipment: "
-            write(luscn,*) "          Rack   Recorder"
-            write(luscn,'("Schedule:  ",a8," ",a8)')
+            write(luscn,*) "          Rack                 Recorder"         
+            write(luscn,'("Schedule:  ",a," ",a)')
      >         cstrack(istat),cstrec(istat,1)
-            write(luscn,'("equip.cat: ",a8," ",a8)')
+            write(luscn,'("equip.cat: ",a," ",a)')
      >         crack_type(irack_ptr),crec_type(irec_ptr)
             write(luscn,*) "This should not effect the schedule "
             kequip_found=.true.
@@ -121,10 +122,10 @@
             write(luscn,'("MAKE_STAT_LIST: Warning! For station ",a,$)')
      >               cantna(istat)
              write(luscn,*) " mismatch in equipment."
-            write(luscn,*) "          Rack   Recorder"
-            write(luscn,'("Schedule:  ",a8," ",a8)')
+            write(luscn,*) "          Rack                 Recorder"
+            write(luscn,'("Schedule:  ",a," ",a)')
      >          cstrack(istat),cstrec(istat,1)
-            write(luscn,'("equip.cat: ",a8," ",a8)')
+            write(luscn,'("equip.cat: ",a," ",a)')
      >          crack_type(irack_ptr),crec_type(irec_ptr)
             cans="X"
             write(luscn,*)"Use catalog equipment? (Y/N/A (A=Y to rest))"

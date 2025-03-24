@@ -50,7 +50,14 @@ C  Local:
        read(iunit,'(a1024)',end=20,iostat=k) ch
        kerr = k
        il   = trimlen(ch)
-       if(il .gt. 0 .and. ch(il:il) .eq. char(13)) then
+       if(il .eq. 0) then
+         ch=" "
+         call char2hol(ch,ibuf,1,ibl)
+         return
+       endif 
+       
+       
+       if(ch(il:il) .eq. char(13)) then
          ch(il:il)=" "
          il=trimlen(ch)
        endif

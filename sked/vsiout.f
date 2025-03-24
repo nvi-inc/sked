@@ -3,6 +3,7 @@ C
 C  This routine writes out the VEX $SITE section.
 C
 C   HISTORY:
+! 2023-09-19 JMG. Removed debugging statement. 
 ! 2021-11-20 JMG. Respect the differenece between step-functions and line-segments. 
 ! 2014-09-16 JMG. Only write out occupation code if we have one!
 C 990606 nrv New. Copied from vsoout.
@@ -49,17 +50,16 @@ C site_ID
         call null_term(cst)
         call fcreate_site_ID(ptr_ch(cst))
 C site_position
-        write(cx,'(f12.3)') stnxyz(1,is)
+        write(cx,'(f13.4)') stnxyz(1,is)
         call null_term(cx)
-        write(cy,'(f12.3)') stnxyz(2,is)
+        write(cy,'(f13.4)') stnxyz(2,is)
         call null_term(cy)
-        write(cz,'(f12.3)') stnxyz(3,is)
+        write(cz,'(f13.4)') stnxyz(3,is)
         call null_term(cz)
         call fcreate_site_position(ptr_ch(cx),ptr_ch('m'//char(0)),
      .                             ptr_ch(cy),ptr_ch('m'//char(0)),
      .                             ptr_ch(cz),ptr_ch('m'//char(0)))
-C horizon_map_az
-        write(*,*) cstnna(is), nhorz(is),klineseg(is)
+C horizon_map_az 
         if (nhorz(is).gt.0) then          
           do iazel=1,2
 !            write(*,*) " "
