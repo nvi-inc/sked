@@ -6,6 +6,9 @@
 ! 2018Feb13. KLB Take into account downtime
 ! 2019Mar16  JMG. Use kastro_src instead of checking rmin_astro, rmax_astro  
 ! 2021-04-27 JMG replace (integer durscan) by (integer idurscan) and introduced (real*4 durscan)
+! 2025-05-08 JMG fixed bug in initializing time duration.  
+! 2025-05-16 JMG Don't limit maximum duration by maxscn.  The  calibration scans may be longer 
+! 2025-05-23 JMG Fixed bug where single station might have scan longer than any other stations. 
 C
 C  FILLCMD checks a schedule for iddle time that can be used
 C    to observe longer the previous scan, and
@@ -73,6 +76,7 @@ C  LOCAL VARIABLES
       integer idur_2max                            
       integer istat_max_dur                        ! station which has the longest duration
       integer istat_2max_dur                       ! station with second longest duration
+      integer imax_dur_in_scan 
      
       integer ih1,im1,is1
       
@@ -155,6 +159,7 @@ C  LOCAL VARIABLES
       knewsk=.true.                  
       kdisplay=.true.
       kdebug_fill=.false. 
+!      kdebug_fill =.true. 
       ltoken=" " 
 
 ! Parse command line.  See above for valid arguments. 
@@ -188,16 +193,16 @@ C  LOCAL VARIABLES
 ! decode the beg/end time of the session and put them in jdstcm / jdencm
       if(NumToken.le.1) then
          if(NumToken .eq. 0) ltoken(1)="BEG-END"     !set up default argument. 
+      endif 
 !stuff the first argument into ckeywd and decode it.          
-         ckeywd=ltoken(1)
-         lkeywd(1)=trimlen(ckeywd) 
-         call gtdtr(lkeywd,ierrcm)
-         if (ierrcm.ne.0) then
-           call wrerr(ierrcm,inumcm)
-           ierr=1
-           return
-         endif
-      endif            
+      ckeywd=ltoken(1)
+      lkeywd(1)=trimlen(ckeywd) 
+      call gtdtr(lkeywd,ierrcm)
+      if (ierrcm.ne.0) then
+        call wrerr(ierrcm,inumcm)
+        ierr=1
+        return
+      endif         
       
 ! Here we check that the fill window overlaps the observation window.
       if(kdebug_fill) then 
@@ -273,7 +278,7 @@ C  LOCAL VARIABLES
            return
         endif
         do i=1,nst                            ! number of stations in the selected subnet
-!           write(*,*) istn(i), cstnna(istn(i))   ! station index, station name
+           if(kdebug_fill)   write(*,*) istn(i), cstnna(istn(i))   ! station index, station name
            kstat_do(istn(i))=.true.
         end do
       endif
@@ -286,7 +291,7 @@ C  LOCAL VARIABLES
 ! These will be updated below. 
       iobs_beg_fill=nobs   
       iobs_end_fill=1   
-      kdebug_fill=.false.
+!     kdebug_fill=.false.
 ! Default is to loop over all scans, but have an alternative exit if past filltime.      
       write(ludsp,'(a,$)') "Starting fill_in: "  
       do iobs=1, nobs               !loop over all the observations.     
@@ -294,11 +299,11 @@ C  LOCAL VARIABLES
 ! put the current observation in the CUR variables.  
         idurcur=0                   ! This makes debugging easier.     
         cbuf=cskobs(iskrec(iobs)) 
-        call unpak(kerr,0)        
+        call unpak(kerr,0)            
         if(kdebug_fill) then      
           write(*,*) "-----New Scan ------------------"    
           write(*,*) "CUR --> ", trim(cbuf)       
-        endif         
+        endif           
           
         istat=istcur(1)                !This is used just to get time and source. 
         mjdnow=mjdcur(istat)
@@ -340,13 +345,15 @@ C  LOCAL VARIABLES
           ical_prv  =icaltst(istat) 
           
           if(kdebug_fill) then
-             write(*,*) "Doit ",ksource_do(isrc_prv),kstat_do(istat) 
+             write(*,*) "Do fill? ",ksource_do(isrc_prv),kstat_do(istat) 
+!             write(*,'(a,11i4)') "idurtst ", idurtst(1:11) 
+!             write(*,*) "max ", max(idurtst(1:32))
           endif 
           
           if(.not.ksource_do(isrc_prv)) cycle                          !CYCLE: Not a source that we do fill for. 
           if(.not.kstat_do(istat))    cycle                            !CYCLE: not doing fill for this station. 
            
-          if(kdebug_fill)  write(*,*) "PRV_TIME ", mjdprv,utprv            
+          if(kdebug_fill)  write(*,*) "PRV_TIME ",mjdprv,utprv       
  
 !  See how long it takes to get from previous source to current source. 
           call when_at_next_source(kdisplay,ludsp,
@@ -371,10 +378,12 @@ C  LOCAL VARIABLES
           idur2down=itime_to_down(mjdprv,utprv,istat)
 ! Find the maximum duration for this station in this scan.
 
-          idur_max=min(idur2down,Maxscn,idur_prv+idleTime)
+! Fixed bug 2025-05-16.  Don't limit filltime by Maxscn 
+!          idur_max=min(idur2down,Maxscn,idur_prv+idleTime)
+          idur_max=min(idur2down,idur_prv+idleTime)          
           if(kdebug_fill) then 
-            writE(*,'(a,4i8)') "idown,Maxscan,idurnew ",
-     &       idur2down,maxscn,idur_prv+idleTime,idur_max
+            writE(*,'(a,4i8)') "time_2_down,idurnew, idur_old", 
+     &       idur2down,idur_max,idur_prv 
           endif 
           if(idur_max .eq. idur_prv) cycle                         !CYCLE: No room to increase the scan length. 
 
@@ -396,7 +405,6 @@ C  LOCAL VARIABLES
           do idurscan = idur_prv+1, idur_max 
 !            write(*,*) "Idurscan ", idurscan 
             CALL CVPOS(isrc_prv,IStat,MJDNow,UTprv+idurscan,
-     &                 AZ2,EL2,HA,DEC,X30,Y30,X85,Y85,KUP)
             if(.not.kup) then
                if(kdebug_fill) write(*,*) "Not up at end "
                 exit                               !EXIT source is not up at the end of the scan.
@@ -466,7 +474,7 @@ C  LOCAL VARIABLES
 !  this could happen because the previous scan it was in was a long time before the end of the FILL window. 
 
       if(kdebug_fill) then 
-        write(*,*) "Fixing up"       
+        write(*,*) "Fixing up XX "       
         do i=1,nstatn
          write(*,*) i, cstnna(i),kstat_do(i), iprv_scan(i)
         end do
@@ -488,8 +496,20 @@ C  LOCAL VARIABLES
           write(*,*) cstnna(i), iprv_scan_ptr
           write(*,*) "----> ", trim(cbuf) 
           write(*,'("Idur before ", 11i4)') idurtst(1:11) 
+        endif   
+        
+! 2025-05-23         
+! Find the maximum scan length of stations in this scan.         
+        imax_dur_in_scan=0
+        do j=1,nstntst
+          istat=isttst(j)
+          imax_dur_in_scan=max(idurtst(istat),imax_dur_in_scan)
+        end do
+        if(kdebug_fill) then
+          write(*,*) "max_dur_in_scan ",imax_dur_in_scan
         endif 
-     
+             
+      
 ! Now loop through all stations in this scan and pick out the ones that have not been done yet.
         do j=1,nstntst
            istat=isttst(j)   
@@ -500,7 +520,7 @@ C  LOCAL VARIABLES
            itime_dif=isecdif(jdencm,utencm,mjdtst(istat),uttst(istat))   
 ! another option is until next downtime.                     
            idur2down=itime_to_down(mjdtst(istat),uttst(istat),istat)           
-           idurscan=min(itime_dif,idur2down,Maxscn) 
+           idurscan=min(itime_dif,idur2down,imax_dur_in_scan) 
 ! NEVER reduce a scan.             
            idurtst(istat)=max(idurscan,idurtst(istat))
 ! Set the station to found.                    

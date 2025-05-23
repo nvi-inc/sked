@@ -1,4 +1,7 @@
  This file contains a brief description of the changes made to sked
+2025-05-23 fillcmd.f           Fixed bug where single station might have scan longer than any other stations. 
+2025-05-16 fillcmd. f          Don't  limit duration by MAXSCCN.  Calibration scans will be longer
+2025-05-08 fillcmd.f           Fixed bug in initializing time duration.
 2025-03-24 sked.f              If exiting with "AB" delete temporary files 
 2025-03-21 chksrcup4scan.f     Previous version was leaving with exit for non-AZ-el Antennas
 2025-03-21 newob.f             Better and more error messages if verbose >=1
