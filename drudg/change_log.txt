@@ -7,7 +7,8 @@ This file contains a summary of changes made and why.
 2023-09-29 JMG. procs.f, proc_lo.f:  Unified treatment of determining kpcal and kpcal_d for VEX and SKD files.  
                  This is done by initializing the sked files in ../skdrut/frinit.f
 2023-02-10 fdrudg.f.  Changed maximum schedule name length to 16. Output file to 18. 
-2023-02-10 proc_thread.f Typographic change in datastrean.
+2023-02-10 proc_thread.f Typographic change in datastream.
+------New  Year
 2022-10-07 vlbah.f, wrhead.f.  Changed handling of octal constant so that new compiler would not complain. 
 2022-10-07 Makefile.  Modified so that compiler would not complain about argument mismatch in calls to subroutines. 
 2022-05-26 Fixed bug in snap.f that affected disk2file. Was not copying iscan_gap to iscan_gap_prev at end of loop

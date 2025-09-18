@@ -405,6 +405,7 @@ C  LOCAL VARIABLES
           do idurscan = idur_prv+1, idur_max 
 !            write(*,*) "Idurscan ", idurscan 
             CALL CVPOS(isrc_prv,IStat,MJDNow,UTprv+idurscan,
+     &                 AZ2,EL2,HA,DEC,X30,Y30,X85,Y85,KUP)
             if(.not.kup) then
                if(kdebug_fill) write(*,*) "Not up at end "
                 exit                               !EXIT source is not up at the end of the scan.

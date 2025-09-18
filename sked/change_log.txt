@@ -1,4 +1,6 @@
  This file contains a brief description of the changes made to sked
+2025-09-18 make_source_list.f  If 1. Source not in catalog and 2. User wishes to continue. Then clear error and mush on.
+2025-09-18 fillcmd.f           Somehow got corrupted. Tried to restore.
 2025-05-23 fillcmd.f           Fixed bug where single station might have scan longer than any other stations. 
 2025-05-16 fillcmd. f          Don't  limit duration by MAXSCCN.  Calibration scans will be longer
 2025-05-08 fillcmd.f           Fixed bug in initializing time duration.
@@ -26,6 +28,7 @@
 2023-02-08   shorter than min, andjust time. (Schedule link is ibegtime-iendtime) 
 2023-01-13 Added in master.i which contians list of valid masterfile types.
 2023-01-13 When checking experiment code in masterfile, make check case insensitive. 
+----New Year
 2022-12-15 return_master_line.f, master_cmd.f:  Modified to handle new format of master file for dates 2023 and onward
 2022-11-03 when_at_next_source.f:  Really fixed it. Promise 
 2022-10-17 when_at_next_source.f:  Fixed  problem with cable wrap for first source

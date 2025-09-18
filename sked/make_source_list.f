@@ -55,8 +55,14 @@
        if(cdo .eq. "a" .or. cdo .eq. "A") goto 100
          write(luscn,'(a)')
      >     " If you continue these will be deleted from the schedule."
-        if(.not. kyes_to_prompt("Continue? (Y/N) ")) return
-                    
+        if(kyes_to_prompt("Continue? (Y/N) ")) then
+          write(*,*) "Continuing"
+          ierr=0
+        else
+          write(*,*) "Aborting "
+          return
+        endif 
+                      
 ! make list only with the number of sources found
       end if !unrecognized code
 
