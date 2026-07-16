@@ -1,0 +1,33 @@
+# Build artifacts
+*.o
+*.a
+*.mod
+*.so
+
+# Compiled executables
+sked/sked
+drudg/drudg
+drudg2/drudg
+*.lnx
+*.lnx_*
+*.hpux
+
+# Editor backups / old-temp source variants
+*~
+*.f0
+*.fn
+*.fold
+*.old
+*.bak
+*.orig
+*.save
+
+# Packaging archives
+*.tgz
+*.tar
+*.tar.gz
+*.zip
+
+# Misc
+core
+gmon.out
