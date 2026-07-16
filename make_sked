@@ -1,0 +1,34 @@
+#!/bin/csh -f
+# ****************************************************************
+# * Makefile for recompiling all executables of sked
+# *
+# * Usage: make_sked
+# *
+# * History:
+# * JMG 2008Mar21  First Version
+# *
+# *********************************************************************************
+#
+# set up the libraries,  compilers etc 
+#source set_misc_gfort64_vlbidev01
+cd curses
+rm *.o
+make
+cd ../skdrlnfch
+rm *.o
+make
+cd ../matrix
+rm *.o
+make
+cd ../skdrut
+rm *.o
+make
+cd ../vex
+rm *.o
+make
+cd ../sked
+rm *.o
+make
+
+
+
