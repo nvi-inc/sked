@@ -7,10 +7,15 @@
 # Compiled executables
 sked/sked
 drudg/drudg
-drudg2/drudg
 *.lnx
 *.lnx_*
 *.hpux
+
+# Generated parser output (regenerate from vex/vex.y + vex/vex.yy.l via bison/flex)
+vex/vex.c
+vex/vex.yy.c
+vex/y.tab.h
+vex/y.tab.c
 
 # Editor backups / old-temp source variants
 *~
